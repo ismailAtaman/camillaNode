@@ -1,0 +1,23 @@
+{
+  "name": "camillanode",
+  "version": "0.0.0",
+  "description": "node based web interface for CamillaDSP",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "IAtaman",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "node-navigator": "^1.0.1",
+    "websocket": "^1.0.34",
+    "websockets": "^0.2.0",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap');
+
+:root {
+    font-family: 'Kdam Thmor Pro', sans-serif;
+    --slider-width: 50px;
+    --slider-height: 200px;
+    --header-bgcolor: #336699;
+    overflow-x: hidden;
+
+}
+
+body {
+    font-family: inherit;
+    background-color: #333333;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.section {
+    width: 100vw;
+    height: auto;    
+    padding: 0.5rem;
+}
+
+#header {
+    display: block;
+    background-color: var(--header-bgcolor);    
+    height: max(10vh,50px);
+}
+
+#title {
+    display: block;    
+}
+
+.menu {
+    display: flex;
+    
+}
+
+.menuItem {
+    margin-top: 1rem;
+    width: 100px;
+    display: inline;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 75%;
+}
+
+.menuItem:hover {
+    color:burlywood;  
+    opacity: 1;
+    transition: all 250ms;
+}
+
+#main {
+    display: grid;
+    grid-template-columns: min(20%,400px) auto;    
+    border:1 solid white;    
+}
+
+#infoBar {
+    display: grid;
+    grid-template-rows: 30% 50% 30%;
+}
+
+
+#messageBox {
+    display: none;
+    position:absolute;
+    left: 50%;
+    top: 50%;
+    width: 400px;
+    height: 250px;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: aliceblue;
+    box-shadow: 10px 10px 10px #222;
+    color:black;
+}
+
+/******************************** SLIDER ********************************************/
+
+.slider-container {
+    margin-top: 0.5rem;
+    position: relative;
+    width: var(--slider-width);
+    height: var(--slider-height);        
+    display: inline-block;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;    
+}
+
+.slider-container:hover {
+    filter: hue-rotate(180deg) grayscale(50%);
+    
+    transition: all 500ms;    
+}
+
+.slider-body {
+    position: relative;
+    width: 20%;
+    height: 100%;
+    left:50%;    
+    background-color: #336699;
+    border-radius: 20px;
+    transform: translateX(-50%);
+}
+
+.slider-knob { 
+    position:relative;    
+    width: 200%;
+    aspect-ratio: 1;
+    background-color: #5588BB;
+    border-radius: 50%;
+    top: 0;
+    left:50%;
+    transform: translateX(-50%);
+}
+
+.eqparam {    
+    display: flex;   
+    appearance: none;
+    justify-content: center;
+    margin-top: 1rem;
+    appearance: none;
+    width:90%;
+    height: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    border: none; 
+    background-color: #DDD;
+    color: black;
+    border-radius: 5px;
+    padding-block:1px;    
+    text-align: center;
+}
+
+.eqparam:hover {
+    background-color: #FFF;
+}

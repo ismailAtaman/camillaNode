@@ -1,0 +1,112 @@
+{
+  "devices": {
+    "samplerate": 44100,
+    "chunksize": 2048,
+    "queuelimit": 4,
+    "silence_threshold": 0,
+    "silence_timeout": 0,
+    "capture": {
+      "type": "Alsa",
+      "channels": 2,
+      "device": "hw:Loopback,0",
+      "format": "S16LE"
+    },
+    "playback": {
+      "type": "Alsa",
+      "channels": 2,
+      "device": "hw:CM38380864,0",
+      "format": "S16LE"
+    },
+    "enable_rate_adjust": false,
+    "target_level": 1024,
+    "adjust_period": 3,
+    "enable_resampling": true,
+    "resampler_type": "FastAsync",
+    "capture_samplerate": 44100,
+    "stop_on_rate_change": false,
+    "rate_measure_interval": 1
+  },
+  "mixers": {},
+  "filters": {
+    "04 - 6100Hz": {
+      "type": "Biquad",
+      "parameters": {
+        "type": "Peaking",
+        "freq": 6100,
+        "q": 2,
+        "gain": 3.7
+      }
+    },
+    "HIGHSHELF": {
+      "type": "Biquad",
+      "parameters": {
+        "type": "Highshelf",
+        "freq": 12000,
+        "slope": 6,
+        "gain": -2
+      }
+    },
+    "02 - 200Hz": {
+      "type": "Biquad",
+      "parameters": {
+        "type": "Peaking",
+        "freq": 200,
+        "q": 0.5,
+        "gain": -3
+      }
+    },
+    "01 - 37Hz": {
+      "type": "Biquad",
+      "parameters": {
+        "type": "Peaking",
+        "freq": 37,
+        "q": 0.5,
+        "gain": 5
+      }
+    },
+    "05 - 8500Hz": {
+      "type": "Biquad",
+      "parameters": {
+        "type": "Peaking",
+        "freq": 8500,
+        "q": 2,
+        "gain": -8.4
+      }
+    },
+    "03 - 3500Hz": {
+      "type": "Biquad",
+      "parameters": {
+        "type": "Peaking",
+        "freq": 3500,
+        "q": 1.4,
+        "gain": 4.6
+      }
+    }
+  },
+  "pipeline": [
+    {
+      "type": "Filter",
+      "channel": 0,
+      "names": [
+        "01 - 37Hz",
+        "02 - 200Hz",
+        "03 - 3500Hz",
+        "04 - 6100Hz",
+        "05 - 8500Hz",
+        "HIGHSHELF"
+      ]
+    },
+    {
+      "type": "Filter",
+      "channel": 1,
+      "names": [
+        "01 - 37Hz",
+        "02 - 200Hz",
+        "03 - 3500Hz",
+        "04 - 6100Hz",
+        "05 - 8500Hz",
+        "HIGHSHELF"
+      ]
+    }
+  ]
+}
