@@ -1,4 +1,6 @@
 
+const MAXDB= 16;
+
 let selectedKnob = null;
 let mouseDownY = 0;
 
@@ -112,21 +114,12 @@ function initEQ() {
         function sliderUpdatePos(slider,mouseY) {
             const yPos = Math.min(sliderMax, Math.max(0,mouseY- sliderTop- sliderKnobHeight/2));
             selectedKnob.style.top = yPos+'px';
-            const num = 12-(24*yPos/sliderMax);
+            const num = MAXDB-(MAXDB*2*yPos/sliderMax);
             slider.value = Math.round((num + Number.EPSILON)*10)/10;            
             gain.value = slider.value+'db';
             slider.dispatchEvent(new Event('change'));     
         }
 
-        function sliderUpdateVal(slider,val) {
-            const sliderKnob = slider.children[0].children[0];            
-            const yPos = ((parseFloat(-val)+12)/24)*sliderMax;
-            // console.log('Val : '+val)            
-            // console.log('sliderMax : '+sliderMax)       
-            // console.log("Move to : " + yPos);
-            sliderKnob.style.top=yPos+'px';
-            slider.dispatchEvent(new Event('change'));    
-        }
 
         let tempFreq;
 
@@ -197,6 +190,22 @@ function initEQ() {
 
 }
 
+function sliderUpdateVal(slider,val) {
+    const sliderKnobHeight = document.getElementsByClassName('slider-container')[0].children[0].children[0].getBoundingClientRect().height;        
+    const sliderMax = document.getElementsByClassName('slider-container')[0].getBoundingClientRect().height-sliderKnobHeight/2;
+
+    
+
+    const sliderKnob = slider.children[0].children[0];            
+    const yPos = ((parseFloat(-val)+MAXDB)/(2*MAXDB))*sliderMax;
+    // console.log('Val : '+val)            
+    // console.log('sliderMax : '+sliderMax)       
+    // console.log("Move to : " + yPos);
+    // console.log(sliderKnob)
+    sliderKnob.style.top=yPos+'px';
+    //slider.dispatchEvent(new Event('change'));    
+}
+
 
 function uploadClick() {
     let filterArray=new Array();
@@ -216,25 +225,41 @@ function uploadClick() {
 
 function downloadClick() {
     downloadConfigFromDSP().then((DSPConfig)=>{
-        //console.log(DSPConfig)
+        // console.log(DSPConfig.filters)
         let filters = DSPConfig.filters;
         i=0;
-        for (const filterName of Object.keys(filters).sort()) {
-            const sliders= document.getElementsByClassName('slider-container');
+        const sliders= document.getElementsByClassName('slider-container');
 
+        for (const filterName of Object.keys(filters).sort()) {        
             sliders[i].children['freq'].value=filters[filterName].parameters.freq+'hz';
             sliders[i].children['gain'].value=filters[filterName].parameters.gain+'db';
-            sliders[i].children['qfact'].value=filters[filterName].parameters.q;
-            
-            const sliderKnob = sliders[i].children[0].children[0];            
-            const yPos = ((parseFloat(filters[filterName].parameters.q)+12)/24)*190;       
-            sliderKnob.style.top=yPos+'px';
+            sliders[i].children['qfact'].value=filters[filterName].parameters.q;            
+            sliderUpdateVal(sliders[i],filters[filterName].parameters.gain);            
             i++;
-            
         }
+
         console.log("Config download successful.");        
     }).catch((err)=>{
         console.log("Failed to download config.")
         console.log(err)
     })
+}
+
+
+function flatten() {
+    const sliders = document.getElementsByClassName('slider-container');
+    for (i=0;i<sliders.length;i++) {
+        sliders[i].children['gain'].value='0db';
+        sliderUpdateVal(sliders[i],0);
+    }
+}
+
+function compress() {
+    const sliders = document.getElementsByClassName('slider-container');
+    for (i=0;i<sliders.length;i++) {
+        let gain=parseFloat(sliders[i].children['gain'].value.replace('db',''));
+        gain==0?gain=0:gain<0?gain++:gain--; 
+        sliders[i].children['gain'].value=gain+'db';
+        sliderUpdateVal(sliders[i],gain);
+    }
 }

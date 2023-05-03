@@ -12,9 +12,11 @@
 <body onload="initEQ()">
 
     <%- include('header.ejs'); %>
-    <div id="main" class="section">      
-        <div class="section" id="equalier"> 
-
+    <div id="eqmain" class="section">      
+        <div class="section" id="eqgraph">
+            <canvas id="eqcanvas" width="100%" height="100%"></canvas>
+        </div>
+        <div class="section" id="equalizer"> 
             <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
@@ -113,9 +115,15 @@
                 <input type="text" class="eqparam" value="0db" id="gain">
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
-        <br><br><br>
-        <input type="button" value="Upload" onclick="uploadClick()">
-        <input type="button" value="Download" onclick="downloadClick();">
+            <br><br><br>
+            <input type="button" value="Upload" onclick="uploadClick()">
+            <input type="button" value="Download" onclick="downloadClick();">
+        </div>
+        <div class="section" id="eqtools">
+            <div class="button" id="Flatten" onclick="flatten()">Flatten</div>
+            <div class="button" id="Compress" onclick="compress()">Compress</div>
+            <div class="button" id="AddBand">Add Band</div>            
+        </div>
     </div>
     
     

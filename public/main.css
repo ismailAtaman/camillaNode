@@ -54,11 +54,51 @@ body {
     
 }
 
-#main {
+#eqmain {
     display: grid;
-    grid-template-columns: min(20%,400px) auto;    
-    border:1 solid white;    
+    grid-template-columns: max(600px,30vw) auto;    
+    grid-auto-rows: auto;
+    gap: 10px;    
 }
+
+#eqgraph {
+    grid-column: 1/ span 2 ;
+    
+    height: 300px;
+}
+
+#eqcanvas {
+    border: 1px solid white;
+    width:  max(700px,30vw);
+    height: 100%;
+}
+
+
+#equalizer {
+    border: none
+}
+
+#eqtools {
+    width: 120px;    
+}
+
+#eqtools .button {
+    width: 100px;
+    font-size: 12px;
+    background-color: #336699;
+    appearance: none;
+    padding: 2px;
+    margin:5px;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 3px;    
+}
+
+#eqtools .button:hover {
+    background-color: #5588BB;
+    transition: all 250ms;
+}
+
 
 #infoBar {
     display: grid;
