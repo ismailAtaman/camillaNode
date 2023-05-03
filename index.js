@@ -14,7 +14,7 @@ app.set('view engine','ejs');
 
 //// Default gets
 app.get('/',(req,res)=>{
-    res.render('index');     
+    res.render('equalizer');     
 }) 
 
 app.get('/server',(req,res)=>{

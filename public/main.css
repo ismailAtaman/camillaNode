@@ -2,8 +2,8 @@
 
 :root {
     font-family: 'Kdam Thmor Pro', sans-serif;
-    --slider-width: 50px;
-    --slider-height: 200px;
+    --slider-width: 2.5em;
+    --slider-height: 10rem;
     --header-bgcolor: #336699;
     overflow-x: hidden;
 
@@ -126,17 +126,18 @@ body {
     display: flex;   
     appearance: none;
     justify-content: center;
-    margin-top: 1rem;
+    margin-top: 0.75rem;
     appearance: none;
     width:90%;
-    height: 20px;
+    height: 15px;
     font-size: 11px;
     cursor: pointer;
     border: none; 
     background-color: #DDD;
     color: black;
     border-radius: 5px;
-    padding-block:1px;    
+    padding:2px;
+    
     text-align: center;
 }
 

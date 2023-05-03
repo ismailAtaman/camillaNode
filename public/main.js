@@ -1,18 +1,8 @@
 
-let server, port;
-let connected = false;
-let ws;
-
-let DSPState;
-let DSPVersion;
-let DSPConfig;
-let DSPDevices;
-
-
 let selectedKnob = null;
 let mouseDownY = 0;
 
-function init() {
+function initEQ() {
 
     const config = window.localStorage.getItem("Config")
     if (config==null) {
@@ -53,7 +43,7 @@ function init() {
     const sliders = document.getElementsByClassName('slider-container');
 
     for (i=0;i<sliders.length;i++) {
-        console.log("Doing slider "+ i);             
+        //console.log("Doing slider "+ i);             
 
         const slider = sliders[i]
         const sliderBody = slider.children[0];
@@ -70,7 +60,6 @@ function init() {
         const sliderMax = sliderHeight-sliderKnobHeight/2;
 
         sliderKnob.style.top=(sliderMax)/2+'px';
-
 
         document.addEventListener('mouseup',function() {
             selectedKnob=null;
@@ -201,100 +190,33 @@ function init() {
             console.log(text);  
             if (isNaN(text)) text=tempFreq;
             this.value=text;               
-            slider.dispatchEvent(new Event('change'));             
-            updatePipeline()
+            slider.dispatchEvent(new Event('change'));                       
         })
     }
 
-    
 
 }
 
 
-function sendCommand(WSObject,messageObject) {
-    ws.send(JSON.stringify(message));
-}
-
-function sendCommand() {
-    const cmd = document.getElementById('cmd').value;
-    ws.send(JSON.stringify(cmd));
-}
-
-function updatePipeline() {    
-    let pipeline = new Array();
-
-    const sliderList = document.getElementsByClassName('slider-container')
-    let filterNames = new Array();
-    for (i=0;i<sliderList.length;i++) {
-        filterNames.push("Filter_"+i);
+function uploadClick() {
+    let filterArray=new Array();
+    const sliders = document.getElementsByClassName('slider-container');
+    for (i=0;i<sliders.length;i++) {
+        let filter = new Object()
+        filter['Filter'+i] = {
+            "freq"  : parseFloat(sliders[i].children['freq'].value.replace('hz','')),
+            "gain"  : parseFloat(sliders[i].children['gain'].value.replace('db','')),
+            "q"     : parseFloat(sliders[i].children['qfact'].value)
+        }
+        filterArray.push(filter);
     }
-    
-    pipeline.push({
-          "type": "Filter",
-          "channel": 0,
-          "names": filterNames
-        })
-
-    pipeline.push(channel1 = {
-        "type": "Filter",
-        "channel": 1,
-        "names": filterNames
-        })
-
-    return pipeline;
-        
+    //console.log(filterArray);
+    uploadConfigToDSP(filterArray)
 }
 
-function updateFilters() {
-    let filters = new Object();
-
-    const sliderList = document.getElementsByClassName('slider-container')
-    for (i=0;i<sliderList.length;i++) {          
-        let filterName = "Filter_"+i;                
-        filters[filterName] = {
-            "type": "Biquad",
-            "parameters": {
-            "type": "Peaking",
-            "freq": parseFloat(sliderList[i].children['freq'].value),
-            "q": parseFloat(sliderList[i].children['qfact'].value),
-            "gain": parseFloat(sliderList[i].children['gain'].value),
-            }
-        }            
-    }
-    //console.log(filters)
-    return filters;
-}
-
-async function uploadConfig() {
-    let pipeline = updatePipeline();
-    let filters = updateFilters();
-    DSPConfig.filters=filters;
-    DSPConfig.pipeline=pipeline;
-    
-    //console.log(DSPConfig)
-
-    let message={'SetConfigJson':JSON.stringify(DSPConfig)};
-    sendDSPMessage(message);
-    
-}
-
-async function saveConfig() {
-    fetch('/saveConfig',{
-        method: "POST",
-        headers: {
-            'Accept' : 'application/json',
-            'content-type' : 'application/json'
-        },
-        body: JSON.stringify(DSPConfig)});    
-}
-
-async function getConfig() {
-    message="GetConfigJson";
-    sendDSPMessage(message);  
-}
-
-function loadConfig() {
-    sendDSPMessage('GetConfigJson').then(()=>{
+function downloadClick() {
+    downloadConfigFromDSP().then((DSPConfig)=>{
+        //console.log(DSPConfig)
         let filters = DSPConfig.filters;
         i=0;
         for (const filterName of Object.keys(filters).sort()) {
@@ -310,76 +232,9 @@ function loadConfig() {
             i++;
             
         }
-    }).error(()=>{console.log("Error loading config")})
-
+        console.log("Config download successful.");        
+    }).catch((err)=>{
+        console.log("Failed to download config.")
+        console.log(err)
+    })
 }
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-async function sendDSPMessage(message) {
-    return new Promise((resolve,reject)=>{
-        ws.send(JSON.stringify(message));        
-        
-        ws.addEventListener('message',function(m){
-            const res = JSON.parse(m.data);     
-            // console.log(res);
-
-            const responseCommand = Object.keys(res)[0];
-            const result = res[responseCommand].result;
-            const value =  res[responseCommand].value;
-
-            // console.log("Command : "+responseCommand)
-            // console.log("Result : "+result)
-            // console.log("Value : "+value)
-
-            switch (responseCommand) {
-                case 'GetVersion':
-                    if (result=='Ok') {
-                        DSPVersion=JSON.parse(value);    
-                        resolve();
-                    }
-                    break;        
-        
-                case 'GetConfigJson':
-                    if (result=='Ok') {
-                        DSPConfig=JSON.parse(value);    
-                        resolve();
-                    }
-                    break;                            
-                            
-                case 'SetConfigJson':
-                    if (result=='Ok') {                        
-                        resolve();
-                    }
-                    break;        
-        
-                case 'GetState':
-                    if (result=='Ok') {            
-                        DSPState=value;
-                        console.log(DSPState);            
-                        resolve();
-                    }
-
-                default:
-                    console.log("Unhandled DSP message")
-                    console.log(res);
-            }
-
-            resolve(true);
-        })
-
-        ws.addEventListener('error',function(m){
-            reject(m.data);
-        })
-
-    })     
-}
-
-

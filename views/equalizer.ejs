@@ -6,15 +6,16 @@
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
     <title>CamillaDSP</title>
     <script src="camillaControl.js"></script>
+    <script src="main.js"></script>
     <link rel="stylesheet" href="main.css">
 </head>
-<body onload="init()">
+<body onload="initEQ()">
 
     <%- include('header.ejs'); %>
     <div id="main" class="section">      
         <div class="section" id="equalier"> 
 
-            <div class="slider-container" id="slider1">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -24,7 +25,7 @@
 
             </div>
         
-            <div class="slider-container" id="slider2">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -35,7 +36,7 @@
                 
             </div>
         
-            <div class="slider-container" id="slider3">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -44,7 +45,7 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
         
-            <div class="slider-container" id="slider4">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -53,17 +54,7 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
         
-            <div class="slider-container" id="slider5">
-                <div class="slider-body">
-                    <div class="slider-knob"> </div>
-                </div>
-        
-                <input type="text" class="eqparam" value="200hz" id="freq">
-                <input type="text" class="eqparam" value="0db" id="gain">
-                <input type="text" class="eqparam" value="1.41" id="qfact">
-            </div>
-
-            <div class="slider-container" id="slider6">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -73,7 +64,7 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
 
-            <div class="slider-container" id="slider7">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -83,7 +74,7 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
 
-            <div class="slider-container" id="slider8">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -93,7 +84,7 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
 
-            <div class="slider-container" id="slider9">
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -103,7 +94,17 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
 
-            <div class="slider-container" id="slider10">
+            <div class="slider-container">
+                <div class="slider-body">
+                    <div class="slider-knob"> </div>
+                </div>
+        
+                <input type="text" class="eqparam" value="200hz" id="freq">
+                <input type="text" class="eqparam" value="0db" id="gain">
+                <input type="text" class="eqparam" value="1.41" id="qfact">
+            </div>
+
+            <div class="slider-container">
                 <div class="slider-body">
                     <div class="slider-knob"> </div>
                 </div>
@@ -113,8 +114,8 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
         <br><br><br>
-        <input type="button" value="Upload" onclick="uploadConfig()">
-        <input type="button" value="Download" onclick="loadConfig();">
+        <input type="button" value="Upload" onclick="uploadClick()">
+        <input type="button" value="Download" onclick="downloadClick();">
     </div>
     
     
