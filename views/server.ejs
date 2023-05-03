@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=100vw, initial-scale=1.0">
+    <title>CamillaDSP</title>
+    <script src="camillaControl.js"></script>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+<%- include('header.ejs'); %>
+
+<div class="section" id="serverSettings">
+    <span>Server IP : </span><input type="text" name="server" id="server">
+    <span>Server Port : </span><input type="text" name="port" id="port">
+    <br>
+    <input type="button" value="Save" onclick="saveServerConfig()">
+    <br>
+    <br>
+
+</div>
+<div id="status" style="font-size:12px; margin-top: 2rem; margin-left: 0.5rem;"></div>
+
+<script>
+    const config = window.localStorage.getItem("Config")
+    let statusBox = document.getElementById("status");
+    if (config==null) {            
+        statusBox.innerText="No server configuration found."
+        statusBox.style.color="#FFBBBB";
+
+    } else {            
+        const sConfig = JSON.parse(config);            
+        console.log(sConfig)
+        document.getElementById("server").value = sConfig.server; 
+        document.getElementById("port").value = sConfig.port;
+    }
+    
+    function saveServerConfig() {
+        // Check if can connect to server
+        
+
+
+        let server = document.getElementById("server").value;
+        let port = document.getElementById("port").value;
+        let statusBox = document.getElementById("status");
+
+        checkConnection(server,port).then(()=>{
+            statusBox.innerText="Successfully connected to camillaDSP version "+CamillaDSPVersion;
+            statusBox.style.color="#DDFFDD";
+        }).catch((error)=>{
+            statusBox.innerText="Error connectiong to server."
+            statusBox.style.color="#FFBBBB";
+            console.log(error)});
+
+
+        sConfig = {
+            "server":server,
+            "port" : port
+        };
+        window.localStorage.setItem("Config",JSON.stringify(sConfig));
+    }
+    
+    async function checkConnection(server,port) {
+        return new Promise((resolve,reject)=>{
+            let tmpWS = new WebSocket("ws://"+server+":"+port);
+
+            tmpWS.addEventListener("error", function (m){
+                reject({"Status":"Error","Reason":"Can not connect to server.","Details":m});
+                
+            });
+
+            tmpWS.addEventListener("open", (event) => {            
+                message="GetVersion";
+                tmpWS.send(JSON.stringify(message));        
+            });
+
+            tmpWS.addEventListener("message", function (m){
+                try {
+                    const res = JSON.parse(m.data);                                                                   
+                    if (res['GetVersion'].result=='Ok') {
+                        CamillaDSPVersion=res['GetVersion'].value;                        
+                        resolve("Success");
+                    }          
+                }
+                catch(err) {
+                    reject({"Status":"Error","Reason":"Can not connect to server.","Details":err});
+                }  
+            })
+        });       
+    }
+
+</script>
+</body>
+
+
+
+</html>

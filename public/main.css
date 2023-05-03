@@ -26,7 +26,7 @@ body {
 #header {
     display: block;
     background-color: var(--header-bgcolor);    
-    height: max(10vh,50px);
+    height: max(5vh,55px);
 }
 
 #title {
@@ -49,8 +49,9 @@ body {
 
 .menuItem:hover {
     color:burlywood;  
-    opacity: 1;
+    opacity: 1;    
     transition: all 250ms;
+    
 }
 
 #main {
@@ -141,4 +142,16 @@ body {
 
 .eqparam:hover {
     background-color: #FFF;
+}
+
+#serverSettings {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 100px 150px;
+}
+
+#serverSettings input[type="button"] {
+    margin-top: 1rem;
+    width: 50%;
+    margin-left: 50%;
 }

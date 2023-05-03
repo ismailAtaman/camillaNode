@@ -1,0 +1,24 @@
+
+
+<div id="header" class="section">
+    <div id="title">CamillaDSP Control</div> 
+    <div class="menu">      
+        <div class="menuItem" target="/server">Server</div> 
+        <div class="menuItem" target="/device">Device</div> 
+        <div class="menuItem" target="/">Equalizer</div>         
+        <div class="menuItem" target="/mixers">Mixers</div>    
+        <div class="menuItem" target="/pipeline">Pipeline</div>    
+    </div>
+</div>    
+
+<script>    
+        console.log("Header script")
+        const menuItems = document.getElementsByClassName('menuItem')
+        // console.log(menuItems)
+        for (i=0;i<menuItems.length;i++) {            
+            menuItems[i].addEventListener('click',function(){
+                window.location.href=this.getAttribute('target');
+            })
+        }
+    
+</script>

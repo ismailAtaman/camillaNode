@@ -9,17 +9,8 @@
     <link rel="stylesheet" href="main.css">
 </head>
 <body onload="init()">
-    <div id="header" class="section">
-        <div id="title">CamillaDSP Control</div> 
-        <div class="menu">      
-            <div class="menuItem">Server</div> 
-            <div class="menuItem">Device</div> 
-            <div class="menuItem">Equalizer</div>         
-            <div class="menuItem">Mixers</div>    
-            <div class="menuItem">Pipeline</div>    
-        </div>
-    </div>    
 
+    <%- include('header.ejs'); %>
     <div id="main" class="section">      
         <div class="section" id="equalier"> 
 
@@ -70,9 +61,60 @@
                 <input type="text" class="eqparam" value="200hz" id="freq">
                 <input type="text" class="eqparam" value="0db" id="gain">
                 <input type="text" class="eqparam" value="1.41" id="qfact">
-        </div>
+            </div>
+
+            <div class="slider-container" id="slider6">
+                <div class="slider-body">
+                    <div class="slider-knob"> </div>
+                </div>
+        
+                <input type="text" class="eqparam" value="200hz" id="freq">
+                <input type="text" class="eqparam" value="0db" id="gain">
+                <input type="text" class="eqparam" value="1.41" id="qfact">
+            </div>
+
+            <div class="slider-container" id="slider7">
+                <div class="slider-body">
+                    <div class="slider-knob"> </div>
+                </div>
+        
+                <input type="text" class="eqparam" value="200hz" id="freq">
+                <input type="text" class="eqparam" value="0db" id="gain">
+                <input type="text" class="eqparam" value="1.41" id="qfact">
+            </div>
+
+            <div class="slider-container" id="slider8">
+                <div class="slider-body">
+                    <div class="slider-knob"> </div>
+                </div>
+        
+                <input type="text" class="eqparam" value="200hz" id="freq">
+                <input type="text" class="eqparam" value="0db" id="gain">
+                <input type="text" class="eqparam" value="1.41" id="qfact">
+            </div>
+
+            <div class="slider-container" id="slider9">
+                <div class="slider-body">
+                    <div class="slider-knob"> </div>
+                </div>
+        
+                <input type="text" class="eqparam" value="200hz" id="freq">
+                <input type="text" class="eqparam" value="0db" id="gain">
+                <input type="text" class="eqparam" value="1.41" id="qfact">
+            </div>
+
+            <div class="slider-container" id="slider10">
+                <div class="slider-body">
+                    <div class="slider-knob"> </div>
+                </div>
+        
+                <input type="text" class="eqparam" value="200hz" id="freq">
+                <input type="text" class="eqparam" value="0db" id="gain">
+                <input type="text" class="eqparam" value="1.41" id="qfact">
+            </div>
         <br><br><br>
         <input type="button" value="Upload" onclick="uploadConfig()">
+        <input type="button" value="Download" onclick="loadConfig();">
     </div>
     
     

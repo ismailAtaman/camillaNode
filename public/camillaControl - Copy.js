@@ -11,8 +11,6 @@ let ws;
 let DSPConfig;
 let DSPDevices;
 
-let CamillaDSPVersion;
-
 let selectedKnob = null;
 let mouseDownY = 0;
 
@@ -51,8 +49,9 @@ function init() {
         ws.send(JSON.stringify(message));        
     });
 
-    ws.addEventListener("message", function (m){
-
+    ws.addEventListener("message", processMessage(m));
+    
+    function processMessage(m) {
         const res = JSON.parse(m.data);     
         console.log("WS Message Received")
         console.log(res);
@@ -70,8 +69,7 @@ function init() {
                 console.log("Upload successful.")
             }            
         }
-    });
-    
+    };
 
     
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,46 +297,9 @@ async function uploadConfig() {
     DSPConfig.filters=filters;
     DSPConfig.pipeline=pipeline;
     
-    // console.log(DSPConfig)
+    console.log(DSPConfig)
 
     let message={'SetConfigJson':JSON.stringify(DSPConfig)};
     ws.send(JSON.stringify(message));      
-    
-}
-
-async function saveConfig() {
-    fetch('/saveConfig',{
-        method: "POST",
-        headers: {
-            'Accept' : 'application/json',
-            'content-type' : 'application/json'
-        },
-        body: JSON.stringify(DSPConfig)});    
-}
-
-async function getConfig() {
-    message="GetConfigJson";
-    ws.send(JSON.stringify(message));        
-}
-
-function loadConfig() {
-    getConfig()
-    let filters = DSPConfig.filters;
-    i=0;
-    for (const filterName of Object.keys(filters).sort()) {
-        const sliders= document.getElementsByClassName('slider-container');
-
-        sliders[i].children['freq'].value=filters[filterName].parameters.freq+'hz';
-        sliders[i].children['gain'].value=filters[filterName].parameters.gain+'db';
-        sliders[i].children['qfact'].value=filters[filterName].parameters.q;
-        
-        const sliderKnob = sliders[i].children[0].children[0];            
-        const yPos = ((parseFloat(filters[filterName].parameters.q)+12)/24)*190;       
-        sliderKnob.style.top=yPos+'px';
-
-
-        i++;
-        
-    }
-
+    //uploadConfig = new Promise(resolve,reject);
 }
