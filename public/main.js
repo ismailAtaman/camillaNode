@@ -6,7 +6,9 @@ let mouseDownY = 0;
 
 function initEQ() {
 
+    
     const config = window.localStorage.getItem("Config")
+    
     if (config==null) {
         console.log("No configuration found.");        
         window.location.href='/server';
@@ -36,6 +38,20 @@ function initEQ() {
     ws.addEventListener("open", (event) => {
         connected=true;
         console.log("Connected");        
+        sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r});
+        let message ={}
+        message["SetUpdateInterval"]=100;
+        sendDSPMessage(message);
+
+        setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
+            let level=isNaN(r[0])?-100:r[0];
+            if (level<-100) level=-100;
+            level=100+level;
+            // console.log(level);
+            document.getElementById('levelBar').style.width=(2*level)+'px';
+
+        })},100)
+        setInterval (function(){sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r} )  },5000)
     });
     
     ////////////////////////////////////////////////////////////////////////////////////////////

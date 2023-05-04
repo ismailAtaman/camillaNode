@@ -33,6 +33,7 @@ body {
     display: block;    
 }
 
+
 .menu {
     display: flex;
     
@@ -50,8 +51,23 @@ body {
 .menuItem:hover {
     color:burlywood;  
     opacity: 1;    
-    transition: all 250ms;
-    
+    transition: all 250ms;    
+}
+
+#state {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+}
+
+#levelBar {
+    position: absolute;
+    top: 60px;
+    right: 0px;
+    width: 10px;
+    height: 10px;
+    background-color: #07f1ee;    
 }
 
 #eqmain {

@@ -9,7 +9,8 @@ async function connect() {
         ws = new WebSocket("ws://"+server+":"+port);
 
         ws.addEventListener("error", function (m){
-            reject({"Status":"Error","Reason":"Can not connect to server.","Details":m});
+            reject({"Status":"Error","Reason":"Can not connect to server."});
+            console.log(m.data);
             
         });
 
@@ -148,16 +149,37 @@ async function sendDSPMessage(message) {
         
                 case 'GetState':
                     if (result=='Ok') {            
-                        DSPState=value;
-                        console.log(DSPState);            
+                        DSPState=value;                        
                         resolve(DSPState);
                     } else {
                         reject(value)
                     }
 
+                case "GetPlaybackSignalPeak":
+                    if (result=='Ok') {                                             
+                        resolve(value);
+                    } else {
+                        reject(value)
+                    }
+                    break;
+                case "GetPlaybackSignalRms":
+                    if (result=='Ok') {                                             
+                        resolve(value);
+                    } else {
+                        reject(value)
+                    }    
+                    break;                
+                case "SetUpdateInterval":
+                    if (result=='Ok') {                                             
+                        resolve(value);
+                    } else {
+                        reject(value)
+                    }    
+                    break;                
                 default:
                     console.log("Unhandled DSP message")
                     console.log(res);
+                    resolve(value)
             }
 
             resolve(true);
