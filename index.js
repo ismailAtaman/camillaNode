@@ -30,8 +30,12 @@ app.post('/saveConfig',(req,res)=>{
     req.on('data', function(chunk) {
         queryResponse+=chunk;        
     }).on('end', function(){
-        console.log(JSON.parse(queryResponse));      
-        fs.writeFileSync('')
+        let config = JSON.parse(queryResponse);      
+        console.log(config)
+        let fileName = './'+config.configName+'.json'
+        console.log(fileName)
+        let fileBuffer = Buffer.from(JSON.stringify(config),'utf-8');
+        fs.writeFileSync(fileName,fileBuffer);        
     });
     
 }) 

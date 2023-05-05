@@ -122,14 +122,14 @@ function convertFilterArayToJSON(filterArray) {
 }
 
 
-async function saveConfig() {
+async function saveConfig(config) {
     fetch('/saveConfig',{
         method: "POST",
         headers: {
             'Accept' : 'application/json',
             'content-type' : 'application/json'
         },
-        body: JSON.stringify(DSPConfig)});    
+        body: JSON.stringify(config)});    
 }
 
 async function getConfig() {

@@ -250,9 +250,7 @@ function uploadClick() {
     let filterArray= createFilterArray()
     //console.log(filterArray);
     uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
-
 }
-
 
 function downloadClick() {
     downloadConfigFromDSP().then((DSPConfig)=>{
@@ -263,7 +261,7 @@ function downloadClick() {
         applyFilters(filters);
         
         console.log("Config download successful.");        
-        displayMessage("Config download successful");
+        displayMessage("Download successful");
     }).catch((err)=>{
         console.log("Failed to download config.")
         console.log(err)
@@ -314,6 +312,11 @@ function compress() {
 }
 
 function saveClick() {    
+    let testName = document.getElementById('configName').value;    
+    let testArray=createFilterArray();      
+    saveConfig(({"configName":testName,"filterArray":testArray}));
+    return;
+
     let configName = document.getElementById('configName').value;    
     if (configName.length==0) return;
     
@@ -349,6 +352,7 @@ function saveClick() {
     
     window.localStorage.setItem('ConfigList',JSON.stringify(configList));    
     configName.value="";
+    saveConfig()
 
     updateConfigList();
 
@@ -383,6 +387,10 @@ function updateConfigList() {
         // div.addEventListener('mouseout',function (){
         //     this.contextMenu.style.display='none';
         // })
+
+        div.addEventListener('contextmenu',function(e){
+            e.preventDefault();            
+        })
 
         div.setAttribute('filterArray',JSON.stringify(config.filterArray));
         configList.appendChild(div);
