@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 const fs = require('fs');
 const WebSocket = require('ws');
-const client = new WebSocket('ws://192.168.50.74:1234')
+// const client = new WebSocket('ws://192.168.50.74:1234')
 
 //// Global settings
 app.use(express.static('public'));
@@ -39,20 +39,20 @@ app.post('/saveConfig',(req,res)=>{
 
 
 
-client.on('error', (e)=> {
-    console.log(e);   
-})
+// client.on('error', (e)=> {
+//     console.log(e);   
+// })
 
-client.on('message', (m)=>{
-    //const mObj = JSON.parse(m);
-    //console.log(mObj);  
+// client.on('message', (m)=>{
+//     //const mObj = JSON.parse(m);
+//     //console.log(mObj);  
     
-})
+// })
 
-client.on('open', ()=>{
-    console.log('WS Connected')
-    message="GetVersion"
-    client.send(JSON.stringify(message))    
-})
+// client.on('open', ()=>{
+//     console.log('WS Connected')
+//     message="GetVersion"
+//     client.send(JSON.stringify(message))    
+// })
 
 app.listen(PORT,console.log(`CamillaNode is running on port ${PORT}...`));

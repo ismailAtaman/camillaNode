@@ -76,11 +76,50 @@ async function uploadConfigToDSP(filterArray) {
     DSPConfig.filters=filters;
     DSPConfig.pipeline=pipeline;
 
-    let message={'SetConfigJson':JSON.stringify(DSPConfig)};
-    sendDSPMessage(message).then(()=>{console.log('Upload successful');}).catch(()=>{console.log('Upload failed.')});
+    return new Promise((resolve,reject)=>{
+        let message={'SetConfigJson':JSON.stringify(DSPConfig)};    
+        sendDSPMessage(message).then(()=>{console.log('Upload successful');resolve()}).catch(()=>{console.log('Upload failed.');reject()});
+    })
+    
     
 }
-    
+
+function convertFilterArayToJSON(filterArray) {
+    let filters = new Object();
+    let pipeline = new Array();      
+    let filterNameArray = new Array();
+
+    // console.log(filterArray)
+    for (let filter of filterArray) {
+        let filterName=Object.keys(filter)[0];
+        filters[filterName] = {
+            "type": "Biquad",
+            "parameters": {
+            "type": "Peaking",
+            "freq": filter[filterName].freq,
+            "q": filter[filterName].q,
+            "gain": filter[filterName].gain,
+            }                    
+        }
+        filterNameArray.push(filterName);
+    }
+    pipeline.push({
+        "type": "Filter",
+        "channel": 0,
+        "names": filterNameArray
+    })
+
+    pipeline.push(channel1 = {
+        "type": "Filter",
+        "channel": 1,
+        "names": filterNameArray
+    })
+
+    let sliderJSON = {}
+    sliderJSON.filters=filters;
+    sliderJSON.pipeline=pipeline;
+    return sliderJSON;
+}
 
 
 async function saveConfig() {
@@ -155,6 +194,8 @@ async function sendDSPMessage(message) {
                         reject(value)
                     }
 
+                    break;
+
                 case "GetPlaybackSignalPeak":
                     if (result=='Ok') {                                             
                         resolve(value);
@@ -162,6 +203,7 @@ async function sendDSPMessage(message) {
                         reject(value)
                     }
                     break;
+
                 case "GetPlaybackSignalRms":
                     if (result=='Ok') {                                             
                         resolve(value);
@@ -169,6 +211,7 @@ async function sendDSPMessage(message) {
                         reject(value)
                     }    
                     break;                
+
                 case "SetUpdateInterval":
                     if (result=='Ok') {                                             
                         resolve(value);
@@ -178,8 +221,7 @@ async function sendDSPMessage(message) {
                     break;                
                 default:
                     console.log("Unhandled DSP message")
-                    console.log(res);
-                    resolve(value)
+                    console.log(res);                    
             }
 
             resolve(true);

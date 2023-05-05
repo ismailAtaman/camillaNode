@@ -116,11 +116,20 @@
                 <input type="text" class="eqparam" value="1.41" id="qfact">
             </div>
             <br><br><br>
-            <input type="button" value="Upload" onclick="uploadClick()">
-            <input type="button" value="Download" onclick="downloadClick();">
+            <div class="button" onclick="uploadClick()">Upload</div>
+            <div class="button" onclick="downloadClick()">Download</div>
+            
+            <br><br>
+            <input type="text" name="configName" id="configName">
+            <input type="button" value="Save" onclick="saveClick();">
+            <div id="configList">
+                <div class="config" id="0">Kiwi Ears Cadenza</div>
+            </div>
+
         </div>
         <div class="section" id="eqtools">
             <div class="button" id="Flatten" onclick="flatten()">Flatten</div>
+            <div class="button" id="Flatten" onclick="reset()">Reset</div>
             <div class="button" id="Compress" onclick="compress()">Compress</div>
             <div class="button" id="AddBand">Add Band</div>            
         </div>
@@ -129,6 +138,10 @@
     
     <br>
     <div id="messageBox"></div>
+    <div id="contextMenu">
+        <div class="button small" id="contexMenuApply">Apply</div>
+        <div class="button small" id="contextMenuDelete">Delete</div>
+    </div>
 <!-- 
     <input type="text" name="cmd" id="cmd">
     <input type="button" value="send" id="sendButton" onclick="sendCommand()">

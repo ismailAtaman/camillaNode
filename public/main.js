@@ -1,5 +1,6 @@
 
 const MAXDB= 16;
+const defaultFreqList = [30,100,200,800,1000,2000,4000,6000,8000,12000]
 
 let selectedKnob = null;
 let mouseDownY = 0;
@@ -134,6 +135,9 @@ function initEQ() {
             slider.value = Math.round((num + Number.EPSILON)*10)/10;            
             gain.value = slider.value+'db';
             slider.dispatchEvent(new Event('change'));     
+
+            let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/180));    
+            sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
         }
 
 
@@ -203,6 +207,7 @@ function initEQ() {
         })
     }
 
+    updateConfigList()
 
 }
 
@@ -210,20 +215,22 @@ function sliderUpdateVal(slider,val) {
     const sliderKnobHeight = document.getElementsByClassName('slider-container')[0].children[0].children[0].getBoundingClientRect().height;        
     const sliderMax = document.getElementsByClassName('slider-container')[0].getBoundingClientRect().height-sliderKnobHeight/2;
 
-    
-
     const sliderKnob = slider.children[0].children[0];            
     const yPos = ((parseFloat(-val)+MAXDB)/(2*MAXDB))*sliderMax;
+    
+    sliderKnob.style.top=yPos+'px';
+    
+    let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/180));    
+    sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
+
     // console.log('Val : '+val)            
     // console.log('sliderMax : '+sliderMax)       
     // console.log("Move to : " + yPos);
     // console.log(sliderKnob)
-    sliderKnob.style.top=yPos+'px';
     //slider.dispatchEvent(new Event('change'));    
 }
 
-
-function uploadClick() {
+function createFilterArray() {
     let filterArray=new Array();
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
@@ -235,30 +242,45 @@ function uploadClick() {
         }
         filterArray.push(filter);
     }
-    //console.log(filterArray);
-    uploadConfigToDSP(filterArray)
+    return filterArray;
 }
+
+
+function uploadClick() {
+    let filterArray= createFilterArray()
+    //console.log(filterArray);
+    uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
+
+}
+
 
 function downloadClick() {
     downloadConfigFromDSP().then((DSPConfig)=>{
-        // console.log(DSPConfig.filters)
+         //console.log(DSPConfig.filters)
         let filters = DSPConfig.filters;
-        i=0;
-        const sliders= document.getElementsByClassName('slider-container');
+        console.log(filters)
 
-        for (const filterName of Object.keys(filters).sort()) {        
-            sliders[i].children['freq'].value=filters[filterName].parameters.freq+'hz';
-            sliders[i].children['gain'].value=filters[filterName].parameters.gain+'db';
-            sliders[i].children['qfact'].value=filters[filterName].parameters.q;            
-            sliderUpdateVal(sliders[i],filters[filterName].parameters.gain);            
-            i++;
-        }
-
+        applyFilters(filters);
+        
         console.log("Config download successful.");        
+        displayMessage("Config download successful");
     }).catch((err)=>{
         console.log("Failed to download config.")
         console.log(err)
     })
+}
+
+function applyFilters(filters) {
+    i=0;
+    const sliders= document.getElementsByClassName('slider-container');
+    for (const filterName of Object.keys(filters).sort()) {        
+        //console.log(filterName);
+        sliders[i].children['freq'].value=filters[filterName].parameters.freq+'hz';
+        sliders[i].children['gain'].value=filters[filterName].parameters.gain+'db';
+        sliders[i].children['qfact'].value=filters[filterName].parameters.q;            
+        sliderUpdateVal(sliders[i],filters[filterName].parameters.gain);            
+        i++;
+    }
 }
 
 
@@ -270,12 +292,138 @@ function flatten() {
     }
 }
 
+function reset() {
+    const sliders = document.getElementsByClassName('slider-container');
+    for (i=0;i<sliders.length;i++) {
+        sliders[i].children['gain'].value='0db';
+        sliders[i].children['qfact'].value='1.4';
+        sliders[i].children['freq'].value=defaultFreqList[i]+'hz';
+        sliderUpdateVal(sliders[i],0);
+    }
+}
+
 function compress() {
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
         let gain=parseFloat(sliders[i].children['gain'].value.replace('db',''));
         gain==0?gain=0:gain<0?gain++:gain--; 
+        if (Math.abs(gain)<1) gain=0;
         sliders[i].children['gain'].value=gain+'db';
         sliderUpdateVal(sliders[i],gain);
     }
+}
+
+function saveClick() {    
+    let configName = document.getElementById('configName').value;    
+    if (configName.length==0) return;
+    
+    let configList = window.localStorage.getItem('ConfigList');    
+    !configList?configList= new Array():configList=JSON.parse(configList);
+
+    let nameExists= configList.find(e=>e.configName==configName)?true:false;
+    if (nameExists) {
+        function overrideClick() {
+            alert("override")
+        }
+
+        displayMessage("Name already in use!",
+            {
+                "persist":true,
+                "timeout":1500,
+                "type":"question",
+                "buttons":[
+                    {
+                        "text":"Override",
+                        "className":"button",
+                        "clickEvent":overrideClick
+                    }
+                ]
+            });
+        return;
+    }
+
+    let filterArray=createFilterArray();      
+    configList.push({"configName":configName,"filterArray":filterArray});
+
+    //console.log(configList)
+    
+    window.localStorage.setItem('ConfigList',JSON.stringify(configList));    
+    configName.value="";
+
+    updateConfigList();
+
+}
+
+function updateConfigList() {
+    const configList = document.getElementById('configList');
+    configList.replaceChildren();
+
+    let configStore = window.localStorage.getItem('ConfigList');    
+    !configStore?configStore= new Array():configStore=JSON.parse(configStore);
+
+    for (let config of configStore) {
+        const div = document.createElement('div');
+        div.innerText=config.configName;
+        div.classList.add('config');
+        div.addEventListener('click',function (){
+            let filterArray = JSON.parse(this.getAttribute('filterArray'));                        
+            let filterArrayJSON = convertFilterArayToJSON(filterArray);            
+            applyFilters(filterArrayJSON.filters);
+        });
+
+        // div.addEventListener('mouseover',function (){
+        //     let contextMenu = document.getElementById('contextMenu');
+        //     let rect = this.getBoundingClientRect();
+        //     let yPos = rect.top;
+        //     contextMenu.style.top = yPos+'px';
+        //     contextMenu.style.left = '200px';
+        //     contextMenu.style.display = 'inline-flex';
+        //     this.contextMenu = contextMenu;
+        // })
+        // div.addEventListener('mouseout',function (){
+        //     this.contextMenu.style.display='none';
+        // })
+
+        div.setAttribute('filterArray',JSON.stringify(config.filterArray));
+        configList.appendChild(div);
+    }
+}
+
+
+function displayMessage(message,options) {
+    if (options==undefined) options={};
+
+    if (options.timeout==undefined) options.timeout=1500;
+    if (options.persist==undefined) options.persist=false;
+    if (options.type == undefined) options.type="default";
+
+    let messageBox = document.getElementById('messageBox');    
+    
+    let timeout = options.timeout    
+    if (options.type=="error") {
+        messageBox.style.backgroundColor='var(--error-background)';
+        messageBox.style.color='var(--error-color)';
+    }
+
+    if (options.type=="success") {
+        messageBox.style.backgroundColor='var(--success-background)';
+        messageBox.style.color='var(--success-color)';
+    }
+
+    if (options.type=="question") {        
+        for (button of options.buttons) {            
+            const div = document.createElement('div');
+            
+            div.className=button.className;
+            div.innerText=button.text;
+            // div.addEventListener('click',button.clickEvent);            
+
+
+            messageBox.appendChild(div);         
+        }
+    }
+    
+    messageBox.innerText=message;
+    messageBox.style.display='block';
+    if (!options.persist) setTimeout(function(){messageBox.style.display='none'},timeout)
 }
