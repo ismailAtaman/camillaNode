@@ -66,21 +66,26 @@ body {
     font-size: 11px;
 }
 
+
+#levelBorder {
+    margin-inline: 1rem;
+    width: 400px;
+    height: 10px;
+    border: 1px solid white;;
+}
+
 #levelBar {
-    position: absolute;
-    top: 60px;
-    right: 0px;
+    position: relative;    
     width: 10px;
     height: 10px;
-    background-color: #07f1ee;    
+    background-color: #4c83e8;        
 }
 
 #eqmain {
     display: grid;
     grid-template-columns: max(600px,30vw) auto;    
     grid-auto-rows: auto;
-    gap: 10px;    
- 
+    gap: 10px;     
 }
 
 #eqgraph {
@@ -255,4 +260,9 @@ body {
     font-size:10px;
     width: 60px;
     margin: 2px;
+}
+
+#deviceSettings {
+    font-family:'Courier New', Courier, monospace;
+    font-size:15px;
 }

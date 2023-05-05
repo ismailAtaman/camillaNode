@@ -18,9 +18,7 @@ function initEQ() {
             "port" : 1234,
         };
         window.localStorage.setItem("Config",JSON.stringify(sConfig));
-
-    } else {
-        
+    } else {       
         const sConfig = JSON.parse(config);
         //console.log(sConfig);
         server = sConfig.server;
@@ -38,10 +36,17 @@ function initEQ() {
 
     ws.addEventListener("open", (event) => {
         connected=true;
-        console.log("Connected");        
+        console.log("Connected");      
+        downloadConfigFromDSP().then((DSPConfig)=>{
+            //console.log(DSPConfig.filters)
+           let filters = DSPConfig.filters;   
+           applyFilters(filters);           
+           console.log("Config download successful.");   
+        });
+
         sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r});
         let message ={}
-        message["SetUpdateInterval"]=100;
+        message={"SetUpdateInterval":100};
         sendDSPMessage(message);
 
         setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
@@ -49,10 +54,11 @@ function initEQ() {
             if (level<-100) level=-100;
             level=100+level;
             // console.log(level);
-            document.getElementById('levelBar').style.width=(2*level)+'px';
+            document.getElementById('levelBar').style.width=(4*level)+'px';
 
         })},100)
         setInterval (function(){sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r} )  },5000)
+        
     });
     
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,10 +329,16 @@ function saveClick() {
         saveConfig(({"configName":configName,"filterArray":filterArray}));
         configNameObject.value='';
         updateConfigList();
-    }));
+    }));   
+}
 
+function deleteClick() {
+    let configNameObject = document.getElementById('configName');
+    let configName = configNameObject.value;
+    if (configName.length==0) return;
 
-    
+    if (!confirm("Do you want to delete the configuration '"+configName+"'?")) return;
+    fetch('/deleteConfig?configName='+configName).then((res)=>updateConfigList());
 }
 
 async function updateConfigList() {  

@@ -1,8 +1,30 @@
-let server, port;
+
 let connected = false;
 let ws;
 
-async function connect() {
+async function initializeConnection() {
+    const config = window.localStorage.getItem("Config")
+    
+    if (config==null) {
+        console.log("No configuration found.");        
+        window.location.href='/server';
+        sConfig = {
+            "server":"192.168.50.74",
+            "port" : 1234,
+        };
+        window.localStorage.setItem("Config",JSON.stringify(sConfig));
+    } else {       
+        const sConfig = JSON.parse(config);
+        //console.log(sConfig);
+        server = sConfig.server;
+        port = sConfig.port;
+    }
+    await connect(server,port)
+    // message={"SetUpdateInterval":100}
+    // sendDSPMessage(message).then((r)=>console.log(r))
+}
+
+async function connect(server,port) {
     return new Promise((resolve,reject)=>{
         if (server.length==0 || port.length==0)  reject({"Status":"Error","Reason":"No server or port specified.","Details":"None"});
 
@@ -193,7 +215,6 @@ async function sendDSPMessage(message) {
                     } else {
                         reject(value)
                     }
-
                     break;
 
                 case "GetPlaybackSignalPeak":
@@ -215,8 +236,10 @@ async function sendDSPMessage(message) {
                 case "SetUpdateInterval":
                     if (result=='Ok') {                                             
                         resolve(value);
+                        console.log("Update interval updated.")
                     } else {
                         reject(value)
+                        console.error(value);
                     }    
                     break;                
                 default:

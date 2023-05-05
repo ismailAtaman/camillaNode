@@ -11,10 +11,30 @@
 <body>
 
 <%- include('header.ejs'); %>
-<br><br>
+
 <div class="section" id="deviceSettings">
 
 </div>
 
 </body>
+<script>
+    initializeConnection().then(()=>{    
+    downloadConfigFromDSP().then((data=>{
+       
+        DSPConfig=data;
+        settings = document.getElementById('deviceSettings');
+        console.log(DSPConfig.devices);
+        for (configItem of Object.keys(DSPConfig.devices)) {
+            let p = document.createElement('p');            
+            // if (typeof DSPConfig.devices[configItem]==="object" && DSPConfig.devices[configItem]!=null) {
+            // } else {
+                p.innerText=configItem+ " : " + DSPConfig.devices[configItem];
+            // }
+            settings.appendChild(p);
+        }
+    }))
+})
+
+
+</script>
 </html>
