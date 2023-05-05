@@ -312,91 +312,52 @@ function compress() {
 }
 
 function saveClick() {    
-    let testName = document.getElementById('configName').value;    
-    let testArray=createFilterArray();      
-    saveConfig(({"configName":testName,"filterArray":testArray}));
-    return;
-
-    let configName = document.getElementById('configName').value;    
+    let configNameObject = document.getElementById('configName');
+    let configName = configNameObject.value.trim();    
     if (configName.length==0) return;
+
+    fetch('/configExists?configName='+configName).then((res)=>res.text().then(data=>{
+        if (data=='true' && !confirm('Configuration with a same name already exists. Would you like to overwrite?')) return;        
+
+        let filterArray=createFilterArray();      
+        saveConfig(({"configName":configName,"filterArray":filterArray}));
+        configNameObject.value='';
+        updateConfigList();
+    }));
+
+
     
-    let configList = window.localStorage.getItem('ConfigList');    
-    !configList?configList= new Array():configList=JSON.parse(configList);
+}
 
-    let nameExists= configList.find(e=>e.configName==configName)?true:false;
-    if (nameExists) {
-        function overrideClick() {
-            alert("override")
-        }
+async function updateConfigList() {  
+    fetch('/getConfigList').then((res)=>res.json().then(data=>{
+        const configList = document.getElementById('configList');
+        configList.replaceChildren();
 
-        displayMessage("Name already in use!",
-            {
-                "persist":true,
-                "timeout":1500,
-                "type":"question",
-                "buttons":[
-                    {
-                        "text":"Override",
-                        "className":"button",
-                        "clickEvent":overrideClick
-                    }
-                ]
+        let savedConfigList = data;
+        for (let config of savedConfigList) {
+            const div = document.createElement('div');
+            div.innerText=config;
+            div.classList.add('config');
+            
+            div.addEventListener('click',function (){                
+                document.getElementById('configName').value=this.innerText;
+                getConfig(this.innerText).then((config)=>{
+                let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
+                applyFilters(filterArrayJSON.filters);
+                });
             });
-        return;
-    }
-
-    let filterArray=createFilterArray();      
-    configList.push({"configName":configName,"filterArray":filterArray});
-
-    //console.log(configList)
-    
-    window.localStorage.setItem('ConfigList',JSON.stringify(configList));    
-    configName.value="";
-    saveConfig()
-
-    updateConfigList();
-
+            configList.appendChild(div);
+        }
+    }))    
 }
 
-function updateConfigList() {
-    const configList = document.getElementById('configList');
-    configList.replaceChildren();
 
-    let configStore = window.localStorage.getItem('ConfigList');    
-    !configStore?configStore= new Array():configStore=JSON.parse(configStore);
-
-    for (let config of configStore) {
-        const div = document.createElement('div');
-        div.innerText=config.configName;
-        div.classList.add('config');
-        div.addEventListener('click',function (){
-            let filterArray = JSON.parse(this.getAttribute('filterArray'));                        
-            let filterArrayJSON = convertFilterArayToJSON(filterArray);            
-            applyFilters(filterArrayJSON.filters);
-        });
-
-        // div.addEventListener('mouseover',function (){
-        //     let contextMenu = document.getElementById('contextMenu');
-        //     let rect = this.getBoundingClientRect();
-        //     let yPos = rect.top;
-        //     contextMenu.style.top = yPos+'px';
-        //     contextMenu.style.left = '200px';
-        //     contextMenu.style.display = 'inline-flex';
-        //     this.contextMenu = contextMenu;
-        // })
-        // div.addEventListener('mouseout',function (){
-        //     this.contextMenu.style.display='none';
-        // })
-
-        div.addEventListener('contextmenu',function(e){
-            e.preventDefault();            
-        })
-
-        div.setAttribute('filterArray',JSON.stringify(config.filterArray));
-        configList.appendChild(div);
-    }
+async function getConfig(configName) {     
+    return new Promise ((resolve,reject)=>{
+          fetch('/getConfig?configName='+configName).then((res)=>res.json()).then((data)=>{resolve(data)});        
+    })    
 }
-
 
 function displayMessage(message,options) {
     if (options==undefined) options={};

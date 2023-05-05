@@ -1,6 +1,7 @@
 //// Global variables
 PORT = 80;
 
+const { json } = require('express');
 //// Global Objects
 const express = require('express');
 const app = express();
@@ -9,6 +10,7 @@ const WebSocket = require('ws');
 // const client = new WebSocket('ws://192.168.50.74:1234')
 
 //// Global settings
+
 app.use(express.static('public'));
 app.set('view engine','ejs');
 
@@ -30,33 +32,40 @@ app.post('/saveConfig',(req,res)=>{
     req.on('data', function(chunk) {
         queryResponse+=chunk;        
     }).on('end', function(){
-        let config = JSON.parse(queryResponse);      
-        console.log(config)
-        let fileName = './'+config.configName+'.json'
+        let config = JSON.parse(queryResponse);              
+        let fileName = './config/'+config.configName+'.json'
         console.log(fileName)
-        let fileBuffer = Buffer.from(JSON.stringify(config),'utf-8');
+        let fileBuffer = Buffer.from(JSON.stringify(config),'utf-8');        
         fs.writeFileSync(fileName,fileBuffer);        
-    });
-    
+        res.end();
+    });    
 }) 
 
+app.get('/getConfigList',(req,res)=>{
+    let configList = Array();
+    let files = fs.readdirSync('./config',);
+    let fileList = Array();
+    for (let file of files) {
+        if (file.includes('json')) fileList.push(file.replace('.json',''));
+    }
+    res.write(JSON.stringify(fileList));
+    res.end();
+})
 
+app.get('/getConfig',function(req,res){    
+    let filePath='./config/'+req.query.configName+'.json'    
+    if (!fs.existsSync(filePath)) { res.write('{"status":"error","reason":"Config not found"}'); res.end() }
+    let config = fs.readFileSync(filePath);
+    //console.log(config.toString());
+    res.write (config.toString());
+    res.end();
+});
 
-
-// client.on('error', (e)=> {
-//     console.log(e);   
-// })
-
-// client.on('message', (m)=>{
-//     //const mObj = JSON.parse(m);
-//     //console.log(mObj);  
-    
-// })
-
-// client.on('open', ()=>{
-//     console.log('WS Connected')
-//     message="GetVersion"
-//     client.send(JSON.stringify(message))    
-// })
+app.get('/configExists',function(req,res){    
+    let filePath='./config/'+req.query.configName+'.json'    
+    //console.log(filePath);
+    fs.existsSync(filePath)?res.write('true'):res.write('false');
+    res.end();
+})
 
 app.listen(PORT,console.log(`CamillaNode is running on port ${PORT}...`));

@@ -118,6 +118,7 @@ body {
     font-size: 12px;
     cursor: pointer;
     padding-bottom: 0.5rem;
+    user-select: none;
 }
 
 .config:hover {
