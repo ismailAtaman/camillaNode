@@ -27,6 +27,11 @@ app.get('/device',(req,res)=>{
     res.render('device');     
 }) 
 
+
+app.get('/settings',(req,res)=>{
+    res.render('settings');     
+}) 
+
 app.post('/saveConfig',(req,res)=>{
     let queryResponse="";
     req.on('data', function(chunk) {

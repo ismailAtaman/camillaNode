@@ -7,13 +7,16 @@ let mouseDownY = 0;
 
 async function initEQ() {    
     
-    let connected = await initializeConnection();
-    if (connected!=true) {
-        console.log("Error! Can not connect to server");
+    let connectionResult = await connectToDsp();
+    if (!connectionResult[0]) {
+        displayMessage("Error connecting to server. Please configure server settings and make sure server is running.",{"type":"error"})
         return;
     }
-    
     await updateConfigList();
+    downloadConfigFromDSP().then((DSPConfig)=>{        
+        let filters = DSPConfig.filters;
+        applyFilters(filters);     
+    }) 
 
     setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
             let levelL=isNaN(r[0])?-100:r[0];
