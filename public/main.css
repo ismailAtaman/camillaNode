@@ -4,7 +4,9 @@
     font-family: 'Kdam Thmor Pro', sans-serif;
     --body-background: #333;
 
-    --slider-width: 3.5em;
+    --eqmain-width: 650px;
+
+    --slider-width: 3.3em;
     --slider-height: 15rem;
     --header-bgcolor: #336699;
 
@@ -26,8 +28,7 @@ body {
     padding: 0;
 }
 
-.section {
-    width: 100vw;
+.section {    
     height: auto;    
     padding: 0.5rem;
 }
@@ -70,26 +71,30 @@ body {
 
 #levelBorder {
     margin-inline: 1rem;
-    width: 400px;
+    width: 100%;
     height: 15px;
     border: 1px solid white;;
     background: linear-gradient(90deg, red 0%, yellow 50%, green 100% );
-    margin-bottom: 3px;
+    margin: 5px;
     transform: rotate(180deg);
+    border-radius: 5px;
+    filter:saturate(50%);
 }
 
 .levelBar {
     position: relative;        
     right: 0px;
-    max-width: 398px;
+    max-width: calc(var(--eqmain-width)-2px);
     height: 15px;    
     opacity: 90%;
     background-color: var(--body-background); 
+    border-radius: 5px 0px 0px 5px;        
 }
 
 #eqmain {
     display: grid;
-    grid-template-columns: max(600px,30vw) auto;    
+    width: var(--eqmain-width);
+    grid-template-columns: 1fr;
     grid-auto-rows: auto;
     gap: 10px;     
 }
@@ -106,7 +111,6 @@ body {
     height: 100%;
 }
 
-
 #equalizer {
     border: none;
 }
@@ -116,6 +120,9 @@ body {
 }
 
 #eqtools {
+    position: absolute;
+    left: var(--eqmain-width);
+    top: 200px;
     width: 120px;    
 }
 
@@ -185,11 +192,6 @@ body {
     -ms-user-select: none;
     user-select: none;    
 }
-/* 
-.slider-container:hover {
-    filter: hue-rotate(180deg) grayscale(50%);    
-    transition: all 500ms;    
-} */
 
 .slider-body {
     position: relative;
@@ -211,6 +213,7 @@ body {
     left:50%;
     transform: translateX(-50%);
     transition: all 350ms;
+    cursor:grabbing;
 }
 
 .eqparam {    
@@ -273,6 +276,7 @@ body {
     cursor: pointer;
     text-align: center;
     border-radius: 5px;        
+    user-select: none;
 }
 
 .button:hover {

@@ -74,13 +74,13 @@ function handleDSPMessage(m) {
         case "SetUpdateInterval":
             if (result=='Ok') return [true,value]; else return[false,value];           
             break;                
+        case "SetVolume":            
+            if (result=='Ok') return [true,value]; else return[false,value];           
+            break;         
         default:
             console.log("Unhandled message received from DSP : "+responseCommand);
-
-            if (result=='Ok') return [true,JSON.parse(value)]; else return[false,value];                        
+            if (result=='Ok') return [true,value]; else return[false,value];                        
     }
-
-    resolve(true);
 
 }
 

@@ -6,6 +6,7 @@ let selectedKnob = null;
 let mouseDownY = 0;
 
 async function initEQ() {    
+
     
     let connectionResult = await connectToDsp();
     if (!connectionResult[0]) {
@@ -20,170 +21,29 @@ async function initEQ() {
 
     setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
             let levelL=isNaN(r[0])?-100:r[0];
-            let levelR=isNaN(r[1])?-100:r[1];            
+            let levelR=isNaN(r[1])?-100:r[1];          
+            
+            levelL<-100?levelL=-100:a=1
+            levelR<-100?levelR=-100:a=1
 
             levelL = 100 + levelL
             levelR = 100 + levelR
 
-           // console.log(levelL+' : ' + levelR);
-           document.getElementById('levelLBar').style.width=400-(4*levelL)+'px';
-           document.getElementById('levelRBar').style.width=400-(4*levelR)+'px';
+            // console.log(levelL+' : ' + levelR);
+            document.getElementById('levelLBar').style.width=650-(4*levelL)+'px';
+            document.getElementById('levelRBar').style.width=650-(4*levelR)+'px';
+
+
         })},50)
 
     sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r});        
-    setInterval (function(){sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r} )  },5000)      
-    
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    
+    setInterval (function(){sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r} )},5000)      
 
-    const sliders = document.getElementsByClassName('slider-container');
-
-    for (i=0;i<sliders.length;i++) {
-        //console.log("Doing slider "+ i);             
-
-        const slider = sliders[i]
-        const sliderBody = slider.children[0];
-        const sliderKnob = sliderBody.children[0];
-
-        const freq= slider.children[1]
-        const gain= slider.children[2]
-        const qfact= slider.children[3]
-
-
-        const sliderTop = parseInt(sliderBody.getBoundingClientRect().top);
-        const sliderHeight = sliderBody.getBoundingClientRect().bottom - sliderTop;
-        const sliderKnobHeight = sliderKnob.getBoundingClientRect().bottom - sliderKnob.getBoundingClientRect().top;
-        const sliderMax = sliderHeight-sliderKnobHeight/2;
-
-        sliderKnob.style.top=(sliderMax)/2+'px';
-
-        document.addEventListener('mouseup',function() {
-            selectedKnob=null;
-        })
-        
-        sliderKnob.addEventListener('mousedown',function() {
-            selectedKnob=this;
-        })
-
-        sliderKnob.addEventListener('mouseup',function() {
-            selectedKnob=null;
-        })
-
-        slider.addEventListener('mouseup',function() {
-            selectedKnob=null;
-        })
-        
-        slider.addEventListener('mousemove',function(event) {
-            if (selectedKnob==null) return;
-            sliderUpdatePos(slider,event.clientY);
-        })
-
-        slider.addEventListener('change',function(){
-            const freq= this.children[1]
-            const gain= this.children[2]
-            const qfact= this.children[3]
-
-            gain.innerText=this.value+'db';
-            let filterIndex=-1;
-
-            const sliderList = document.getElementsByClassName('slider-container')
-            for (i=0;i<sliderList.length;i++) {
-                if (sliderList[i]==this) filterIndex=i; 
-            }            
-            let filterName = "Filter_"+filterIndex;
-            
-            const sliderJSON = new Object();
-             sliderJSON[filterName] = {
-                "type": "Biquad",
-                "parameters": {
-                  "type": "Peaking",
-                  "freq": parseFloat(freq.value),
-                  "q": parseFloat(qfact.value),
-                  "gain": parseFloat(gain.value),
-                }
-              }            
-            //console.log(sliderJSON)
-        })       
-
-        function sliderUpdatePos(slider,mouseY) {
-            const yPos = Math.min(sliderMax, Math.max(0,mouseY- sliderTop- sliderKnobHeight/2));
-            selectedKnob.style.top = yPos+'px';
-            const num = MAXDB-(MAXDB*2*yPos/sliderMax);
-            slider.value = Math.round((num + Number.EPSILON)*10)/10;            
-            gain.value = slider.value+'db';
-            slider.dispatchEvent(new Event('change'));     
-
-            let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/180));    
-            sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
-        }
-
-
-        let tempFreq;
-
-        freq.addEventListener('click',function(){
-            tempFreq=this.value;
-            this.value= this.value.replace('hz','');
-        })
-
-        freq.addEventListener('focus',function(){
-            tempFreq=this.value;
-            this.value= this.value.replace('hz','');                        
-        })
-        
-        freq.addEventListener('focusout',function(){            
-            let text = this.value;               
-            if (isNaN(text)) text=tempFreq;
-            this.value=text;
-            this.value=text+'hz';            
-            slider.dispatchEvent(new Event('change'));    
-        })
-
-        let tempgain;
-
-        gain.addEventListener('click',function(){
-            tempgain=this.value;
-            this.value= this.value.replace('db','');            
-        })
-
-        gain.addEventListener('focus',function(){
-            tempgain=this.value;
-            this.value= this.value.replace('db','');            
-            this.contentEditable='true';
-        })
-        
-        gain.addEventListener('focusout',function(){            
-            let text = this.value;               
-            if (isNaN(text)) text=tempFreq;
-            this.value=text;
-            this.value=text+'db';            
-            // console.log("Gain Value : " +this.value)
-            sliderUpdateVal(this.parentElement,text);
-            
-        })
-
-        let tempqfact;
-
-        qfact.addEventListener('click',function(){
-            tempqfact=this.value;     
-            this.contentEditable='true';
-        })
-
-        qfact.addEventListener('focus',function(){
-            tempqfact=this.value;
-            this.value= this.value.replace('hz','');            
-            this.contentEditable='true';
-        })
-        
-        qfact.addEventListener('focusout',function(){            
-            let text = this.value;   
-            console.log(text);  
-            if (isNaN(text)) text=tempFreq;
-            this.value=text;               
-            slider.dispatchEvent(new Event('change'));                       
-       })
+    const equalizer = document.getElementById('equalizer');
+    for (i=0;i<=9;i++) {
+        let s = new EQSlider();
+        equalizer.appendChild(s);
     }
-
 
 }
 
@@ -266,7 +126,7 @@ function reset() {
     for (i=0;i<sliders.length;i++) {
         sliders[i].children['gain'].value='0db';
         sliders[i].children['qfact'].value='1.4';
-        sliders[i].children['freq'].value=defaultFreqList[i]+'hz';
+        sliders[i].children['freq'].value=defaultFreqList[i % 10]+'hz';
         sliderUpdateVal(sliders[i],0);
     }
 }
@@ -376,4 +236,140 @@ function displayMessage(message,options) {
     messageBox.innerText=message;
     messageBox.style.display='block';
     if (!options.persist) setTimeout(function(){messageBox.style.display='none'},timeout)
+}
+
+function addBand() {
+    let s = new EQSlider();
+    document.getElementById('equalizer').appendChild(s);
+}
+
+
+class EQSlider {    
+
+    constructor() {
+        let sliderContainer = document.createElement('div');
+        let sliderBody = document.createElement('div');
+        let sliderKnob = document.createElement('div');
+
+        sliderContainer.className='slider-container';
+        sliderBody.className='slider-body';
+        sliderKnob.className='slider-knob';
+        
+        let freq = document.createElement('input');
+        freq.type='text';
+        freq.className='eqparam';
+        freq.value='1000hz'
+        freq.id='freq';
+
+
+        let tempFreq;
+
+        freq.addEventListener('click',function(){
+            tempFreq=this.value;
+            this.value= this.value.replace('hz','');
+        })
+
+        freq.addEventListener('focus',function(){
+            tempFreq=this.value;
+            this.value= this.value.replace('hz','');                        
+        })
+        
+        freq.addEventListener('focusout',function(){            
+            let text = this.value;               
+            if (isNaN(text)) text=tempFreq;            
+            this.value=text+'hz';                        
+        })
+
+        let gain = document.createElement('input');
+        gain.type='text';
+        gain.className='eqparam';
+        gain.value='0db'
+        gain.id='gain';
+
+        let tempGain;
+
+        gain.addEventListener('click',function(){
+            tempGain=this.value;
+            this.value= this.value.replace('db','');            
+        })
+
+        gain.addEventListener('focus',function(){
+            tempGain=this.value;
+            this.value= this.value.replace('db','');                        
+        })
+        
+        gain.addEventListener('focusout',function(){            
+            let text = this.value;               
+            if (isNaN(text)) text=tempGain;
+            this.value=text+'db';            
+        })
+
+        let qfact = document.createElement('input');
+        qfact.type='text';
+        qfact.className='eqparam';
+        qfact.value='1.41';
+        qfact.id='qfact';
+
+
+        let tempqfact;
+        
+        qfact.addEventListener('focusout',function(){            
+            let text = this.value;               
+            if (isNaN(text)) text=tempqfact;
+            this.value=text;                     
+       })
+    
+       const sliderTop = parseInt(sliderBody.getBoundingClientRect().top);
+       const sliderHeight = sliderBody.getBoundingClientRect().bottom - sliderTop;
+       const sliderKnobHeight = sliderKnob.getBoundingClientRect().bottom - sliderKnob.getBoundingClientRect().top;
+       const sliderMax = sliderHeight-sliderKnobHeight/2;
+       
+
+       sliderKnob.style.top=(sliderMax)/2+'px';
+       
+       let selected=false;
+
+       sliderKnob.addEventListener('mousedown',function() {
+           selected=true;
+       })
+
+       sliderKnob.addEventListener('mouseup',function() {
+           selected=false;
+       })
+
+       sliderContainer.addEventListener('mouseup',function() {
+           selected=false;
+       })
+       
+       sliderContainer.addEventListener('mousemove',function(event) {
+            if (selected==false) return;          
+            const pos = event.clientY-sliderBody.getBoundingClientRect().top;
+            const sliderMax= sliderBody.clientHeight-sliderKnob.clientHeight;
+            const yPos = Math.max(0,Math.min(pos,sliderBody.clientHeight-sliderKnob.clientHeight));
+            sliderKnob.style.top = yPos+'px';            
+
+            const num = MAXDB-(MAXDB*2*yPos/sliderMax);
+            sliderContainer.value = Math.round((num + Number.EPSILON)*10)/10;            
+            gain.value = sliderContainer.value+'db';            
+
+            let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/180));    
+            sliderBody.style.filter='hue-rotate('+hueAngle+'deg)';
+       })
+
+       sliderBody.appendChild(sliderKnob);
+       sliderContainer.appendChild(sliderBody);
+       sliderContainer.appendChild(freq)
+       sliderContainer.appendChild(gain)
+       sliderContainer.appendChild(qfact)
+
+       let sh = getComputedStyle(document.body).getPropertyValue('--slider-height').replace('rem','');
+       sh *= getComputedStyle(document.body).fontSize.replace('px','')/2
+       sliderKnob.style.top=sh+'px'
+       
+       
+       return sliderContainer;
+    }
+
+
+
 }

@@ -76,12 +76,30 @@ app.get('/configExists',function(req,res){
 app.get('/deleteConfig',function(req,res){    
     let filePath='./config/'+req.query.configName+'.json'    
     if (!fs.existsSync(filePath)) { res.write('{"status":"error","reason":"Config not found"}'); res.end()}
-    fs.rm(filePath,(r)=>{
-        if (r==null) res.write("Deleted");
-        res.end();
-    });
+    try {
+        fs.unlink(filePath,(r)=>{
+            if (r==null) res.write("Deleted");
+            res.end();
+        });
+    }
+    catch(err) {
+        console.log("Error deleting configuration file.")
+        console.log(err);
+    }
     
 
 })
+
+// const { exec } = require('child_process');
+// exec('dir', (err, stdout, stderr) => {
+//   if (err) {
+//     //some err occurred
+//     console.error(err)
+//   } else {
+//    // the *entire* stdout and stderr (buffered)
+//    console.log(`stdout: ${stdout}`);
+//    console.log(`stderr: ${stderr}`);
+//   }
+// });
 
 app.listen(PORT,console.log(`CamillaNode is running on port ${PORT}...`));
