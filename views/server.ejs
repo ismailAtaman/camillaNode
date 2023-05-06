@@ -13,8 +13,8 @@
 <%- include('header.ejs'); %>
 
 <div class="section" id="serverSettings">
-    <span>Server IP : </span><input type="text" name="server" id="server">
-    <span>Server Port : </span><input type="text" name="port" id="port">
+    <span>Server IP  </span><input type="text" name="server" id="server">
+    <span>Server Port  </span><input type="text" name="port" id="port">
     <br>
     <input type="button" value="Save" onclick="saveServerConfig()">
     <br>
@@ -39,8 +39,6 @@
     
     function saveServerConfig() {
         // Check if can connect to server
-        
-
 
         let server = document.getElementById("server").value;
         let port = document.getElementById("port").value;
@@ -67,8 +65,7 @@
             let tmpWS = new WebSocket("ws://"+server+":"+port);
 
             tmpWS.addEventListener("error", function (m){
-                reject({"Status":"Error","Reason":"Can not connect to server.","Details":m});
-                
+                reject({"Status":"Error","Reason":"Can not connect to server.","Details":m});                
             });
 
             tmpWS.addEventListener("open", (event) => {            

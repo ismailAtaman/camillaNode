@@ -2,8 +2,10 @@
 
 :root {
     font-family: 'Kdam Thmor Pro', sans-serif;
-    --slider-width: 3em;
-    --slider-height: 10rem;
+    --body-background: #333;
+
+    --slider-width: 3.5em;
+    --slider-height: 15rem;
     --header-bgcolor: #336699;
 
     --error-background: #dd2222;
@@ -18,7 +20,7 @@
 
 body {
     font-family: inherit;
-    background-color: #333333;
+    background-color: var(--body-background);
     color: white;
     margin: 0;
     padding: 0;
@@ -33,17 +35,16 @@ body {
 #header {
     display: block;
     background-color: var(--header-bgcolor);    
-    height: max(5vh,55px);
+    height: max(5vh,65px);
 }
 
 #title {
     display: block;    
 }
 
-
 .menu {
     display: flex;
-    
+    margin: 3px;    
 }
 
 .menuItem {
@@ -51,7 +52,8 @@ body {
     width: 100px;
     display: inline;
     font-size: 14px;
-    cursor: pointer;    
+    cursor: pointer; 
+    padding-bottom: 1rem;   
 }
 
 .menuItem:hover {
@@ -66,19 +68,23 @@ body {
     font-size: 11px;
 }
 
-
 #levelBorder {
     margin-inline: 1rem;
     width: 400px;
-    height: 10px;
+    height: 15px;
     border: 1px solid white;;
+    background: linear-gradient(90deg, red 0%, yellow 50%, green 100% );
+    margin-bottom: 3px;
+    transform: rotate(180deg);
 }
 
-#levelBar {
-    position: relative;    
-    width: 10px;
-    height: 10px;
-    background-color: #4c83e8;        
+.levelBar {
+    position: relative;        
+    right: 0px;
+    max-width: 398px;
+    height: 15px;    
+    opacity: 90%;
+    background-color: var(--body-background); 
 }
 
 #eqmain {
@@ -103,6 +109,10 @@ body {
 
 #equalizer {
     border: none;
+}
+
+#equalizer select {
+    height: 15px;
 }
 
 #eqtools {
@@ -207,18 +217,17 @@ body {
     display: flex;   
     appearance: none;
     justify-content: center;
-    margin-top: 0.75rem;
+    margin-top: 10px;
     appearance: none;
-    width:90%;
-    height: 15px;
+    width: 45px;
+    height: 16px;
     font-size: 11px;
     cursor: pointer;
     border: none; 
     background-color: #DDD;
     color: black;
-    border-radius: 5px;
-    padding:2px;
-    
+    border-radius: 3px;
+    padding:2px;    
     text-align: center;
 }
 
@@ -230,6 +239,7 @@ body {
     margin-top: 2rem;
     display: grid;
     grid-template-columns: 100px 150px;
+    gap: 1rem;
 }
 
 #serverSettings input[type="button"] {
@@ -238,6 +248,20 @@ body {
     margin-left: 50%;
 }
 
+#serverSettings input[type="text"] {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-color: #ddd;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    
+}
+
+#serverSettings input[type="text"]:hover {
+    background-color: #FFF;
+}
 .button {
     display: inline-block;
     width: 100px;

@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
     <title>CamillaDSP</title>
     <script src="camillaControl.js"></script>
-    <script src="main.js"></script>
+    <script src="equalizer.js"></script>
     <link rel="stylesheet" href="main.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body onload="initEQ()">
 
@@ -24,6 +25,12 @@
                 <input type="text" class="eqparam" value="200hz" id="freq">
                 <input type="text" class="eqparam" value="0db" id="gain">
                 <input type="text" class="eqparam" value="1.41" id="qfact">
+                <!-- <select class="eqparam">
+                    <option value="Peaking">PK</option>
+                    <option value="Low Shelf">LS</option>
+                    <option value="High Shelf">HS</option>
+                </select> -->
+
 
             </div>
         
@@ -141,7 +148,11 @@
     <br>
     
     <div id="levelBorder">
-        <div id="levelBar"></div>
+        <div id="levelLBar" class="levelBar"></div>
+    </div>
+
+    <div id="levelBorder">
+        <div id="levelRBar" class="levelBar"></div>
     </div>
 
     <div id="messageBox"></div>

@@ -3,13 +3,12 @@ let connected = false;
 let ws;
 
 async function initializeConnection() {
-    const config = window.localStorage.getItem("Config")
-    
+    const config = window.localStorage.getItem("Config")    
     if (config==null) {
         console.log("No configuration found.");        
         window.location.href='/server';
         sConfig = {
-            "server":"192.168.50.74",
+            "server":"192.168.50.208",
             "port" : 1234,
         };
         window.localStorage.setItem("Config",JSON.stringify(sConfig));
@@ -19,9 +18,12 @@ async function initializeConnection() {
         server = sConfig.server;
         port = sConfig.port;
     }
-    await connect(server,port)
-    // message={"SetUpdateInterval":100}
-    // sendDSPMessage(message).then((r)=>console.log(r))
+    let connected = await connect(server,port)       
+    if (connected===true) {    
+        message={"SetUpdateInterval":50}
+        sendDSPMessage(message)
+        return true;
+    }
 }
 
 async function connect(server,port) {
@@ -38,7 +40,7 @@ async function connect(server,port) {
 
         ws.addEventListener("open", (event) => {            
             message="GetVersion";
-            ws.send(JSON.stringify(message));        
+            ws.send(JSON.stringify(message));                    
         });
 
         ws.addEventListener("message", function (m){
@@ -46,7 +48,7 @@ async function connect(server,port) {
                 const res = JSON.parse(m.data);                                                                   
                 if (res['GetVersion'].result=='Ok') {
                     CamillaDSPVersion=res['GetVersion'].value;                        
-                    resolve("Success");
+                    resolve(true);
                 }          
             }
             catch(err) {
@@ -159,9 +161,14 @@ async function getConfig() {
     sendDSPMessage(message);  
 }
 
-async function downloadConfigFromDSP() {
+async function downloadConfigFromDSP() {    
     return new Promise((resolve,reject)=>{
-        sendDSPMessage('GetConfigJson').then((DSPConfig)=>{resolve(DSPConfig)}).catch((err)=>reject(err));
+        sendDSPMessage('GetConfigJson').then(DSPConfig=>{
+            resolve(DSPConfig)
+        }).catch(err=>{
+            console.log(err)
+            reject(err)
+        });
     })
 }
 
@@ -185,15 +192,15 @@ async function sendDSPMessage(message) {
                 case 'GetVersion':
                     if (result=='Ok') {
                         DSPVersion=JSON.parse(value);    
-                        resolve();
+                        resolve(DSPVersion);
                     } else {
                         reject(value)
                     }
                     break;        
         
                 case 'GetConfigJson':
-                    if (result=='Ok') {
-                        DSPConfig=JSON.parse(value);    
+                    if (result=='Ok') {                       
+                        DSPConfig=JSON.parse(value);                            
                         resolve(DSPConfig);                        
                     } else {
                         reject(value)
