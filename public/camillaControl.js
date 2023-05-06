@@ -2,7 +2,12 @@
 let connected = false;
 let ws;
 
+let messageQue;
+let messageId = 0;
+
 async function initializeConnection() {
+
+    // Check for saved server configuration and it does not exist, load defaults
     const config = window.localStorage.getItem("Config")    
     if (config==null) {
         console.log("No configuration found.");        
@@ -18,6 +23,9 @@ async function initializeConnection() {
         server = sConfig.server;
         port = sConfig.port;
     }
+
+
+    // Conneect to server
     let connected = await connect(server,port)       
     if (connected===true) {    
         message={"SetUpdateInterval":50}
@@ -164,104 +172,102 @@ async function getConfig() {
 async function downloadConfigFromDSP() {    
     return new Promise((resolve,reject)=>{
         sendDSPMessage('GetConfigJson').then(DSPConfig=>{
-            resolve(DSPConfig)
+            resolve(DSPConfig);
         }).catch(err=>{
-            console.log(err)
+            console.error("downloadConfigFromDSP Error");
+            console.error(err);
             reject(err)
         });
     })
 }
 
 async function sendDSPMessage(message) {
-    return new Promise((resolve,reject)=>{
-        ws.send(JSON.stringify(message));        
-        
-        ws.addEventListener('message',function(m){
-            const res = JSON.parse(m.data);     
-            // console.log(res);
-
-            const responseCommand = Object.keys(res)[0];
-            const result = res[responseCommand].result;
-            const value =  res[responseCommand].value;
-
-            // console.log("Command : "+responseCommand)
-            // console.log("Result : "+result)
-            // console.log("Value : "+value)
-
-            switch (responseCommand) {
-                case 'GetVersion':
-                    if (result=='Ok') {
-                        DSPVersion=JSON.parse(value);    
-                        resolve(DSPVersion);
-                    } else {
-                        reject(value)
-                    }
-                    break;        
-        
-                case 'GetConfigJson':
-                    if (result=='Ok') {                       
-                        DSPConfig=JSON.parse(value);                            
-                        resolve(DSPConfig);                        
-                    } else {
-                        reject(value)
-                    }
-                    break;                            
-                            
-                case 'SetConfigJson':
-                    if (result=='Ok') {                        
-                        resolve(true);
-                    } else {                        
-                        reject(value)
-                    }
-                    break;        
-        
-                case 'GetState':
-                    if (result=='Ok') {            
-                        DSPState=value;                        
-                        resolve(DSPState);
-                    } else {
-                        reject(value)
-                    }
-                    break;
-
-                case "GetPlaybackSignalPeak":
-                    if (result=='Ok') {                                             
-                        resolve(value);
-                    } else {
-                        reject(value)
-                    }
-                    break;
-
-                case "GetPlaybackSignalRms":
-                    if (result=='Ok') {                                             
-                        resolve(value);
-                    } else {
-                        reject(value)
-                    }    
-                    break;                
-
-                case "SetUpdateInterval":
-                    if (result=='Ok') {                                             
-                        resolve(value);
-                        console.log("Update interval updated.")
-                    } else {
-                        reject(value)
-                        console.error(value);
-                    }    
-                    break;                
-                default:
-                    console.log("Unhandled DSP message")
-                    console.log(res);                    
-            }
-
-            resolve(true);
-        })
-
-        ws.addEventListener('error',function(m){
-            reject(m.data);
-        })
-
+    return new Promise((resolve,reject)=>{          
+        ws.send(JSON.stringify(message));           
     })     
 }
 
 
+async function handleDSPMessage(m) {
+    return new Promise((resolve,reject)=>{
+        const res = JSON.parse(m.data);     
+        // console.log(res);
+
+        const responseCommand = Object.keys(res)[0];
+        const result = res[responseCommand].result;
+        const value =  res[responseCommand].value;
+
+        // console.log("Command : "+responseCommand)
+        // console.log("Result : "+result)
+        // console.log("Value : "+value)
+
+        switch (responseCommand) {
+            case 'GetVersion':
+                if (result=='Ok') {
+                    DSPVersion=JSON.parse(value);    
+                    resolve(DSPVersion);
+                } else {
+                    reject(value)
+                }
+                break;        
+
+            case 'GetConfigJson':
+                if (result=='Ok') {                       
+                    DSPConfig=JSON.parse(value);                            
+                    resolve(DSPConfig);                        
+                } else {
+                    reject(value)
+                }
+                break;                            
+                        
+            case 'SetConfigJson':
+                if (result=='Ok') {                        
+                    resolve(true);
+                } else {                        
+                    reject(value)
+                }
+                break;        
+
+            case 'GetState':
+                if (result=='Ok') {            
+                    DSPState=value;                        
+                    resolve(DSPState);
+                } else {
+                    reject(value)
+                }
+                break;
+
+            case "GetPlaybackSignalPeak":
+                if (result=='Ok') {                                             
+                    resolve(value);
+                } else {
+                    reject(value)
+                }
+                break;
+
+            case "GetPlaybackSignalRms":
+                if (result=='Ok') {                                             
+                    resolve(value);
+                } else {
+                    reject(value)
+                }    
+                break;                
+
+            case "SetUpdateInterval":
+                if (result=='Ok') {                                             
+                    resolve(value);
+                    console.log("Update interval updated.")
+                } else {
+                    reject(value)
+                    console.error(value);
+                }    
+                break;                
+            default:
+                console.log("Unhandled DSP message")
+                console.log(res);                    
+        }
+
+        resolve(true);
+
+    })
+    }
