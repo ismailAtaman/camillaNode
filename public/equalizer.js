@@ -5,9 +5,7 @@ const defaultFreqList = [30,100,200,800,1000,2000,4000,6000,8000,12000]
 let selectedKnob = null;
 let mouseDownY = 0;
 
-async function initEQ() {    
-
-    
+async function initEQ() {        
     let connectionResult = await connectToDsp();
     if (!connectionResult[0]) {
         displayMessage("Error connecting to server. Please configure server settings and make sure server is running.",{"type":"error"})
@@ -20,7 +18,6 @@ async function initEQ() {
     }) 
 
     let levelMaxWidth=document.getElementById('levelBorder').getBoundingClientRect().width
-
     setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
             let levelL=isNaN(r[0])?-100:r[0];
             let levelR=isNaN(r[1])?-100:r[1];          
@@ -39,7 +36,21 @@ async function initEQ() {
     sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r});        
     setInterval (function(){sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r} )},5000)      
 
+    let preampGainVal = document.getElementById('preampGainVal');
+
+
+    preampGainVal.addEventListener('focus',function(){        
+        this.value= this.value.replace('db','');                        
+    })
     
+    preampGainVal.addEventListener('focusout',function(){                  
+        let text = this.value;   
+        if (text.length==0) text=0;
+        if (isNaN(text)) text=0;                                
+        this.value=text+'db';                                
+    })
+
+
     for (i=0;i<=9;i++)  addBand();
     
 
@@ -67,17 +78,14 @@ function sliderUpdateVal(slider,val) {
 function createFilterArray() {
     let filterArray=new Array();
     const sliders = document.getElementsByClassName('slider-container')       
-    for (i=0;i<sliders.length;i++) {        
-        
+    for (i=0;i<sliders.length;i++) {                
         let sliderId=i+1;
         sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
         let slider= document.getElementById(sliderId);
 
         // console.log(sliderId);
         // console.log(slider);
-        let filter = new Object()
-
-
+        let filter = new Object();
         filter[sliderId] = {
             "type"  : slider.children['filterType'].value,
             "freq"  : parseFloat(slider.children['freq'].value.replace('hz','')),
@@ -86,6 +94,14 @@ function createFilterArray() {
         }
         filterArray.push(filter);
     }
+
+    preampGainVal=document.getElementById("preampGainVal").value.replace('db','');
+    let filter = new Object();
+    filter["Preamp"] = {        
+        "gain"  : parseFloat(preampGainVal),        
+    }
+    filterArray.push(filter);
+
     console.log(filterArray)
     return filterArray;
 }
@@ -111,19 +127,22 @@ async function downloadClick() {
 function applyFilters(filters) {
     i=0;     
     for (const filterName of Object.keys(filters).sort()) {        
-        let sliderId=i+1;
-        sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
-        let slider= document.getElementById(sliderId);
+        if (filterName=="Preamp") {
+            document.getElementById("preampGainVal").value=filters[filterName].parameters.gain+'db';
+        } else {
+            let sliderId=i+1;
+            sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
+            let slider= document.getElementById(sliderId);
 
-
-        //console.log(filterName);
-        if (slider==null) { addBand(); slider= document.getElementById(sliderId); }
-        slider.children['freq'].value=filters[filterName].parameters.freq+'hz';
-        slider.children['gain'].value=filters[filterName].parameters.gain+'db';
-        slider.children['qfact'].value=filters[filterName].parameters.q;            
-        slider.children['filterType'].value=filters[filterName].parameters.type;            
-        sliderUpdateVal(slider,filters[filterName].parameters.gain);            
-        i++;
+            //console.log(filterName);
+            if (slider==null) { addBand(); slider= document.getElementById(sliderId); }
+            slider.children['freq'].value=filters[filterName].parameters.freq+'hz';
+            slider.children['gain'].value=filters[filterName].parameters.gain+'db';
+            slider.children['qfact'].value=filters[filterName].parameters.q;            
+            slider.children['filterType'].value=filters[filterName].parameters.type;            
+            sliderUpdateVal(slider,filters[filterName].parameters.gain);            
+            i++;
+        }
     }
 }
 
@@ -427,3 +446,4 @@ class EQSlider {
 
 
 }
+

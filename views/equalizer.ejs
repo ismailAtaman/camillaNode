@@ -15,8 +15,7 @@
     <%- include('header.ejs'); %>
     <div id="eqmain" class="section">      
 
-        <div class="section" id="eqLevel">            
-            
+        <div class="section" id="eqLevel">
             <div id="levelBorder">
                 <div id="levelLBar" class="levelBar"></div>
             </div>                    
@@ -24,9 +23,15 @@
                 <div id="levelRBar" class="levelBar"></div>
             </div>
         </div>
+
         <div class="section" id="eqgraph">
             <canvas id="eqcanvas" width="100%" height="100%"></canvas>
         </div>
+
+        <div class="section" id="preampGain">
+           <span style="font-size: 14px; margin-left:6px">Pre-amp</span><input type="text" name="" id="preampGainVal" class="eqparam" style="width:75px;margin-inline:10px; display: inline-block;">
+        </div>
+
         <div class="section" id="equalizer">         
         </div>
 
@@ -40,6 +45,8 @@
         <div class="section" id="DSPManagement">
             <div class="button" onclick="uploadClick()">Upload</div>
             <div class="button" onclick="downloadClick()">Download</div>
+            <div class="button" onclick="toggleSaved()">Saved Configs</div>
+
         </div>        
         
         <div class="section" id="configManagement">

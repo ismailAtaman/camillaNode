@@ -107,17 +107,26 @@ async function uploadConfigToDSP(filterArray) {
 
     for (let filter of filterArray) {
         let filterName=Object.keys(filter)[0];
-        console.log(filter[filterName].type);
-
-        filters[filterName] = {
-            "type": "Biquad",
-            "parameters": {
-            "type": filter[filterName].type,
-            "freq": filter[filterName].freq,
-            "q": filter[filterName].q,
-            "gain": filter[filterName].gain,
-            }                    
-        }
+        if (filterName=="Preamp") {
+            filters["Preamp"] = {
+                "type": "Gain",
+                "parameters": {        
+                    "gain": filter[filterName].gain,
+                    "inverted":false,
+                    "mute":false
+                }                    
+            }
+        } else {
+            filters[filterName] = {
+                "type": "Biquad",
+                "parameters": {
+                "type": filter[filterName].type,
+                "freq": filter[filterName].freq,
+                "q": filter[filterName].q,
+                "gain": filter[filterName].gain,
+                }                    
+            }       
+        }        
         filterNameArray.push(filterName);
     }
 
@@ -167,17 +176,30 @@ function convertFilterArayToJSON(filterArray) {
     // console.log(filterArray)
     for (let filter of filterArray) {
         let filterName=Object.keys(filter)[0];
-        filters[filterName] = {
-            "type": "Biquad",
-            "parameters": {
-            "type": filter[filterName].type,
-            "freq": filter[filterName].freq,
-            "q": filter[filterName].q,
-            "gain": filter[filterName].gain,
-            }                    
-        }
+        if (filterName=="Preamp") {
+            filters["Preamp"] = {
+                "type": "Gain",
+                "parameters": {        
+                    "gain": filter[filterName].gain,
+                    "inverted":"false",
+                    "mute":"false"
+                }                    
+            }
+        } else {
+
+            filters[filterName] = {
+                "type": "Biquad",
+                "parameters": {
+                "type": filter[filterName].type,
+                "freq": filter[filterName].freq,
+                "q": filter[filterName].q,
+                "gain": filter[filterName].gain,
+                }                    
+            }       
+        } 
         filterNameArray.push(filterName);
-    }
+    }    
+
     pipeline.push({
         "type": "Filter",
         "channel": 0,
