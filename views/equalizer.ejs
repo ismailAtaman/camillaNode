@@ -65,8 +65,6 @@
 
 
     </div>       
-   
-    
     
     <div id="messageBox"></div>
     <div id="contextMenu">
@@ -81,7 +79,7 @@
 
 <div id="autoEQWindow">
     <div>AutoEQ Search</div>
-    <input type="text" name="" id="autoEQSearch">
+    <input type="text" name="" id="autoEQSearch" onkeydown="autoEQSearchKeyDown()">
     <div class="button" onclick="searchAutoEq()">Search</div>
     <div class="button" onclick="document.getElementById('autoEQWindow').style.display='none'">Close</div>
     <div class="button" onclick="refreshAutoEq()">Refresh</div>

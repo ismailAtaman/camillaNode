@@ -344,7 +344,15 @@ input, select {
     margin-top: 10px;
     display: block;
     width: 97%;
-    height: 90%;
+    height: 85%;
     overflow: scroll;
     background-color: #369;
+}
+
+.hpVisible {
+    display: inline-block;
+}
+
+.hpHidden {
+    display: none;
 }

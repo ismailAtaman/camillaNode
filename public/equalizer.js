@@ -328,12 +328,18 @@ function refreshAutoEq() {
     loadHeadphoneList();
 }
 
-function loadHeadphoneList() {
+function loadHeadphoneList(filter) {    
     const listObject = document.getElementById('headphoneList');
     listObject.replaceChildren();
     const headphoneRecords = JSON.parse(window.localStorage.getItem('headphoneRecords'));
-    let div;
+    let div;    
+
     for (let headphone of Object.keys(headphoneRecords)) {
+        if (filter!=undefined) {                
+            // console.log(headphone+" "+headphone.search(filter.text))
+            if (headphone.toLowerCase().search(filter.text)==-1) continue;            
+        }
+
         div = document.createElement('div');
         div.className='config';        
         div.innerText=headphone;
@@ -358,10 +364,12 @@ function loadHeadphoneList() {
 
 
 function searchAutoEq() {
-    let text = document.getElementById('autoEQSearch').value;
-    if (text.length<2) return;
+    const text = document.getElementById('autoEQSearch').value.toLowerCase();        
+    loadHeadphoneList({"text":text})
+}
 
-
+function autoEQSearchKeyDown() {
+    if (event.keyCode==13) searchAutoEq()
 }
 
 class EQSlider {    
