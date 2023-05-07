@@ -347,7 +347,16 @@ function loadHeadphoneList(filter) {
         div.addEventListener('dblclick',function(){
             let url = this.getAttribute('url')
             fetch(url).then((res)=>res.text().then(fileList=>{        
-                let paramEQUrl = JSON.parse(fileList).tree[2].url;
+                let list = JSON.parse(fileList).tree;
+                let paramEQUrl;
+                for (i=0;i<list.length;i++) {
+                    if (list[i].path.toLowerCase().search('parametriceq')>-1) {
+                        paramEQUrl=list[i].url;
+                        break;
+                    }
+                }                
+
+                console.log(JSON.parse(fileList).tree);
                 fetch(paramEQUrl).then((res)=>res.json().then(paramEQ=>{                            
                     let paramEQText = atob(paramEQ.content);                    
                     let filterArray = parseAutoEQText(paramEQText);
