@@ -107,10 +107,12 @@ async function uploadConfigToDSP(filterArray) {
 
     for (let filter of filterArray) {
         let filterName=Object.keys(filter)[0];
+        console.log(filter[filterName].type);
+
         filters[filterName] = {
             "type": "Biquad",
             "parameters": {
-            "type": "Peaking",
+            "type": filter[filterName].type,
             "freq": filter[filterName].freq,
             "q": filter[filterName].q,
             "gain": filter[filterName].gain,
@@ -168,7 +170,7 @@ function convertFilterArayToJSON(filterArray) {
         filters[filterName] = {
             "type": "Biquad",
             "parameters": {
-            "type": "Peaking",
+            "type": filter[filterName].type,
             "freq": filter[filterName].freq,
             "q": filter[filterName].q,
             "gain": filter[filterName].gain,

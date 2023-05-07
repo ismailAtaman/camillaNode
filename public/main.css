@@ -1,31 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
 
 :root {
-    font-family: 'Kdam Thmor Pro', sans-serif;
-    --body-background: #333;
+    font-family: 'Abel', sans-serif;
+    font-size: 16px;
+    --body-bgcolor1: hsl(0, 0%, 20%);
+    --body-bgcolor2: hsl(0, 0%, 25%);
 
     --eqmain-width: 650px;
 
     --slider-width: 3.3em;
     --slider-height: 15rem;
-    --header-bgcolor: #336699;
+    --header-bgcolor2: hsl(210, 50%, 40%);
+    --header-bgcolor1: hsl(210, 30%, 20%);
 
-    --error-background: #dd2222;
+    --error-background: hsl(0, 70%, 50%);
     --error-color: #FFFFFF;
 
-    --success-background: #2c8ff8;
+    --success-background: hsl(175, 70%, 20%);
     --success-color: #fff;
 
     overflow-x: hidden;
-
 }
+
+
 
 body {
     font-family: inherit;
-    background-color: var(--body-background);
+    background: linear-gradient(135deg, var(--body-bgcolor1), var(--body-bgcolor2));    
     color: white;
     margin: 0;
     padding: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+input, select {
+    font-family: 'Abel', sans-serif;
+    font-style:normal;
 }
 
 .section {    
@@ -35,7 +48,8 @@ body {
 
 #header {
     display: block;
-    background-color: var(--header-bgcolor);    
+
+    background: linear-gradient(45deg, var(--header-bgcolor1), var(--header-bgcolor2));
     height: max(5vh,65px);
 }
 
@@ -87,7 +101,7 @@ body {
     max-width: calc(var(--eqmain-width)-2px);
     height: 15px;    
     opacity: 90%;
-    background-color: var(--body-background); 
+    background-color: var(--body-bgcolor1); 
     border-radius: 5px 0px 0px 5px;        
 }
 
@@ -116,7 +130,8 @@ body {
 }
 
 #equalizer select {
-    height: 15px;
+    width: 50px;   
+    height: 20px;
 }
 
 #eqtools {
@@ -126,27 +141,38 @@ body {
     width: 120px;    
 }
 
-#configList {
-    margin-block: 0.5rem;
+#configName {
+    border-radius: 5px;
+    border: none;
+    padding: 3px;
+    font-weight: bold;
+}
+
+#configList {    
+    margin-left: 10px;
     border: 1px solid #555;
     padding: 0.5rem;
-    width: 400px;
+    width: 420px;
     height: 150px;;
     overflow-y: scroll;
-    background-color: #666;
+    background-color: #369;
+    border-radius: 10px;
+
 }
 
 .config {
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
-    padding-bottom: 0.5rem;
+    padding: 0.2rem;
     user-select: none;
+    border-radius: 5px;
 }
 
 .config:hover {
-    color: #CDF;   
-    
+    color: #222;   
+    background-color: hsl(210, 50%, 80%);    
     transition: all 250ms;
+
     
 }
 
@@ -157,16 +183,16 @@ body {
 
 
 #messageBox {
-    font-size: 12px;
+    font-size: 15px;
     display: none;
     position:absolute;
     left: 50%;
     top: 50%;
     width: fit-content;
     height: fit-content;
-    padding: 20px;
+    padding: 10px;
     border: 1px solid white;
-    border-radius: 10px;
+    border-radius: 7px;
     background-color: #234e7a;
     color:white;        
     z-index: -1;    
@@ -185,7 +211,8 @@ body {
     position: relative;
     width: var(--slider-width);
     height: var(--slider-height);        
-    display: inline-block;
+    display: inline-block;    
+    align-items: center;
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
     -webkit-user-select: none;
@@ -222,9 +249,9 @@ body {
     justify-content: center;
     margin-top: 10px;
     appearance: none;
-    width: 45px;
-    height: 16px;
-    font-size: 11px;
+    width: 45px;    
+    height: 15px;
+    font-size: 12px;
     cursor: pointer;
     border: none; 
     background-color: #DDD;
@@ -268,7 +295,7 @@ body {
 .button {
     display: inline-block;
     width: 100px;
-    font-size: 12px;
+    font-size: 14px;
     background-color: #336699;
     appearance: none;
     padding: 3px;

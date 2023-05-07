@@ -14,12 +14,13 @@
 
     <%- include('header.ejs'); %>
     <div id="eqmain" class="section">      
-        <div class="section" id="eqLevel">
-            <div id="levelBorder">
-                <div id="levelLBar" class="levelBar"></div>
-            </div>        
+
+        <div class="section" id="eqLevel">            
             
             <div id="levelBorder">
+                <div id="levelLBar" class="levelBar"></div>
+            </div>                    
+           <div id="levelBorder">
                 <div id="levelRBar" class="levelBar"></div>
             </div>
         </div>
@@ -35,15 +36,17 @@
             <div class="button" onclick="compress()">Compress</div>
             <div class="button" onclick="addBand()">Add Band</div>            
         </div>
-
-        <br>
-        <div class="button" onclick="uploadClick()">Upload</div>
-        <div class="button" onclick="downloadClick()">Download</div>
         
-        <br><br>
-        <input type="text" name="configName" id="configName">
-        <div class="button" onclick="saveClick()">Save</div>
-        <div class="button" onclick="deleteClick()">Delete</div>
+        <div class="section" id="DSPManagement">
+            <div class="button" onclick="uploadClick()">Upload</div>
+            <div class="button" onclick="downloadClick()">Download</div>
+        </div>        
+        
+        <div class="section" id="configManagement">
+            <input type="text" name="configName" style="width:200px" id="configName">
+            <div class="button" onclick="saveClick()">Save</div>
+            <div class="button" onclick="deleteClick()">Delete</div>
+        </div>
 
         <div id="configList">
             <div class="config" id="0">Kiwi Ears Cadenza</div>
