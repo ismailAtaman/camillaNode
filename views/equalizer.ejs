@@ -40,19 +40,22 @@
             <div class="button" onclick="reset()">Reset</div>
             <div class="button" onclick="compress()">Compress</div>
             <div class="button" onclick="addBand()">Add Band</div>            
+            <div class="button" onclick="removeLast()">Remove Last</div>            
+            
         </div>
         
         <div class="section" id="DSPManagement">
             <div class="button" onclick="uploadClick()">Upload</div>
             <div class="button" onclick="downloadClick()">Download</div>
             <div class="button" onclick="toggleSaved()">Saved Configs</div>
-
+            <div class="button" onclick="document.getElementById('autoEQWindow').style.display='block'; loadHeadphoneList()">AutoEQ</div>
         </div>        
         
         <div class="section" id="configManagement">
-            <input type="text" name="configName" style="width:200px" id="configName">
+            <input type="text" name="configName" style="width:421px" id="configName">
             <div class="button" onclick="saveClick()">Save</div>
             <div class="button" onclick="deleteClick()">Delete</div>
+            
         </div>
 
         <div id="configList">
@@ -62,6 +65,7 @@
 
 
     </div>       
+   
     
     
     <div id="messageBox"></div>
@@ -74,6 +78,18 @@
     <input type="button" value="send" id="sendButton" onclick="sendCommand()">
     <div id="response"></div> 
 -->
+
+<div id="autoEQWindow">
+    <div>AutoEQ Search</div>
+    <input type="text" name="" id="autoEQSearch">
+    <div class="button" onclick="searchAutoEq()">Search</div>
+    <div class="button" onclick="document.getElementById('autoEQWindow').style.display='none'">Close</div>
+    <div class="button" onclick="refreshAutoEq()">Refresh</div>
+    <br>
+    <div id="headphoneList">
+
+    </div>
+</div>
 
 </body>
 

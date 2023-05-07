@@ -24,8 +24,6 @@
     overflow-x: hidden;
 }
 
-
-
 body {
     font-family: inherit;
     background: linear-gradient(135deg, var(--body-bgcolor1), var(--body-bgcolor2));    
@@ -146,13 +144,14 @@ input, select {
     border: none;
     padding: 3px;
     font-weight: bold;
+    font-size: 14px;
 }
 
 #configList {    
     margin-left: 10px;
     border: 1px solid #555;
     padding: 0.5rem;
-    width: 420px;
+    width: var(--eqmain-width);
     height: 150px;;
     overflow-y: scroll;
     background-color: #369;
@@ -161,7 +160,7 @@ input, select {
 }
 
 .config {
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     padding: 0.2rem;
     user-select: none;
@@ -320,4 +319,32 @@ input, select {
 #deviceSettings {
     font-family:'Courier New', Courier, monospace;
     font-size:15px;
+}
+
+
+
+/************************************************************ AUTOEQ *************************************************************/
+
+#autoEQWindow {
+    position:absolute;
+    background-color: #222;
+    left: 50%;
+    top:50%;
+    display: none;
+    border: 1px solid white;
+    width: 40vw;
+    height: 60vh;
+    padding: 10px;
+    border-radius: 7px;
+    transform: translate(-50%,-50%);    
+
+}
+
+#headphoneList {
+    margin-top: 10px;
+    display: block;
+    width: 97%;
+    height: 90%;
+    overflow: scroll;
+    background-color: #369;
 }

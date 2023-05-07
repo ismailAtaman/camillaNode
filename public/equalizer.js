@@ -101,8 +101,7 @@ function createFilterArray() {
         "gain"  : parseFloat(preampGainVal),        
     }
     filterArray.push(filter);
-
-    console.log(filterArray)
+    //console.log(filterArray)
     return filterArray;
 }
 
@@ -116,6 +115,8 @@ async function downloadClick() {
     downloadConfigFromDSP().then((DSPConfig)=>{        
         let filters = DSPConfig.filters;
         applyFilters(filters);        
+
+
         console.log("Config download successful.");        
         displayMessage("Download successful");
     }).catch((err)=>{
@@ -126,6 +127,9 @@ async function downloadClick() {
 
 function applyFilters(filters) {
     i=0;     
+    document.getElementById('equalizer').replaceChildren();
+
+    //console.log(filters)
     for (const filterName of Object.keys(filters).sort()) {        
         if (filterName=="Preamp") {
             document.getElementById("preampGainVal").value=filters[filterName].parameters.gain+'db';
@@ -164,6 +168,7 @@ function reset() {
         sliders[i].children['filterType'].value='Peaking';
         sliderUpdateVal(sliders[i],0);
     }
+    document.getElementById("preampGainVal").value='0db'
 }
 
 function compress() {
@@ -176,6 +181,16 @@ function compress() {
         sliderUpdateVal(sliders[i],gain);
     }
 }
+
+function removeLast() {
+    let sliders = document.getElementsByClassName('slider-container');    
+    if (sliders.length<=1) return;
+
+    let lastSlider = sliders[sliders.length-1];
+    lastSlider.parentElement.removeChild(lastSlider);
+}
+
+
 
 function saveClick() {    
     let configNameObject = document.getElementById('configName');
@@ -282,6 +297,71 @@ function addBand() {
     nextId<10?nextId="0"+nextId:a=1;
     s.id = "Filter"+ nextId;    
     EQParent.appendChild(s);
+}
+
+
+
+function searchClick() {
+    getCongifText('https://raw.githubusercontent.com/jaakkopasanen/AutoEq/master/results/oratory1990/harman_over-ear_2018/Audeze%20LCD-X%202021/Audeze%20LCD-X%202021%20ParametricEQ.txt').then((d)=>{
+        console.log(d);
+        let filterArray = parseAutoEQText(d);
+        let filterArrayJSON = convertFilterArayToJSON(filterArray);            
+        applyFilters(filterArrayJSON.filters);        
+    })    
+}
+
+function refreshAutoEq() {
+    let list = document.getElementById('headphoneList')
+    list.replaceChildren();
+    list.innerText="Dowloading headphone data from AutoEQ..."   
+
+    downloadHeadphoneList().then((data)=>{
+        let headphoneList = JSON.parse(data);
+        let record;
+        let records = Object();
+        for (let headphone of headphoneList.tree ) {
+            record =  {"name":headphone.path,"url": headphone.url}
+            records[headphone.path]=record;
+        }
+        window.localStorage.setItem("headphoneRecords",JSON.stringify(records));
+    })
+    loadHeadphoneList();
+}
+
+function loadHeadphoneList() {
+    const listObject = document.getElementById('headphoneList');
+    listObject.replaceChildren();
+    const headphoneRecords = JSON.parse(window.localStorage.getItem('headphoneRecords'));
+    let div;
+    for (let headphone of Object.keys(headphoneRecords)) {
+        div = document.createElement('div');
+        div.className='config';        
+        div.innerText=headphone;
+        div.setAttribute('url',headphoneRecords[headphone].url);
+        div.addEventListener('dblclick',function(){
+            let url = this.getAttribute('url')
+            fetch(url).then((res)=>res.text().then(fileList=>{        
+                let paramEQUrl = JSON.parse(fileList).tree[2].url;
+                fetch(paramEQUrl).then((res)=>res.json().then(paramEQ=>{                            
+                    let paramEQText = atob(paramEQ.content);                    
+                    let filterArray = parseAutoEQText(paramEQText);
+                    let filterArrayJSON = convertFilterArayToJSON(filterArray);            
+                    applyFilters(filterArrayJSON.filters);
+                    document.getElementById('configName').value=this.innerText;
+                    document.getElementById('autoEQWindow').style.display='none';        
+                }))
+            }))
+        })
+        listObject.appendChild(div)
+    }
+}
+
+
+function searchAutoEq() {
+    let text = document.getElementById('autoEQSearch').value;
+    if (text.length<2) return;
+
+
 }
 
 class EQSlider {    
@@ -447,3 +527,74 @@ class EQSlider {
 
 }
 
+
+
+//////////////////////// AUTO-EQ //////////////////
+
+
+async function getCongifText(url) {
+    return new Promise((resolve)=>{;
+        fetch(url).then((res)=>res.text().then(data=>{        
+            resolve(data);
+        }))
+    })
+    
+}
+
+async function downloadHeadphoneList() {
+    url = 'https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08';
+    return new Promise((resolve)=>{;
+        fetch(url).then((res)=>res.text().then(data=>{        
+            resolve(data);
+        }))
+    })    
+}
+
+
+function parseAutoEQText(text,name) {    
+    let lines = text.split('\n');
+    let filterArray=new Array();        
+    let i=0;
+    //console.log(lines)
+
+    for (let line of lines) {
+        if (line.length==0) continue;
+        //console.log(line)
+        let name = line.substring(0,line.indexOf(':'));
+        let lineFragments = line.substring(line.indexOf(':')+1).split(' ');
+        //console.log(lineFragments)
+
+        let type,gain,freq,qfact;
+        
+        if (name=='Preamp') { 
+            gain=lineFragments[1]; 
+            freq=0;
+            qfact=0; 
+            filterType="Preamp"
+        } else {
+            i<10?name="Filter0"+i:name="Filter"+i;
+            filterType=lineFragments[2];
+            freq=lineFragments[4];
+            gain=lineFragments[7];
+            qfact=lineFragments[10];
+        }         
+        console.log(filterType)
+        filterType=="PK"?filterType="Peaking":filterType=="LS"?filterType="Lowshelf":filterType="Highshelf";
+
+        let filter = new Object();
+
+        filter[name] = {
+            "type"  : filterType,
+            "freq"  : parseInt(freq),
+            "gain"  : parseFloat(gain),
+            "q"     : parseFloat(qfact)
+        }
+
+        filterArray.push(filter);        
+        i++;
+    }
+
+    console.log(filterArray);
+    return filterArray;
+
+}
