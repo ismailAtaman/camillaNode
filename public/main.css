@@ -233,7 +233,7 @@ input, select {
     position:relative;    
     width: 200%;
     aspect-ratio: 1;
-    background-color: #5588BB;
+    background-color: #DDD; /*#5588BB;*/
     border-radius: 50%;
     top: 0;
     left:50%;

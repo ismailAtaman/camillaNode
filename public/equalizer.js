@@ -115,8 +115,6 @@ async function downloadClick() {
     downloadConfigFromDSP().then((DSPConfig)=>{        
         let filters = DSPConfig.filters;
         applyFilters(filters);        
-
-
         console.log("Config download successful.");        
         displayMessage("Download successful");
     }).catch((err)=>{
@@ -379,6 +377,36 @@ function searchAutoEq() {
 
 function autoEQSearchKeyDown() {
     if (event.keyCode==13) searchAutoEq()
+}
+
+
+function sortByFreq() {    
+    let filterArray = createFilterArray()    
+    filterArray.sort((a,b)=>{
+        return a[Object.keys(a)[0]].freq - b[Object.keys(b)[0]].freq;
+    })
+    //console.log(filterArray);   
+
+    let tempfilterArray = new Array();
+    
+
+    for (i=1;i<=filterArray.length;i++) {
+        let tempFilter = new Object();
+        let filterName = i<10?'Filter0'+i:'Filter'+i;
+        // console.log(filterName);
+        // console.log(filterArray[i-1][Object.keys(filterArray[i-1])]);        
+
+        if (Object.keys(filterArray[i-1])!='Preamp') {
+            tempFilter[filterName]=filterArray[i-1][Object.keys(filterArray[i-1])]                        
+        } else {
+            tempFilter["Preamp"]=filterArray[i-1][Object.keys(filterArray[i-1])]
+        }
+        // console.log(tempFilter);
+        tempfilterArray.push(tempFilter)
+    }
+    //console.log(tempfilterArray)
+    let filterArrayJSON = convertFilterArayToJSON(tempfilterArray);            
+    applyFilters(filterArrayJSON.filters);    
 }
 
 class EQSlider {    
