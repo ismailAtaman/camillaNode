@@ -15,7 +15,7 @@
     <%- include('header.ejs'); %>
     <div id="eqmain" class="section">      
 
-        <div class="section" id="eqLevel">
+        <div class="section eqSection" id="eqLevel">            
             <div id="levelBorder">
                 <div id="levelLBar" class="levelBar"></div>
             </div>                    
@@ -28,41 +28,43 @@
             <canvas id="eqcanvas" width="100%" height="100%"></canvas>
         </div>
 
-        <div class="section" id="preampGain">
-           <span style="font-size: 14px; margin-left:6px">Pre-amp</span><input type="text" name="" id="preampGainVal" class="eqparam" style="width:75px;margin-inline:10px; display: inline-block;">
+        <div class="section eqSection" id="preampGain">
+           <span style="font-size: 14px; margin-left:6px">Pre-amp</span><input type="text" name="" id="preampGainVal" class="eqparam" style="width:75px;margin-inline:10px; display: inline-block;">            
         </div>
 
-        <div class="section" id="equalizer">         
-        </div>
-
+        
         <div class="section" id="eqtools">
             <div class="button" onclick="flatten()">Flatten</div>
             <div class="button" onclick="reset()">Reset</div>
             <div class="button" onclick="compress()">Compress</div>
             <div class="button" onclick="addBand()">Add Band</div>            
             <div class="button" onclick="removeLast()">Remove Last</div>            
-            <div class="button" onclick="sortByFreq()">I have OCD</div>            
-
-            
+            <div class="button" onclick="sortByFreq()">I have OCD</div>             
         </div>
+
         
-        <div class="section" id="DSPManagement">
+
+        <div class="section eqSection" id="equalizer">         
+        </div>
+
+
+        
+        <div class="section " id="DSPManagement">
             <div class="button" onclick="uploadClick()">Upload</div>
             <div class="button" onclick="downloadClick()">Download</div>
             <!-- <div class="button" onclick="toggleSaved()">Saved Configs</div> -->
             <div class="button" onclick="document.getElementById('autoEQWindow').style.display='block'; loadHeadphoneList()">AutoEQ</div>
         </div>        
         
-        <div class="section" id="configManagement">
+        <div class="section eqSection" id="configManagement">
             <input type="text" name="configName" style="width:421px" id="configName">
             <div class="button" onclick="saveClick()">Save</div>
             <div class="button" onclick="deleteClick()">Delete</div>            
-        </div>
 
-        <div id="configList">
-            <div class="config" id="0">Kiwi Ears Cadenza</div>
-        </div>
 
+            <div id="configList">                
+            </div>
+        </div>
 
 
     </div>       

@@ -65,7 +65,7 @@ function sliderUpdateVal(slider,val) {
     
     sliderKnob.style.top=yPos+'px';
     
-    let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/180));    
+    let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/360));    
     sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
 
     // console.log('Val : '+val)            
@@ -251,6 +251,8 @@ async function getConfig(configName) {
 }
 
 function displayMessage(message,options) {
+
+
     if (options==undefined) options={};
 
     if (options.timeout==undefined) options.timeout=1500;
@@ -258,6 +260,10 @@ function displayMessage(message,options) {
     if (options.type == undefined) options.type="default";
 
     let messageBox = document.getElementById('messageBox');    
+    let equalizerRect = document.getElementById('equalizer').getBoundingClientRect();    
+    messageBox.style.top=equalizerRect.top+equalizerRect.height/2;
+    messageBox.style.top=equalizerRect.left+equalizerRect.width/2;
+
     
     let timeout = options.timeout    
     if (options.type=="error") {
@@ -571,8 +577,6 @@ class EQSlider {
 
 
 }
-
-
 
 //////////////////////// AUTO-EQ //////////////////
 

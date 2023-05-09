@@ -18,21 +18,55 @@
 
 </body>
 <script>
+    const defaultSampleRates = [44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000, 705600, 768000]
+    const fieldTypes=[
+        {"samplerate":"select"},
+        {"chunksize":"number"},
+        {"quelimit":"number"},
+        {"silence_threshold":"number"},
+        {"silence_timeout":"number"},
+        {"capture":"object"},
+        {"playback":"object"},        
+    ]
+
     connectToDsp().then(()=>{    
     downloadConfigFromDSP().then((data=>{
-       
+
         DSPConfig=data;
         settings = document.getElementById('deviceSettings');
         console.log(DSPConfig.devices);
-        for (configItem of Object.keys(DSPConfig.devices)) {
-            let p = document.createElement('p');
-            let label = document.createElement('span');            
-            let textBox = document.createElement('span')            
+        for (configItem of Object.keys(DSPConfig.devices)) {            
+            
+            let type = fieldTypes.find(e=>configItem==Object.keys(e)[0]);
+            if (type==undefined) continue; let dataType = type[Object.keys(type)];
+            let val;
 
+            switch (dataType) {
+                case "number":
+                    val = document.createElement('input');
+                    val.type='number';
+                    val.value=DSPConfig.devices[configItem];
+                    break;
+                case "object":
+                    val = document.createElement('input');
+                    val.type='text';
+                    val.value=DSPConfig.devices[configItem];
+                    break;
+                case "select":
+                    val = document.createElement('input');
+                    val.type='text';
+                    val.value=DSPConfig.devices[configItem];
+                    break;
+                default:
+                    break;
+            }
+            
+            let p = document.createElement('p');
+            let label = document.createElement('span');
             label.innerText=configItem
-            textBox.innerText= DSPConfig.devices[configItem];            
+            
             p.appendChild(label);
-            p.appendChild(textBox);
+            p.appendChild(val);
             settings.appendChild(p);
 
         }
