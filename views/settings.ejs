@@ -16,54 +16,87 @@
 </div>
 
 <script>
-    let preferencesString = window.localStorage.getItem('preferences');
-    if (preferencesString==undefined) preferences = loadDefaultPreferences(); else preferences =JSON.parse(preferencesString);
+
+    loadPreferences();
+    loadSettings();
+
+    const inputElements = document.getElementsByTagName('input');
+    for (i=0;i<inputElements.length;i++) {
+        inputElements[i].addEventListener('change',function(){
+            
+            let val;            
+            if (this.type=="checkbox") val=this.checked;            
+            if (this.type=="range") val=this.value;
+            let settingName=this.getAttribute('settingName');
+             setSettingValue(settingName,val)
+            // console.log(settingName+" : " + val);            
+            window.localStorage.setItem('preferences',JSON.stringify(preferences));
+        })
+    }
+    
+
     window.localStorage.setItem('preferences',JSON.stringify(preferences));
-    //console.log(preferences)
 
-    let settingsElement = document.getElementById('settings');
+    function loadPreferences() {
+        let preferencesString = window.localStorage.getItem('preferences');
+        if (preferencesString==undefined) preferences = loadDefaultPreferences(); else preferences =JSON.parse(preferencesString);
+        window.localStorage.setItem('preferences',JSON.stringify(preferences));
+        //console.log(preferences)
+    }
 
-    let legend = preferences.legend;
-    for (let group of Object.keys(legend)) {
-        groupTitleElement = document.createElement('div');
-        groupTitleElement.innerText=legend[group];
-        groupTitleElement.className='settingsGroup';
-        
-        for (let item of Object.keys(preferences[group])) {
-            let itemElement;
-            let itemTitle = document.createElement('p');            
-            itemTitle.innerText=preferences[group][item].title;
+    function loadSettings() {
+        let settingsElement = document.getElementById('settings');
 
-            switch (preferences[group][item].params.format) {
-                case "boolean":
-                    itemElement = document.createElement("input")
-                    itemElement.type="checkbox";
-                    break;
-                case "range":
-                    itemElement = document.createElement("input")
-                    itemElement.type="range";
-                    itemElement.min = preferences[group][item].params.min;
-                    itemElement.max = preferences[group][item].params.max;
-                    itemElement.value = preferences[group][item].value
+        let legend = preferences.legend;
+        for (let group of Object.keys(legend)) {
+            groupElement = document.createElement('div');        
+            groupElement.className='settingsGroup';
+            
+            groupTitleElement = document.createElement('div');        
+            groupTitleElement.innerText=legend[group];
+            groupTitleElement.className='settingsGroupTitle';
 
-                    break;            
+            groupElement.appendChild(groupTitleElement);
+            
+            for (let item of Object.keys(preferences[group])) {
+                let itemElement;
+                let itemTitle = document.createElement('div');            
+                itemTitle.innerText=preferences[group][item].title;
+
+                switch (preferences[group][item].params.format) {
+                    case "boolean":
+                        itemElement = document.createElement("input")
+                        itemElement.type="checkbox";
+                        if (preferences[group][item].value) itemElement.checked=true;
+                        break;
+                    case "range":
+                        itemElement = document.createElement("input")
+                        itemElement.type="range";
+                        itemElement.min = preferences[group][item].params.min;
+                        itemElement.max = preferences[group][item].params.max;
+                        itemElement.value = preferences[group][item].value
+                        break;            
+                }
+                itemElement.setAttribute("settingName",item);
+
+                groupElement.appendChild(itemTitle);
+                groupElement.appendChild(itemElement);
+                // console.log(group+":"+item+":"+preferences[group][item].params.format)
             }
-            groupTitleElement.appendChild(itemTitle);
-            groupTitleElement.appendChild(itemElement);
-            console.log(group+":"+item+":"+preferences[group][item].params.format)
-        }
 
-        settingsElement.appendChild(groupTitleElement);
-        settingsElement.appendChild(document.createElement('hr'))
+            settingsElement.appendChild(groupElement);
+            settingsElement.appendChild(document.createElement('hr'))
+        }
     }
 
     function loadDefaultPreferences() {
         let legend = {"display":"Display Settings","general":"General Settings","equalizer":"Equalizer Settings"}
         let display = {
-            "backgroundHue":{"title":"Page background color","value":170,"params":{"format":"range","min":0,"max":360}},
+            "backgroundHue":{"title":"Page background hue","value":170,"params":{"format":"range","min":0,"max":360}},
+            "headerHue":{"title":"Header background hue","value":210,"params":{"format":"range","min":0,"max":360}},
             "EQSectionbackgroundHue":{"title":"EQ section backgroun hue","value":210,"params":{"format":"range","min":0,"max":360}},
             "hueRotate" : {"title":"Change EQ Band color with chaning gain","value":true,"params":{"format":"boolean"}},
-            "eqparamFontSize": {"title":"Change EQ Band color with chaning gain","value":true,"params":{"format":"boolean"}}
+            "eqparamFontSize": {"title":"Equalizer parameter font size","value":14,"params":{"format":"range","min":12,"max":18}},
         }
 
         let general = {
@@ -81,5 +114,48 @@
     }
 
 
+    function getSettingValue(setting) {
+        return getObjectValue(preferences,setting)        
+    }
+
+    function setSettingValue(setting,value) {        
+        return setObjectValue(preferences,setting,value)        
+    }
+
+    function getObjectValue(searchObject,searchKey) {
+        let found = undefined;
+        found = searchObject[searchKey];        
+        if (found!=undefined) return found;        
+        for (let key of Object.keys(searchObject)) {            
+            if (typeof searchObject[key]=="object") {                                            
+                let found = getObjectValue(searchObject[key],searchKey);   
+                if (found!=undefined) return found.value;
+            }
+        }                
+        return found;
+    }
+
+    function setObjectValue(searchObject,searchKey,value) {
+        let found = undefined;
+        found = searchObject[searchKey];        
+
+        if (found!=undefined) { 
+            found.value=value;  
+            return true; 
+        }       
+
+        for (let key of Object.keys(searchObject)) {            
+            if (typeof searchObject[key]=="object") {                                            
+                let found = getObjectValue(searchObject[key],searchKey);   
+                //console.log(found)
+                if (found!=undefined) { 
+                    found.value=value;  
+                    return true; 
+                }       
+            }
+            
+        }                
+        return false;
+    }
     
 </script>

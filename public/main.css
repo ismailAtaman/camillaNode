@@ -398,9 +398,20 @@ input, select {
     display: none;
 }
 
+#settings {
+    margin:10px;
+    margin-top: 20px;
+}
 
-.settingsGroup {
-    display: block;
+.settingsGroup {    
+    display: grid;
+    grid-template-columns: 300px auto;    
+    gap: 20px;
+    font-size: 16px;    
+}
+
+.settingsGroupTitle {    
+    grid-column: span 2;
     font-size: 25px;
     font-weight: bold;
 }
@@ -409,4 +420,76 @@ input, select {
     display: block;
     font-size: 14px;
     font-weight: normal;
+}
+
+#settings input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;    
+    border-radius: 5px;
+    width: 40px;
+    height: 16px;
+    border: 1px solid gray;
+    background-color: #622;
+    transition: all 250ms;
+}
+
+#settings input[type="checkbox"]:before {
+    content: ' ';
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+    display: block;
+    background-color: white;    
+    transition: all 250ms;
+}
+
+#settings input[type="checkbox"]:checked:before {
+    content: ' ';
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+    display: block;
+    background-color: white;        
+    transform: translateX(150%);
+    transition: all 250ms;
+}
+
+
+#settings input[type="checkbox"]:checked {        
+    background-color: #393;
+    transition: all 500ms;
+}
+
+
+#settings input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;    
+    background-color: #369;
+    border-radius: 7px;
+    height: 8px;
+    width: 300px;    
+
+}
+
+#settings input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    margin-top: -12px; /* Centers thumb on the track */
+    background-color: #5cd5eb;
+    height: 24px;
+    width: 12px;    
+ }
+
+ input[type="range"]::-moz-range-thumb {
+    border: none; /*Removes extra border that FF applies*/
+    border-radius: 5px; /*Removes default border-radius that FF applies*/
+    background-color: #5588BB;
+    height: 24px;
+    width: 12px;
+    
+}
+
+#settings hr {
+    margin-block: 20px;
 }
