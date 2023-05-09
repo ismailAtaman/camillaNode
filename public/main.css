@@ -4,16 +4,27 @@
 
 :root {
     font-family: 'Abel', sans-serif;
-    font-size: 16px;
-    --body-bgcolor1: hsl(0, 0%, 20%);
-    --body-bgcolor2: hsl(0, 0%, 25%);
+    --default-font-size: 16px;
+
+    font-size: var(--default-font-size);
+
+    --header-hue: 210;
+    --main-hue: 210;
+    --saturation: 50%;
+
+    
+
+    --body-bgcolor1: hsl(var(--main-hue), 5%, 20%);
+    --body-bgcolor2: hsl(var(--main-hue), 5%, 25%);
 
     --eqmain-width: 650px;
 
     --slider-width: 3.4em;
     --slider-height: 15rem;
-    --header-bgcolor2: hsl(210, 50%, 40%);
-    --header-bgcolor1: hsl(210, 30%, 20%);
+
+
+    --header-bgcolor2: hsl(var(--header-hue), 50%, 40%);
+    --header-bgcolor1: hsl(var(--header-hue), 30%, 20%);
 
     --eqparamFontSize: 13px;
 
@@ -26,7 +37,7 @@
     overflow-x: hidden;
 }
 
-body {
+body {    
     font-family: inherit;
     background: linear-gradient(135deg, var(--body-bgcolor1), var(--body-bgcolor2));    
     color: white;
@@ -47,10 +58,10 @@ input, select {
 }
 
 .eqSection {    
-    border: 1px solid hsl(210, 5%, 15%);    
+    border: 1px solid hsl(var(--main-hue), 5%, 15%);    
     border-radius: 7px;
     margin-inline: 10px;
-    background-color: hsl(210, 10%, 20%);        
+    background-color: hsl(var(--main-hue), 10%, 20%);        
 }
 /* .eqSection::after {
     position: relative;
@@ -109,8 +120,13 @@ input, select {
     margin-inline: 1rem;
     width: 98%;
     height: 15px;
-    border: 1px solid white;;
-    background: linear-gradient(90deg, red 0%, yellow 50%, green 100% );
+    border: 1px solid white;
+    --bar-saturation: calc(var(--saturation) + 20%);
+    --color-1 : hsl(0,var(--bar-saturation),50%);
+    --color-2 : hsl(60,var(--bar-saturation),50%);
+    --color-3 : hsl(120,var(--bar-saturation),50%);
+
+    background: linear-gradient(90deg, var(--color-1),var(--color-2),var(--color-3) );
     margin: 5px;
     transform: rotate(180deg);
     border-radius: 5px;
@@ -150,7 +166,7 @@ input, select {
 }
 
 #equalizer select {
-    background-color: #DFD;
+    background-color: hsl(var(--main-hue), 100%, 93%);
     height: 20px;
     width: 50px;    
 }
@@ -171,6 +187,7 @@ input, select {
     border: 1px solid white;
     border-radius: 7px;
     margin-inline: 10px;
+    height: fit-content;
 
 }
 
@@ -187,15 +204,15 @@ input, select {
     border: 1px solid #555;
     padding: 0.5rem;
     width: var(--eqmain-width);
-    height: 200px;;
+    height: calc( 10 * var(--default-font-size));
     overflow-y: scroll;
-    background-color: #369;
+    background-color: hsl(var(--main-hue), var(--saturation), 40%);
     border-radius: 10px;
 
 }
 
 .config {
-    font-size: 16px;
+    font-size: var(--default-font-size);
     cursor: pointer;
     padding: 0.2rem;
     user-select: none;
@@ -204,7 +221,7 @@ input, select {
 
 .config:hover {
     color: #222;   
-    background-color: hsl(210, 50%, 80%);    
+    background-color: hsl(var(--main-hue), var(--saturation), 80%);    
     transition: all 250ms;    
 }
 
@@ -263,7 +280,7 @@ input, select {
     width: 20%;
     height: 100%;
     left:50%;    
-    background-color: hsl(210, 50%, 40%);
+    background-color: hsl(var(--main-hue), var(--saturation), 40%);
     border-radius: 20px;
     transform: translateX(-50%);
 }
@@ -336,7 +353,7 @@ input, select {
     min-height: 30px;    
     width: 100px;
     font-size: 14px;
-    background-color: #336699;
+    background-color: hsl(var(--main-hue), var(--saturation), 40%);
     appearance: none;
     padding: 3px;
     margin: 3px;
@@ -347,8 +364,8 @@ input, select {
 }
 
 .button:hover {
-    filter: hue-rotate(90deg);
-    transition: all 500ms;
+    filter: hue-rotate(180deg) saturate(150%);
+    transition: all 350ms;
 }
 
 .small {
@@ -425,11 +442,11 @@ input, select {
 #settings input[type="checkbox"] {
     -webkit-appearance: none;
     appearance: none;    
-    border-radius: 5px;
-    width: 40px;
+    border-radius: 7px;
+    width: 30px;
     height: 16px;
     border: 1px solid gray;
-    background-color: #622;
+    background-color: hsl(0, 30%, 27%);
     transition: all 250ms;
 }
 
@@ -437,7 +454,7 @@ input, select {
     content: ' ';
     width: 16px;
     height: 16px;
-    border-radius: 5px;
+    border-radius: 7px;
     display: block;
     background-color: white;    
     transition: all 250ms;
@@ -447,16 +464,16 @@ input, select {
     content: ' ';
     width: 16px;
     height: 16px;
-    border-radius: 5px;
+    border-radius: 7px;
     display: block;
     background-color: white;        
-    transform: translateX(150%);
+    transform: translateX(100%);
     transition: all 250ms;
 }
 
 
 #settings input[type="checkbox"]:checked {        
-    background-color: #393;
+    background-color: hsl(120, 30%, 40%);
     transition: all 500ms;
 }
 
@@ -465,7 +482,7 @@ input, select {
     -webkit-appearance: none;
     appearance: none;
     border: none;    
-    background-color: #369;
+    background-color: hsl(var(--main-hue), 30%, 40%);
     border-radius: 7px;
     height: 8px;
     width: 300px;    
@@ -476,7 +493,7 @@ input, select {
     -webkit-appearance: none; /* Override default look */
     appearance: none;
     margin-top: -12px; /* Centers thumb on the track */
-    background-color: #5cd5eb;
+    background-color: hsl(var(--main-hue), var(--saturation), 55%);
     height: 24px;
     width: 12px;    
  }
@@ -484,7 +501,7 @@ input, select {
  input[type="range"]::-moz-range-thumb {
     border: none; /*Removes extra border that FF applies*/
     border-radius: 5px; /*Removes default border-radius that FF applies*/
-    background-color: #5588BB;
+    background-color: hsl(var(--main-hue), var(--saturation), 55%);
     height: 24px;
     width: 12px;
     
@@ -492,4 +509,21 @@ input, select {
 
 #settings hr {
     margin-block: 20px;
+}
+
+.tooltip {
+    position: absolute;
+    width: fit-content;
+    height: fit-content;
+    background-color: transparent;      
+    animation-name: disappear; 
+    animation-duration: 2s;
+    animation-iteration-count: 1;    
+    animation-fill-mode: forwards;
+}
+
+@keyframes disappear {
+    0% { opacity: 1;} 
+    75% {opacity: 1;}   
+    100% { opacity: 0;}    
 }

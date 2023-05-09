@@ -1,6 +1,5 @@
 
-const MAXDB= 16; // Max +/- db setting for individual filer
-const defaultFreqList = [30,100,200,800,1000,2000,4000,6000,8000,12000]
+
 
 let selectedKnob = null;
 let mouseDownY = 0;
@@ -12,14 +11,16 @@ async function initEQ() {
         return;
     }
     await updateConfigList();
-    downloadConfigFromDSP().then((DSPConfig)=>{        
+
+    if (autoDownload) downloadConfigFromDSP().then((DSPConfig)=>{        
         let filters = DSPConfig.filters;
         applyFilters(filters);     
     }) 
 
     let levelMaxWidth=document.getElementById('levelBorder').getBoundingClientRect().width
     setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
-            let levelL=isNaN(r[0])?-100:r[0];
+            if (r==undefined) return;
+             let levelL=isNaN(r[0])?-100:r[0];
             let levelR=isNaN(r[1])?-100:r[1];          
             
             levelL<-100?levelL=-100:a=1
@@ -50,10 +51,10 @@ async function initEQ() {
         this.value=text+'db';                                
     })
 
-
     for (i=0;i<=9;i++)  addBand();
     
-
+    if (showLevelBars==false) document.getElementById('eqLevel').style.display='none'; else document.getElementById('eqLevel').style.display='block';
+    
 }
 
 function sliderUpdateVal(slider,val) {
@@ -61,12 +62,12 @@ function sliderUpdateVal(slider,val) {
     const sliderMax = document.getElementsByClassName('slider-container')[0].getBoundingClientRect().height-sliderKnobHeight/2;
 
     const sliderKnob = slider.children[0].children[0];            
-    const yPos = ((parseFloat(-val)+MAXDB)/(2*MAXDB))*sliderMax;
+    const yPos = ((parseFloat(-val)+MaxDB)/(2*MaxDB))*sliderMax;
     
     sliderKnob.style.top=yPos+'px';
     
     let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/360));    
-    sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
+    if (hueRotate) sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
 
     // console.log('Val : '+val)            
     // console.log('sliderMax : '+sliderMax)       
@@ -236,6 +237,11 @@ async function updateConfigList() {
                 getConfig(this.innerText).then((config)=>{
                 let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
                 applyFilters(filterArrayJSON.filters);
+                if (autoUpload) {
+                    let filterArray= createFilterArray();                    
+                    uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
+                }
+
                 });
             });
             configList.appendChild(div);
@@ -295,12 +301,20 @@ function displayMessage(message,options) {
 }
 
 function addBand() {
+    
     let s = new EQSlider();
     let EQParent = document.getElementById('equalizer');
     let nextId = parseInt(EQParent.childElementCount)+1;
+    if (nextId>maxBands) return;
     nextId<10?nextId="0"+nextId:a=1;
     s.id = "Filter"+ nextId;    
     EQParent.appendChild(s);
+    if (autoUpload) {
+        s.addEventListener('change',function(){
+            console.log('DSP updated')
+            uploadClick();
+        })
+    }
 }
 
 
@@ -448,7 +462,8 @@ class EQSlider {
         freq.addEventListener('focusout',function(){            
             let text = this.value;               
             if (isNaN(text) || text<0) text=tempFreq;                        
-            this.value=text+'hz';                        
+            this.value=text+'hz';                   
+            dispatchEvent(new Event('change'));     
         })
 
         let gain = document.createElement('input');
@@ -474,6 +489,7 @@ class EQSlider {
             if (isNaN(text)) text=tempGain;
             this.value=text+'db';            
             sliderUpdateVal(sliderContainer,text);
+            dispatchEvent(new Event('change'));
         })
 
         let qfact = document.createElement('input');
@@ -492,7 +508,8 @@ class EQSlider {
         qfact.addEventListener('focusout',function(){            
             let text = this.value;               
             if (isNaN(text) || text<=0) text=tempQfact;
-            this.value=text;                     
+            this.value=text;       
+            dispatchEvent(new Event('change'));              
        })
 
 
@@ -517,19 +534,14 @@ class EQSlider {
        filterType.appendChild(HS)
 
        filterType.addEventListener('change',function(){
-            console.log(this.value)
+            dispatchEvent(new Event('change'));
        })
-
-
-
-
     
        const sliderTop = parseInt(sliderBody.getBoundingClientRect().top);
        const sliderHeight = sliderBody.getBoundingClientRect().bottom - sliderTop;
        const sliderKnobHeight = sliderKnob.getBoundingClientRect().bottom - sliderKnob.getBoundingClientRect().top;
        const sliderMax = sliderHeight-sliderKnobHeight/2;
        
-
        sliderKnob.style.top=(sliderMax)/2+'px';
        
        let selected=false;
@@ -539,11 +551,14 @@ class EQSlider {
        })
 
        sliderKnob.addEventListener('mouseup',function() {
-           selected=false;
+           selected=false;           
+           dispatchEvent(new Event('change'));
        })
+
 
        sliderContainer.addEventListener('mouseup',function() {
            selected=false;
+           dispatchEvent(new Event('change'));
        })
        
        sliderContainer.addEventListener('mousemove',function(event) {
@@ -553,12 +568,12 @@ class EQSlider {
             const yPos = Math.max(0,Math.min(pos,sliderBody.clientHeight-sliderKnob.clientHeight));
             sliderKnob.style.top = yPos+'px';            
 
-            const num = MAXDB-(MAXDB*2*yPos/sliderMax);
+            const num = MaxDB-(MaxDB*2*yPos/sliderMax);
             sliderContainer.value = Math.round((num + Number.EPSILON)*10)/10;            
             gain.value = sliderContainer.value+'db';            
 
             let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/360));    
-            sliderBody.style.filter='hue-rotate('+hueAngle+'deg)';
+            if (hueRotate) sliderBody.style.filter='hue-rotate('+hueAngle+'deg)';
        })
 
        sliderBody.appendChild(sliderKnob);

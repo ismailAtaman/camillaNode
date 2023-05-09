@@ -86,7 +86,11 @@ app.get('/deleteConfig',function(req,res){
         console.log("Error deleting configuration file.")
         console.log(err);
     }
-    
+})
+
+
+app.get('/log',function(req,res){    
+    // Check camilla    
 
 })
 

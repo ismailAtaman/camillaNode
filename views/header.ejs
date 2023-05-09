@@ -1,5 +1,8 @@
 
 <script src="main.js"></script>
+
+
+
 <div id="header" class="section">
     <div id="title">CamillaDSP Control</div> 
     <div class="menu">      
@@ -13,9 +16,19 @@
     </div>
 </div>    
 
-<script>    
+<script>     
+                
+        // Apply styles from preferences 
+        document.documentElement.style.setProperty('--header-hue',headerHue);
+        document.documentElement.style.setProperty('--main-hue',mainHue);
+        document.documentElement.style.setProperty('--eqparamFontSize',eqparamFontSize);
+        document.documentElement.style.setProperty('--saturation',saturation+'%');
+        
+        
         // console.log("Header script")
         const menuItems = document.getElementsByClassName('menuItem')
+
+
         // console.log(menuItems)
         for (i=0;i<menuItems.length;i++) {            
             menuItems[i].addEventListener('click',function(){
