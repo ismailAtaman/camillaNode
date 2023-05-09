@@ -346,6 +346,25 @@ function refreshAutoEq() {
     loadHeadphoneList();
 }
 
+
+function refreshAutoEqIEM() {
+    let list = document.getElementById('headphoneList')
+    list.replaceChildren();
+    list.innerText="Dowloading headphone data from AutoEQ..."   
+
+    downloadIEMList().then((data)=>{
+        let headphoneList = JSON.parse(data);
+        let record;
+        let records = Object();
+        for (let headphone of headphoneList.tree ) {
+            record =  {"name":headphone.path,"url": headphone.url}
+            records[headphone.path]=record;
+        }
+        window.localStorage.setItem("headphoneRecords",JSON.stringify(records));
+    })
+    loadHeadphoneList();
+}
+
 function loadHeadphoneList(filter) {    
     const listObject = document.getElementById('headphoneList');
     listObject.replaceChildren();
@@ -606,6 +625,11 @@ async function getCongifText(url) {
 }
 
 async function downloadHeadphoneList() {
+    // AutoEQ Results folder 
+    // https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/27c4591c3fc158d1bfc73a0710bde842261189f4
+    // oratory in-ear URL 
+    // https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08
+
     url = 'https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08';
     return new Promise((resolve)=>{;
         fetch(url).then((res)=>res.text().then(data=>{        
@@ -614,6 +638,17 @@ async function downloadHeadphoneList() {
     })    
 }
 
+
+async function downloadIEMList() {    
+
+    // Cirnicle > harman_in-ear_2019v2
+    url = 'https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/7e4de6a8936e7b43eb4d1f1679e679aac28f863b';
+    return new Promise((resolve)=>{;
+        fetch(url).then((res)=>res.text().then(data=>{        
+            resolve(data);
+        }))
+    })    
+}
 
 function parseAutoEQText(text,name) {    
     let lines = text.split('\n');

@@ -53,7 +53,7 @@
             <div class="button" onclick="uploadClick()">Upload</div>
             <div class="button" onclick="downloadClick()">Download</div>
             <!-- <div class="button" onclick="toggleSaved()">Saved Configs</div> -->
-            <div class="button" onclick="document.getElementById('autoEQWindow').style.display='block'; loadHeadphoneList()">AutoEQ</div>
+            <div class="button" onclick="document.getElementById('autoEQWindow').style.display='block'; loadHeadphoneList()">AutoEQ</div>            
         </div>        
         
         <div class="section eqSection" id="configManagement">
@@ -85,7 +85,8 @@
     <input type="text" name="" id="autoEQSearch" onkeydown="autoEQSearchKeyDown()">
     <div class="button" onclick="searchAutoEq()">Search</div>
     <div class="button" onclick="document.getElementById('autoEQWindow').style.display='none'">Close</div>
-    <div class="button" onclick="refreshAutoEq()">Refresh</div>
+    <div class="button" onclick="refreshAutoEq()">Load Headphones</div>
+    <div class="button" onclick="refreshAutoEqIEM()">Load IEMs</div>
     <br>
     <div id="headphoneList">
 
