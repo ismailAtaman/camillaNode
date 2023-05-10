@@ -70,8 +70,10 @@ function handleDSPMessage(m) {
         case "GetPlaybackSignalRms":
             if (result=='Ok') return [true,value]; else return[false,value];           
             break;                
-
         case "SetUpdateInterval":
+            if (result=='Ok') return [true,value]; else return[false,value];           
+            break;                
+        case "GetClippedSamples":
             if (result=='Ok') return [true,value]; else return[false,value];           
             break;                
         case "SetVolume":            
@@ -87,6 +89,10 @@ function handleDSPMessage(m) {
 async function sendDSPMessage(message) {
     return new Promise((resolve,reject)=>{
         let eventListener = ws.addEventListener('message',function(m){
+            const res = JSON.parse(m.data);
+            const responseCommand = Object.keys(res)[0];
+            if (message!=responseCommand) return;
+
             let handleResult = handleDSPMessage(m);
             if (handleResult[0]) resolve(handleResult[1]); else reject(handleResult[1]);
             ws.removeEventListener('message',eventListener);

@@ -7,7 +7,7 @@ let mouseDownY = 0;
 async function initEQ() {        
     let connectionResult = await connectToDsp();
     if (!connectionResult[0]) {
-        displayMessage("Error connecting to server. Please configure server settings and make sure server is running.",{"type":"error"})
+        displayMessage("Error connecting to server. Please configure server settings and make sure CamillaDSP service is running.",{"type":"error"})
         return;
     }
     await updateConfigList();
@@ -34,8 +34,32 @@ async function initEQ() {
             document.getElementById('levelRBar').style.width=levelMaxWidth-(4*levelR)+'px';
         })},50)
 
-    sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r});        
-    setInterval (function(){sendDSPMessage("GetState").then(r=>{document.getElementById('state').innerText=r} )},5000)      
+    
+    
+        //// This section handles clipping detection but needs some work
+        // setInterval(function(){
+        //     sendDSPMessage("GetClippedSamples").then(clipCount=>{
+        //         console.log(clipCount)
+        //         if (clipCount>0) {
+        //             console.log("Clipping detected!")                    
+        //             document.getElementById('clipped').style.backgroundColor='#F00';
+        //             document.getElementById('clippedMessage').innerText="Clipping detected! Please review your pre-amp setting!";
+                    
+        //         }
+        //     })},1000)     
+    
+        // document.getElementById('clipped').style.display='none';
+        // document.getElementById('clippedMessage').style.display='none';
+    
+    // Get current state of DSP
+    sendDSPMessage("GetState").then(state=>{document.getElementById('state').innerText=state})     
+
+    setInterval (function(){
+        sendDSPMessage("GetState").then(state=>{            
+            if (typeof state!="object") document.getElementById('state').innerText=state
+        })
+    },1000)      
+
 
     let preampGainVal = document.getElementById('preampGainVal');
 
@@ -110,6 +134,7 @@ function uploadClick() {
     let filterArray= createFilterArray()
     //console.log(filterArray);
     uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
+    
 }
 
 async function downloadClick() {

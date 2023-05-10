@@ -15,6 +15,7 @@ const autoDownload = getSettingValue("autoDownload");
 const autoUpload = getSettingValue("autoUpload");
 const saturation = getSettingValue("saturation");
 const levelmeterHeight = parseInt(getSettingValue("levelmeterHeight"));
+const showClippingIndicator = getSettingValue("showClippingIndicator");
 
 
 const defaultFreqList = [30,100,200,800,1000,2000,4000,6000,8000,12000]
@@ -92,6 +93,7 @@ function loadDefaultPreferences() {
         "MaxDB":{"title":"Maximum Gain (dB)","value":16,"params":{"format":"range","min":6,"max":30}},
         "MaxBands" : {"title":"Maximum Number of EQ Bands","value":24,"params":{"format":"range","min":6,"max":36}},
         "showLevelBars" :{"title":"Show Level Bars","value":true,"params":{"format":"boolean"}},      
+        // "showClippingIndicator" :{"title":"Show Clipping Indicator","value":true,"params":{"format":"boolean"}},      
         "levelmeterHeight":{"title":"Lever bar height (px)","value":20,"params":{"format":"range","min":10,"max":40}},
         "autoUpload":{"title":"Automatically Upload Changes to DSP","value":false,"params":{"format":"boolean"}},
         "autoDownload":{"title":"Download EQ Config From DSP at Startup","value":true,"params":{"format":"boolean"}},            

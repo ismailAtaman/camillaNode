@@ -109,7 +109,25 @@ input, select {
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 11px;
+    font-size: 13px;
+}
+
+#clipped  {    
+    display: inline-block;    
+    margin-left: 10px;
+    height: 13px;
+    width: 25px;
+    border: none;
+    border-radius: 5px;
+    background-color:transparent;
+}
+
+#clippedMessage {
+    display: inline-block;
+    font-size: 13px;
+    margin-left: 10px;
+    line-height: 1;
+    margin-bottom: 2px;
 }
 
 #levelBorder {
