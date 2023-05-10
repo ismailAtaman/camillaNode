@@ -1,13 +1,14 @@
 //// Global variables
 PORT = 80;
 
-const { json } = require('express');
+
 //// Global Objects
 const express = require('express');
+const { json } = require('express');
 const app = express();
 const fs = require('fs');
 const WebSocket = require('ws');
-// const client = new WebSocket('ws://192.168.50.74:1234')
+
 
 //// Global settings
 
@@ -93,6 +94,25 @@ app.get('/log',function(req,res){
     // Check camilla    
 
 })
+
+app.get('/restartService',function(req,res){
+    // const { exec } = require('child_process');
+    // exec('sudo service camilldasp restart', (err, stdout, stderr) => {
+    //     if (err) {
+    //         //some err occurred
+    //         console.error(err);
+    //         // res.write({"status":"error","details":stderr})            
+    //     } else {
+    //     // the *entire* stdout and stderr (buffered)
+    //     console.log(`stdout: ${stdout}`);
+    //     console.log(`stderr: ${stderr}`);
+    //     }
+    // })
+})
+    
+    
+
+
 
 // const { exec } = require('child_process');
 // exec('dir', (err, stdout, stderr) => {

@@ -3,17 +3,13 @@
 <script src="autoeq.js"></script>
 <script src="camillaControl.js"></script>
 
-
-
-
 <div id="header" class="section">
     <div id="title">CamillaDSP Control</div> 
     <div class="menu">      
         <div class="menuItem" target="/server">Server</div> 
         <div class="menuItem" target="/device">Device</div> 
         <div class="menuItem" target="/">Equalizer</div>         
-        <div class="menuItem" target="/settings">Settings</div>            
-        
+        <div class="menuItem" target="/settings">Preferences</div>            
         <div id="state"></div>
         
     </div>
@@ -26,6 +22,7 @@
         document.documentElement.style.setProperty('--main-hue',mainHue);
         document.documentElement.style.setProperty('--eqparamFontSize',eqparamFontSize);
         document.documentElement.style.setProperty('--saturation',saturation+'%');
+        document.documentElement.style.setProperty('--levelmeter_height',levelmeterHeight+'px');
         
         
         // console.log("Header script")

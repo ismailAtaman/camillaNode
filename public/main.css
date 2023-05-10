@@ -10,23 +10,21 @@
 
     --header-hue: 210;
     --main-hue: 210;
-    --saturation: 50%;
-
-    
+    --saturation: 50%;    
 
     --body-bgcolor1: hsl(var(--main-hue), 5%, 20%);
     --body-bgcolor2: hsl(var(--main-hue), 5%, 25%);
 
+    --levelmeter_height: 20px;
     --eqmain-width: 650px;
 
     --slider-width: 3.4em;
     --slider-height: 15rem;
 
-
-    --header-bgcolor2: hsl(var(--header-hue), 50%, 40%);
     --header-bgcolor1: hsl(var(--header-hue), 30%, 20%);
+    --header-bgcolor2: hsl(var(--header-hue), 50%, 40%);
 
-    --eqparamFontSize: 13px;
+    --eqparamFontSize: 14px;
 
     --error-background: hsl(0, 70%, 50%);
     --error-color: #FFFFFF;
@@ -87,12 +85,10 @@ input, select {
     font-weight: bold;
     display: block;  
     padding: auto;
-
 }
 
 .menu {
-    display: flex;
-    margin: 3px;    
+    display: flex;    
 }
 
 .menuItem {
@@ -105,7 +101,7 @@ input, select {
 }
 
 .menuItem:hover {
-    color:rgb(255, 186, 161);      
+    color: hsl(calc(180 + var(--main-hue)), var(--saturation), 50%);
     transition: all 250ms;    
 }
 
@@ -119,8 +115,8 @@ input, select {
 #levelBorder {
     margin-inline: 1rem;
     width: 98%;
-    height: 15px;
-    border: 1px solid white;
+    height: var(--levelmeter_height);
+    border: 0px solid white;
     --bar-saturation: calc(var(--saturation) + 20%);
     --color-1 : hsl(0,var(--bar-saturation),50%);
     --color-2 : hsl(60,var(--bar-saturation),50%);
@@ -137,7 +133,7 @@ input, select {
     position: relative;        
     right: 0px;
     max-width: calc(var(--eqmain-width));
-    height: 15px;    
+    height: var(--levelmeter_height);   
     opacity: 90%;
     background-color: var(--body-bgcolor1); 
     border-radius: 5px 0px 0px 5px;        
@@ -273,6 +269,12 @@ input, select {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;    
+    transition: filter 350ms;
+}
+
+.slider-container:hover { 
+    filter: brightness(120%) saturate(120%);
+    transition: filter 350ms;
 }
 
 .slider-body {
@@ -375,8 +377,9 @@ input, select {
 }
 
 #deviceSettings {
-    font-family:'Courier New', Courier, monospace;
-    font-size:15px;
+    margin: 10px;
+    width: 600px;
+    border: none;
 }
 
 
@@ -401,10 +404,11 @@ input, select {
 #headphoneList {
     margin-top: 10px;
     display: block;
-    width: 97%;
-    height: 85%;
-    overflow: scroll;
-    background-color: #369;
+    width: auto;
+    height: 88%;
+    overflow-y: scroll;
+    background-color: hsl(var(--main-hue),var(--saturation), 40%);
+    
 }
 
 .hpVisible {
@@ -507,7 +511,7 @@ input, select {
     
 }
 
-#settings hr {
+hr {
     margin-block: 20px;
 }
 

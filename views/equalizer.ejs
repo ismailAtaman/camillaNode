@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
-    <title>CamillaDSP</title>
-    <script src="camillaControl.js"></script>
+    <title>CamillaDSP</title>    
     <script src="equalizer.js"></script>
     <link rel="stylesheet" href="main.css">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -57,7 +56,8 @@
         </div>        
         
         <div class="section eqSection" id="configManagement">
-            <input type="text" name="configName" style="width:421px" id="configName">
+            <input type="text" name="configName" style="width:401px" id="configName">
+            <!-- <input type="text" name="configShortcut" style="width:20px" id="configShortcut"> -->
             <div class="button" onclick="saveClick()">Save</div>
             <div class="button" onclick="deleteClick()">Delete</div>            
 
@@ -83,13 +83,12 @@
 <div id="autoEQWindow">
     <div>AutoEQ Search</div>
     <input type="text" name="" id="autoEQSearch" onkeydown="autoEQSearchKeyDown()">
-    <div class="button" onclick="searchAutoEq()">Search</div>
-    <div class="button" onclick="document.getElementById('autoEQWindow').style.display='none'">Close</div>
+    <div class="button" onclick="searchAutoEq()">Search</div>    
     <div class="button" onclick="refreshAutoEq()">Load Headphones</div>
     <div class="button" onclick="refreshAutoEqIEM()">Load IEMs</div>
+    <div class="button" onclick="document.getElementById('autoEQWindow').style.display='none'">Close</div>
     <br>
     <div id="headphoneList">
-
     </div>
 </div>
 

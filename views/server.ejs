@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
     <title>CamillaDSP</title>
-    <script src="camillaControl.js"></script>
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -13,20 +12,22 @@
 <%- include('header.ejs'); %>
 
 <div class="section" id="serverSettings">
-    <span>Server IP  </span><input type="text" name="server" id="server">
-    <span>Server Port  </span><input type="text" name="port" id="port">
-    <br>
-    <input type="button" value="Save" onclick="saveServerConfig()">
-    <br>
-    <br>
-    <input type="button" value="Check log" onclick="checkLog()">
+    <div class="settingsGroup">
+        <div class="settingsGroupTitle">CamillaDSP Server Settings</div>
+        <span>Server IP  </span><input type="text" name="server" id="server">
+        <span>Server Port  </span><input type="text" name="port" id="port">
 
+        <br><input type="button" value="Save" onclick="saveServerConfig()">
+        <!-- <br><input type="button" value="Check log" onclick="checkLog()"> -->
+    </div>
 </div>
-<div id="status" style="font-size:12px; margin-top: 2rem; margin-left: 0.5rem;"></div>
 
-<script>
+<div id="statusBox" style="margin:10px"></div>
+
+
+<script defer>
     const config = window.localStorage.getItem("Config")
-    let statusBox = document.getElementById("status");
+    let statusBox = document.getElementById("statusBox");
     if (config==null) {            
         statusBox.innerText="No server configuration found."
         statusBox.style.color="#FFBBBB";
@@ -40,19 +41,17 @@
     
     function saveServerConfig() {
         // Check if can connect to server
-
         let server = document.getElementById("server").value;
         let port = document.getElementById("port").value;
-        let statusBox = document.getElementById("status");
+        let statusBox = document.getElementById("statusBox");
 
         checkConnection(server,port).then(()=>{
-            statusBox.innerText="Successfully connected to camillaDSP version "+CamillaDSPVersion;
+            statusBox.innerText="Successfully connected to CamillaDSP version "+CamillaDSPVersion;
             statusBox.style.color="#DDFFDD";
         }).catch((error)=>{
             statusBox.innerText="Error connectiong to server."
             statusBox.style.color="#FFBBBB";
             console.log(error)});
-
 
         sConfig = {
             "server":server,
@@ -91,7 +90,4 @@
 
 </script>
 </body>
-
-
-
 </html>

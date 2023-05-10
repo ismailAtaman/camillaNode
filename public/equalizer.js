@@ -227,14 +227,20 @@ async function updateConfigList() {
         configList.replaceChildren();
 
         let savedConfigList = data;
+        i=1;
         for (let config of savedConfigList) {
-            const div = document.createElement('div');
-            div.innerText=config;
-            div.classList.add('config');
             
-            div.addEventListener('click',function (){                
+            const div = document.createElement('div');            
+            div.classList.add('config');
+            div.accessKey=i;
+            // div.innerText="["+i+"] " + config;
+            div.innerText=config;
+            i++
+            
+            // Load config from server when configName is clicked
+            div.addEventListener('click',function (){                               
                 document.getElementById('configName').value=this.innerText;
-                getConfig(this.innerText).then((config)=>{
+                getConfigFromServer(this.innerText).then((config)=>{                    
                 let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
                 applyFilters(filterArrayJSON.filters);
                 if (autoUpload) {
@@ -250,11 +256,7 @@ async function updateConfigList() {
 }
 
 
-async function getConfig(configName) {     
-    return new Promise ((resolve,reject)=>{
-          fetch('/getConfig?configName='+configName).then((res)=>res.json()).then((data)=>{resolve(data)});        
-    })    
-}
+
 
 function displayMessage(message,options) {
 
@@ -318,16 +320,6 @@ function addBand() {
 }
 
 
-
-function searchClick() {
-    getCongifText('https://raw.githubusercontent.com/jaakkopasanen/AutoEq/master/results/oratory1990/harman_over-ear_2018/Audeze%20LCD-X%202021/Audeze%20LCD-X%202021%20ParametricEQ.txt').then((d)=>{
-        console.log(d);
-        let filterArray = parseAutoEQText(d);
-        let filterArrayJSON = convertFilterArayToJSON(filterArray);            
-        applyFilters(filterArrayJSON.filters);        
-    })    
-}
-
 function refreshAutoEq() {
     let list = document.getElementById('headphoneList')
     list.replaceChildren();
@@ -381,6 +373,8 @@ function loadHeadphoneList(filter) {
         div.className='config';        
         div.innerText=headphone;
         div.setAttribute('url',headphoneRecords[headphone].url);
+
+        
         div.addEventListener('dblclick',function(){
             let url = this.getAttribute('url')
             fetch(url).then((res)=>res.text().then(fileList=>{        
@@ -392,8 +386,7 @@ function loadHeadphoneList(filter) {
                         break;
                     }
                 }                
-
-                console.log(JSON.parse(fileList).tree);
+                //console.log(JSON.parse(fileList).tree);
                 fetch(paramEQUrl).then((res)=>res.json().then(paramEQ=>{                            
                     let paramEQText = atob(paramEQ.content);                    
                     let filterArray = parseAutoEQText(paramEQText);
@@ -449,7 +442,8 @@ function sortByFreq() {
 }
 
 class EQSlider {    
-
+    mousePos;
+    selectedGain; 
     constructor() {
         let sliderContainer = document.createElement('div');
         let sliderBody = document.createElement('div');
@@ -595,6 +589,14 @@ class EQSlider {
             if (hueRotate) sliderBody.style.filter='hue-rotate('+hueAngle+'deg)';
        })
 
+       sliderContainer.addEventListener('wheel',function(e) {
+            let dif = e.deltaY<0?0.1:-0.1;            
+            let val=parseInt(10*(parseFloat(gain.value.replace('db',''))+dif))/10;
+            gain.value=val+'db';
+            e.preventDefault();
+            sliderUpdateVal(sliderContainer,val);
+       })          
+
        sliderBody.appendChild(sliderKnob);
        sliderContainer.appendChild(sliderBody);
        sliderContainer.appendChild(freq)
@@ -608,92 +610,6 @@ class EQSlider {
        
        return sliderContainer;
     }
-
-
-}
-
-//////////////////////// AUTO-EQ //////////////////
-
-
-async function getCongifText(url) {
-    return new Promise((resolve)=>{;
-        fetch(url).then((res)=>res.text().then(data=>{        
-            resolve(data);
-        }))
-    })
-    
-}
-
-async function downloadHeadphoneList() {
-    // AutoEQ Results folder 
-    // https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/27c4591c3fc158d1bfc73a0710bde842261189f4
-    // oratory in-ear URL 
-    // https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08
-
-    url = 'https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08';
-    return new Promise((resolve)=>{;
-        fetch(url).then((res)=>res.text().then(data=>{        
-            resolve(data);
-        }))
-    })    
 }
 
 
-async function downloadIEMList() {    
-
-    // Cirnicle > harman_in-ear_2019v2
-    url = 'https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/7e4de6a8936e7b43eb4d1f1679e679aac28f863b';
-    return new Promise((resolve)=>{;
-        fetch(url).then((res)=>res.text().then(data=>{        
-            resolve(data);
-        }))
-    })    
-}
-
-function parseAutoEQText(text,name) {    
-    let lines = text.split('\n');
-    let filterArray=new Array();        
-    let i=0;
-    //console.log(lines)
-
-    for (let line of lines) {
-        if (line.length==0) continue;
-        //console.log(line)
-        let name = line.substring(0,line.indexOf(':'));
-        let lineFragments = line.substring(line.indexOf(':')+1).split(' ');
-        //console.log(lineFragments)
-
-        let type,gain,freq,qfact;
-        
-        if (name=='Preamp') { 
-            gain=lineFragments[1]; 
-            freq=0;
-            qfact=0; 
-            filterType="Preamp"
-        } else {
-            i<10?name="Filter0"+i:name="Filter"+i;
-            filterType=lineFragments[2];
-            freq=lineFragments[4];
-            gain=lineFragments[7];
-            qfact=lineFragments[10];
-        }         
-        console.log(filterType)
-        filterType=="PK"?filterType="Peaking":filterType=="LS"?filterType="Lowshelf":filterType="Highshelf";
-
-        let filter = new Object();
-
-        filter[name] = {
-            "type"  : filterType,
-            "freq"  : parseInt(freq),
-            "gain"  : parseFloat(gain),
-            "q"     : parseFloat(qfact)
-        }
-
-        filterArray.push(filter);        
-        i++;
-    }
-
-    console.log(filterArray);
-    return filterArray;
-
-}

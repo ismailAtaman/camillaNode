@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
-    <title>CamillaDSP</title>
-    <script src="camillaControl.js"></script>
+    <title>CamillaDSP</title>    
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -48,8 +47,15 @@
         document.getElementById('saturation').addEventListener('input',function(){document.documentElement.style.setProperty('--saturation',this.value+'%')});
     }
     
+    function resetSettingsToDefault() {
+        if (confirm("This will reset all settings to their default values and can not be undone. Do you want to continue?")==false) return;
+        window.localStorage.removeItem('preferences');
+        window.location.reload();
+    }
 
     window.localStorage.setItem('preferences',JSON.stringify(preferences));
 
 
 </script>
+<div class="button" style="margin:10px" onclick="resetSettingsToDefault()">Reset to Default</div>
+</body>

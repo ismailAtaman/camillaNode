@@ -5,20 +5,93 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
     <title>CamillaDSP</title>
-    <script src="camillaControl.js"></script>
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
 
 <%- include('header.ejs'); %>
 
-<div class="section" id="deviceSettings">
+<style>
+    input, select, option {
+        font-size: 14px;
+    }
+</style>
 
+<div class="section" id="deviceSettings">
+    <div class="settingsGroup">
+        <div class="settingsGroupTitle">Sampling & FFT Settings</div>
+            <div>Sample Rate</div> <div><select name="" id="sampleRate"></select></div>
+            <div>Chunk Size</div> <div><input name="" id="chunkSize"></input></div>
+            <div>Queue Limit</div> <div><input name="" id="queueLimit"></input></div>
+    </div>
+    <hr>
+
+    <div class="settingsGroup">        
+        <div class="settingsGroupTitle">Capture Device</div>       
+        <div>Type</div>
+        <div>
+            <select id="captureDeviceType">
+                <option>File</option>
+                <option>Stdin</option>            
+                <option>Jack</option>
+                <option>Wasapi</option>
+                <option>CoreAudio</option>
+                <option>Alsa</option>
+                <option>Pulse</option>
+            </select>
+        </div>
+        <div>Device</div><div> <input type="text" name="" id="captureDeviceName"> </div>
+        <div>Channels</div><div> <input type="text" name="" id="captureChannels"> </div>
+        <div>Format</div>
+        <div>
+            <select id="captureDeviceFormat">
+                <option>S16LE</option>
+                <option>S24LE</option>
+                <option>S24LE3</option>
+                <option>S32LE</option>
+                <option>FLOAT32LE</option>
+                <option>FLOAT64LE</option>
+            </select>
+        </div>
+    </div>
+    <hr>
+    <div class="settingsGroup">
+        <div class="settingsGroupTitle">Playback Device</div>
+        <div>Type</div>
+        <div>
+            <select id="playbackDeviceType">
+                <option>File</option>
+                <option>Stdin</option>            
+                <option>Jack</option>
+                <option>Wasapi</option>
+                <option>CoreAudio</option>
+                <option>Alsa</option>
+                <option>Pulse</option>
+            </select>
+        </div>
+
+        <div>Device</div><div> <input type="text" name="" id="playbackDeviceName"> </div>
+        <div>Channels</div><div> <input type="text" name="" id="playbackChannels"> </div>
+        <div>Format</div>
+        <div>
+            <select id="playbackDeviceFormat">
+                <option>S16LE</option>
+                <option>S24LE</option>
+                <option>S24LE3</option>
+                <option>S32LE</option>
+                <option>FLOAT32LE</option>
+                <option>FLOAT64LE</option>
+            </select>
+        </div>
+    </div>
+    <br>
+    <div class="button" onclick="uploadDeviceConfig()">Upload</div>
+    <div class="button" onclick="downloadDeviceConfig() ">Download</div>
 </div>
 
 </body>
-<script>
-    const defaultSampleRates = [44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000, 705600, 768000]
+<script defer>
+    const defaultSampleRates = [44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000, 705600, 768000];
     const fieldTypes=[
         {"samplerate":"select"},
         {"chunksize":"number"},
@@ -29,50 +102,75 @@
         {"playback":"object"},        
     ]
 
-    connectToDsp().then(()=>{    
-    downloadConfigFromDSP().then((data=>{
+    let sampleRate =  document.getElementById("sampleRate");
+    for (let rate of defaultSampleRates) {
+        let opt = document.createElement('option');
+        opt.value=rate;
+        opt.innerText=rate;
+        sampleRate.appendChild(opt);
+    }
 
-        DSPConfig=data;
-        settings = document.getElementById('deviceSettings');
-        console.log(DSPConfig.devices);
-        for (configItem of Object.keys(DSPConfig.devices)) {            
+    downloadDeviceConfig();
+
+    function downloadDeviceConfig() {
+        connectToDsp().then(()=>{    
+            downloadConfigFromDSP().then((data=>{
+                DSPConfig=data;
+                settings = document.getElementById('deviceSettings');
+                console.log(DSPConfig.devices)
+
+                document.getElementById('sampleRate').value=DSPConfig.devices.samplerate
+                document.getElementById('chunkSize').value=DSPConfig.devices.chunksize
+                document.getElementById('queueLimit').value=DSPConfig.devices.queuelimit
+
+                document.getElementById('captureDeviceType').value=DSPConfig.devices.capture.type;
+                document.getElementById('captureDeviceName').value=DSPConfig.devices.capture.device
+                document.getElementById('captureChannels').value=DSPConfig.devices.capture.channels
+                document.getElementById('captureDeviceFormat').value=DSPConfig.devices.capture.format
+                
+                document.getElementById('playbackDeviceType').value=DSPConfig.devices.playback.type;
+                document.getElementById('playbackDeviceName').value=DSPConfig.devices.playback.device
+                document.getElementById('playbackChannels').value=DSPConfig.devices.playback.channels
+                document.getElementById('playbackDeviceFormat').value=DSPConfig.devices.playback.format
             
-            let type = fieldTypes.find(e=>configItem==Object.keys(e)[0]);
-            if (type==undefined) continue; let dataType = type[Object.keys(type)];
-            let val;
+            }))
+        })
+    }
 
-            switch (dataType) {
-                case "number":
-                    val = document.createElement('input');
-                    val.type='number';
-                    val.value=DSPConfig.devices[configItem];
-                    break;
-                case "object":
-                    val = document.createElement('input');
-                    val.type='text';
-                    val.value=DSPConfig.devices[configItem];
-                    break;
-                case "select":
-                    val = document.createElement('input');
-                    val.type='text';
-                    val.value=DSPConfig.devices[configItem];
-                    break;
-                default:
-                    break;
-            }
+
+    function uploadDeviceConfig() {
+        connectToDsp().then(()=>{    
+            downloadConfigFromDSP().then(data=>{
+            DSPConfig=data;
+            const oldDSPConfig = DSPConfig;
+
+
+            DSPConfig.devices.samplerate=parseInt(document.getElementById('sampleRate').value);
+            DSPConfig.devices.chunksize=parseInt(document.getElementById('chunkSize').value);
+            DSPConfig.devices.queuelimit=parseInt(document.getElementById('queueLimit').value);
+
+            DSPConfig.devices.capture.type=document.getElementById('captureDeviceType').value;
+            DSPConfig.devices.capture.device=document.getElementById('captureDeviceName').value;
+            DSPConfig.devices.capture.channels=parseInt(document.getElementById('captureChannels').value);
+            DSPConfig.devices.capture.format=document.getElementById('captureDeviceFormat').value;
+                    
+            DSPConfig.devices.playback.type=document.getElementById('playbackDeviceType').value;
+            DSPConfig.devices.playback.device=document.getElementById('playbackDeviceName').value;
+            DSPConfig.devices.playback.channels=parseInt(document.getElementById('playbackChannels').value);
+            DSPConfig.devices.playback.format=document.getElementById('playbackDeviceFormat').value;
             
-            let p = document.createElement('p');
-            let label = document.createElement('span');
-            label.innerText=configItem
+            console.log(DSPConfig)
+
+            let message={'SetConfigJson':JSON.stringify(DSPConfig)};    
+
+            sendDSPMessage(message).then(()=>{
+                
+                console.log('Upload successful');
             
-            p.appendChild(label);
-            p.appendChild(val);
-            settings.appendChild(p);
-
-        }
-    }))
-})
-
+            }).catch((r)=>{console.log('Upload failed.'); console.log(r)});
+            })            
+        })
+    }
 
 </script>
 </html>

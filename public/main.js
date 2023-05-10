@@ -14,6 +14,8 @@ const eqparamFontSize = parseInt(getSettingValue("eqparamFontSize"))+"px";
 const autoDownload = getSettingValue("autoDownload");
 const autoUpload = getSettingValue("autoUpload");
 const saturation = getSettingValue("saturation");
+const levelmeterHeight = parseInt(getSettingValue("levelmeterHeight"));
+
 
 const defaultFreqList = [30,100,200,800,1000,2000,4000,6000,8000,12000]
 
@@ -73,13 +75,13 @@ function loadSettings() {
 }
 
 function loadDefaultPreferences() {
-    let legend = {"display":"Display Settings","general":"General Settings","equalizer":"Equalizer Settings"}
+    let legend = {"display":"Display Preferences","general":"General Preferences","equalizer":"Equalizer Preferences"}
     let display = {
-        "mainHue":{"title":"Main Hue","value":210,"params":{"format":"range","min":0,"max":360}},
-        "saturation":{"title":"Saturation","value":30,"params":{"format":"range","min":10,"max":80}},
+        "mainHue":{"title":"Main Hue","value":210,"params":{"format":"range","min":0,"max":360}},        
         "headerHue":{"title":"Header Hue","value":210,"params":{"format":"range","min":0,"max":360}},        
+        "saturation":{"title":"Saturation","value":30,"params":{"format":"range","min":10,"max":80}},
         "hueRotate" : {"title":"Change EQ Band Color With Chaning Gain","value":true,"params":{"format":"boolean"}},
-        "eqparamFontSize": {"title":"Equalizer Parameter Font Size","value":14,"params":{"format":"range","min":11,"max":16}},
+        "eqparamFontSize": {"title":"Equalizer Parameter Font Size (px)","value":14,"params":{"format":"range","min":11,"max":16}},
     }
 
     let general = {
@@ -87,11 +89,12 @@ function loadDefaultPreferences() {
 
     }
     let equalizer = { 
-        "MaxDB":{"title":"Maximum gain in db","value":16,"params":{"format":"range","min":6,"max":30}},
-        "MaxBands" : {"title":"Maximum number of EQ bands","value":24,"params":{"format":"range","min":6,"max":36}},
-        "showLevelBars" :{"title":"Show level bars","value":true,"params":{"format":"boolean"}},      
-        "autoUpload":{"title":"Automatically upload changes to DSP","value":false,"params":{"format":"boolean"}},
-        "autoDownload":{"title":"Download loaded config from DSP at startup","value":true,"params":{"format":"boolean"}},            
+        "MaxDB":{"title":"Maximum Gain (dB)","value":16,"params":{"format":"range","min":6,"max":30}},
+        "MaxBands" : {"title":"Maximum Number of EQ Bands","value":24,"params":{"format":"range","min":6,"max":36}},
+        "showLevelBars" :{"title":"Show Level Bars","value":true,"params":{"format":"boolean"}},      
+        "levelmeterHeight":{"title":"Lever bar height (px)","value":20,"params":{"format":"range","min":10,"max":40}},
+        "autoUpload":{"title":"Automatically Upload Changes to DSP","value":false,"params":{"format":"boolean"}},
+        "autoDownload":{"title":"Download EQ Config From DSP at Startup","value":true,"params":{"format":"boolean"}},            
     }
     return {"legend":legend,"display":display,"general":general,"equalizer":equalizer}
 }
@@ -141,3 +144,17 @@ function setObjectValue(searchObject,searchKey,value) {
     return false;
 }
 
+//////////////////////////////////////////////// Interacting with the node.js server ///////////////////////////////////////////////
+
+function getConfigFromServer(configName) {         
+    return new Promise ((resolve,reject)=>{
+          fetch('/getConfig?configName='+configName).then((res)=>res.json()).then((data)=>{resolve(data)}).catch(err=>reject(err));        
+    })    
+}
+
+function JSONToYaml(jsonObject) {
+
+}
+
+
+//////////////////////////////////////// Generic UI Functions ///////////////
