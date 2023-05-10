@@ -249,6 +249,7 @@ input, select {
     z-index: 0;    
 }
 
+
 #contextMenu {
     position: absolute;
     display: none;       
@@ -387,25 +388,33 @@ input, select {
 /************************************************************ AUTOEQ *************************************************************/
 
 #autoEQWindow {
+    color: white;
     position:absolute;
     background-color: #222;
     left: 50%;
     top:50%;
-    display: none;
+    display: block;
     border: 1px solid white;
     width: 40vw;
     height: 60vh;
     padding: 10px;
     border-radius: 7px;
-    transform: translate(-50%,-50%);    
-
+    transform: translate(-50%,-50%);        
 }
+
+#autoEQDialog {
+    width: 100%;
+    height: 100%;
+    backdrop-filter: saturate(50%);
+    background-color: hsl(var(--main-hue), var(--saturation), 40%,50%);
+}
+
 
 #headphoneList {
     margin-top: 10px;
     display: block;
     width: auto;
-    height: 88%;
+    height: 87%;
     overflow-y: scroll;
     background-color: hsl(var(--main-hue),var(--saturation), 40%);
     

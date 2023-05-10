@@ -297,8 +297,9 @@ function displayMessage(message,options) {
         }
     }
     
-    messageBox.innerText=message;
+    messageBox.innerText=message;    
     messageBox.style.display='block';
+
     if (!options.persist) setTimeout(function(){messageBox.style.display='none'},timeout)
 }
 
@@ -393,12 +394,19 @@ function loadHeadphoneList(filter) {
                     let filterArrayJSON = convertFilterArayToJSON(filterArray);            
                     applyFilters(filterArrayJSON.filters);
                     document.getElementById('configName').value=this.innerText;
-                    document.getElementById('autoEQWindow').style.display='none';        
+                    document.getElementById('autoEQDialog').close();
                 }))
             }))
         })
         listObject.appendChild(div)
     }
+}
+
+function showAutoEQClick() {
+    let autoEQDialog = document.getElementById('autoEQDialog')
+    autoEQDialog.showModal();
+
+    loadHeadphoneList();
 }
 
 
