@@ -1,27 +1,18 @@
 
 let ws;
 
-async function connectToDsp() {
-    const config = window.localStorage.getItem("Config");
-    if (config==null) {
-        console.log("No configuration found.");        
-        window.location.href='/server';
-        sConfig = {
-            "server":"192.168.50.208",
-            "port" : 1234,
-        };
-        window.localStorage.setItem("Config",JSON.stringify(sConfig));
+async function connectToDsp(server,port) {
 
-    } else {       
-        const sConfig = JSON.parse(config);
-        //console.log(sConfig);
-        server = sConfig.server;
-        port = sConfig.port;
+    if (server==undefined) {
+        let serverConfig = getDefaultServerConfig();
+        server=serverConfig.serverIp;
+        port=serverConfig.port;
+        
     }
 
+
     const WS = new WebSocket("ws://"+server+":"+port);
-    return new Promise((resolve,reject)=>{
-        
+    return new Promise((resolve,reject)=>{        
         WS.addEventListener('open',function(){            
             ws = WS;
             resolve([true,WS]);

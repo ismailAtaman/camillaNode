@@ -85,6 +85,7 @@ input, select {
     font-weight: bold;
     display: block;  
     padding: auto;
+    margin-left:10px;
 }
 
 .menu {
@@ -107,9 +108,9 @@ input, select {
 
 #state {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 13px;
+    top: 20px;
+    right: 20px;
+    font-size: 0.8em;
 }
 
 #clipped  {    
@@ -211,6 +212,7 @@ input, select {
     padding: 3px;
     font-weight: bold;
     font-size: 14px;
+    width:401px;
 }
 
 #configList {    
@@ -564,3 +566,68 @@ hr {
     75% {opacity: 1;}   
     100% { opacity: 0;}    
 }
+
+
+@media only screen and (max-width:500px) {
+    :root {
+        --default-font-size: 12px;
+        --eqmain-width: 600px;
+        --slider-width: 9vw;
+        --slider-height: 10rem;
+        margin-left: -10px;        
+    }
+    
+    .eqparam {
+        font-size: 10px;
+        padding-inline: 0;
+    }
+
+    #equalizer select {
+        background-color: hsl(var(--main-hue), 100%, 93%);
+        height: 20px;
+        width: 42px;    
+    }
+
+    #levelBorder {
+        width: 90vw;
+    }
+
+    #eqtools {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 5px;
+        width: 90vw;        
+    }
+
+    .config {
+        font-size: 12px;
+
+    }
+
+    #configName {
+        width: 40vw;
+        font-size: 12px;
+    }
+
+    .button {
+        min-height: 20px;    
+        width: 90px;
+        font-size: 13px;
+    }
+
+    #equalizer {
+        width: 90vw;
+    }
+
+    #configList {
+        height: calc( 20 * 12px);
+    }
+
+    #autoEQWindow {
+        width: 90vw;
+        height: 90vh;
+        padding: 4px;
+        border-radius: 4px;        
+    }
+
+ }

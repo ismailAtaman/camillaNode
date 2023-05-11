@@ -18,6 +18,7 @@ async function initEQ() {
     }) 
 
     let levelMaxWidth=document.getElementById('levelBorder').getBoundingClientRect().width
+    
     setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
             if (r==undefined) return;
              let levelL=isNaN(r[0])?-100:r[0];
@@ -30,8 +31,11 @@ async function initEQ() {
             levelR = 100 + levelR            
 
             // console.log(levelL+' : ' + levelR);
-            document.getElementById('levelLBar').style.width=levelMaxWidth-(4*levelL)+'px';
-            document.getElementById('levelRBar').style.width=levelMaxWidth-(4*levelR)+'px';
+
+            let multiplier = levelMaxWidth>=500?4:2
+
+            document.getElementById('levelLBar').style.width=levelMaxWidth-(multiplier*levelL)+'px';
+            document.getElementById('levelRBar').style.width=levelMaxWidth-(multiplier*levelR)+'px';
         })},50)
 
     

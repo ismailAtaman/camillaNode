@@ -94,7 +94,7 @@ function loadDefaultPreferences() {
         "MaxBands" : {"title":"Maximum Number of EQ Bands","value":24,"params":{"format":"range","min":6,"max":36}},
         "showLevelBars" :{"title":"Show Level Bars","value":true,"params":{"format":"boolean"}},      
         // "showClippingIndicator" :{"title":"Show Clipping Indicator","value":true,"params":{"format":"boolean"}},      
-        "levelmeterHeight":{"title":"Lever bar height (px)","value":20,"params":{"format":"range","min":10,"max":40}},
+        "levelmeterHeight":{"title":"Level bar height (px)","value":20,"params":{"format":"range","min":10,"max":40}},
         "autoUpload":{"title":"Automatically Upload Changes to DSP","value":false,"params":{"format":"boolean"}},
         "autoDownload":{"title":"Download EQ Config From DSP at Startup","value":true,"params":{"format":"boolean"}},            
     }
@@ -160,3 +160,46 @@ function JSONToYaml(jsonObject) {
 
 
 //////////////////////////////////////// Generic UI Functions ///////////////
+
+
+
+////////////////////////////////////////// Server Configuration 
+
+function getServerList() {
+    let serverConfig = window.localStorage.getItem("serverConfig");
+    
+    if (serverConfig == undefined) {
+        serverConfig=defaultServerConfig();
+    }else { 
+        serverConfig=JSON.parse(serverConfig);
+    }
+
+    return serverConfig
+}
+
+function defaultServerConfig() {
+    return [{"Raspberry Pi 4":{"serverIp":"192.168.50.74","port":"1234","default":false}}]
+}
+
+function addServerConfig(serverConfig) {
+    let existingServerConfig = getServerList();
+    existingServerConfig.push(serverConfig);
+    saveServerConfig(existingServerConfig);    
+}
+
+function saveServerConfig(serverConfig) {
+    window.localStorage.setItem("serverConfig",JSON.stringify(serverConfig))
+}
+
+function getDefaultServerConfig() {
+    let serverConfig =getServerList()[0];    
+    //console.log(serverConfig)
+    let serverName = Object.keys(serverConfig)[0];   
+
+    let retObject = {}
+    retObject.serverName =serverName
+    retObject.serverIp=serverConfig[serverName].serverIp;
+    retObject.port=serverConfig[serverName].port;
+
+    return retObject;
+}
