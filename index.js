@@ -47,8 +47,7 @@ app.post('/saveConfig',(req,res)=>{
     });    
 }) 
 
-app.get('/getConfigList',(req,res)=>{
-    let configList = Array();
+app.get('/getConfigList',(req,res)=>{    
     let files = fs.readdirSync('./config',);
     let fileList = Array();
     for (let file of files) {

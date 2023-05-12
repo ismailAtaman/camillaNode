@@ -215,6 +215,16 @@ input, select {
     width:401px;
 }
 
+#configShortcut {
+    border-radius: 5px;
+    border: none;
+    padding: 3px;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    width:12px;
+}
+
 #configList {    
     margin-block: 10px;
     border: 1px solid #555;
@@ -237,13 +247,20 @@ input, select {
 .config:hover {
     color: #222;   
     background-color: hsl(var(--main-hue), var(--saturation), 80%);    
-    transition: all 250ms;    
+    transition: all 350ms;    
 }
 
-.config::before {
+#config::before {
     content: url('headphone16.png');
-    margin-right: 5px;  
+    margin-right: 5px;
 
+}
+
+.config::after {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: calc( 0.8 * var(--default-font-size));
+    content: "[" attr(accessKey) "]";
+    margin-left: 8px;  
 }
 
 #infoBar {
@@ -627,11 +644,14 @@ hr {
 
     .config {
         font-size: 12px;
-
     }
 
     #configName {
-        width: 40vw;
+        font-size: 12px;
+        width: 40vw;        
+    }
+
+    #configShortcut {
         font-size: 12px;
     }
 

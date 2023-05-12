@@ -223,17 +223,18 @@ function removeLast() {
 function saveClick() {    
     let configNameObject = document.getElementById('configName');
     let configName = configNameObject.value.trim();    
-    if (configName.length==0) return;
+    if (configName.length==0) return;8
     if (configName.indexOf('/')>-1 || configName.indexOf('\\')>-1) {
         displayMessage("Invalid character in config name.",{"type":"error"})
         return;
     }
 
     fetch('/configExists?configName='+configName).then((res)=>res.text().then(data=>{
-        if (data=='true' && !confirm('Configuration with a same name already exists. Would you like to overwrite?')) return;        
+        if (data=='true' && !confirm('Configuration with a same name already exists. Would you like to overwrite?')) return;       
 
         let filterArray=createFilterArray();      
-        saveConfig(({"configName":configName,"filterArray":filterArray}));
+        let accessKey= document.getElementById("configShortcut").value
+        saveConfig(({"configName":configName,"accessKey":accessKey,"filterArray":filterArray}));
         configNameObject.value='';
         updateConfigList();
     }));   
@@ -259,18 +260,21 @@ async function updateConfigList() {
 
         let savedConfigList = data;
         i=1;
-        for (let config of savedConfigList) {
-            let selectedConfig;
+        for (let config of savedConfigList) {            
             const div = document.createElement('div');            
             div.classList.add('config');                        
             div.innerText=config;
-            i++
+            getConfigFromServer(config).then((config)=>{
+               if (config.accessKey!=undefined) div.accessKey=config.accessKey;
+            })
+            i++;
             
             // Load config from server when configName is clicked
             div.addEventListener('click',function () {                               
                 document.getElementById('configName').value=this.innerText;
+                document.getElementById('configShortcut').value=this.accessKey;
                 getConfigFromServer(this.innerText).then((config)=>{                    
-                   let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
+                    let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
                     applyFilters(filterArrayJSON.filters);
                     if (autoUpload) {
                         let filterArray= createFilterArray();                    
