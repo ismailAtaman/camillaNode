@@ -26,6 +26,8 @@
 
     --eqparamFontSize: 14px;
 
+    --configCount: 6;
+
     --error-background: hsl(0, 70%, 50%);
     --error-color: #FFFFFF;
 
@@ -230,7 +232,7 @@ input, select {
     border: 1px solid #555;
     padding: 0.5rem;
     width: var(--eqmain-width);
-    height: calc( 10 * var(--default-font-size));
+    height: calc( ( var(--configCount) * 1.645) * var(--default-font-size)  );
     overflow-y: scroll;
     background-color: hsl(var(--main-hue), var(--saturation), 40%);
     border-radius: 10px;
@@ -285,7 +287,7 @@ input, select {
     border-radius: 7px;
     background-color: #234e7a;
     color:white;        
-    z-index: 0;    
+    z-index: -1;    
 }
 
 
@@ -610,6 +612,45 @@ hr {
     animation-iteration-count: 1;    
     animation-fill-mode: forwards;
 }
+
+#importDialog {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: saturate(50%);
+    background-color: hsl(var(--main-hue), var(--saturation), 40%, 50%);
+    z-index: 2;
+}
+
+#importWindow {
+    color: white;
+    position:absolute;
+    background-color: #222;
+    left: 50%;
+    top:50%;
+    display: block;
+    border: 1px solid white;
+    width: 40vw;
+    height: 60vh;
+    padding: 10px;
+    border-radius: 7px;
+    transform: translate(-50%,-50%);        
+    
+}
+
+#importText {
+    padding: 10px;   
+    height: 87%; 
+    background-color: hsl(var(--main-hue), var(--saturation),5%);
+    border-radius: 7px;    
+    margin: 15px;
+    color:white;
+}
+
+
+/**************************************************************************************************************/
+
+
 
 @keyframes disappear {
     0% { opacity: 1;} 

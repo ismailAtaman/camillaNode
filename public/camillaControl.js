@@ -6,10 +6,8 @@ async function connectToDsp(server,port) {
     if (server==undefined) {
         let serverConfig = getDefaultServerConfig();
         server=serverConfig.serverIp;
-        port=serverConfig.port;
-        
+        port=serverConfig.port;        
     }
-
 
     const WS = new WebSocket("ws://"+server+":"+port);
     return new Promise((resolve,reject)=>{        

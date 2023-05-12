@@ -265,7 +265,7 @@ async function updateConfigList() {
             div.classList.add('config');                        
             div.innerText=config;
             getConfigFromServer(config).then((config)=>{
-               if (config.accessKey!=undefined) div.accessKey=config.accessKey;
+               if (config.accessKey!=undefined) div.accessKey=config.accessKey; 
             })
             i++;
             
@@ -441,10 +441,14 @@ function loadHeadphoneList(filter) {
 function showAutoEQClick() {
     let autoEQDialog = document.getElementById('autoEQDialog')
     autoEQDialog.showModal();
-
     loadHeadphoneList();
 }
 
+function importClick() {
+    let importDialogue = document.getElementById('importDialog')
+    importDialogue.showModal();
+ 
+}
 
 function searchAutoEq() {
     const text = document.getElementById('autoEQSearch').value.toLowerCase();        
@@ -484,6 +488,22 @@ function sortByFreq() {
     let filterArrayJSON = convertFilterArayToJSON(tempfilterArray);            
     applyFilters(filterArrayJSON.filters);    
 }
+
+function importFromText() {
+    let importText = document.getElementById('importText').innerText;    
+    let filterArray = parseAutoEQText(importText);
+    console.log(filterArray)
+    if (filterArray===false) {
+        displayMessage("Invalid configuration format.")
+        return;
+    };
+
+    let filterArrayJSON = convertFilterArayToJSON(filterArray);            
+    applyFilters(filterArrayJSON.filters);
+    document.getElementById('autoEQDialog').close();
+    
+}
+
 
 class EQSlider {    
     mousePos;

@@ -46,13 +46,17 @@ function parseAutoEQText(text) {
 
         let type,gain,freq,qfact;
         
+        
+
         if (name=='Preamp') { 
+            //if (typeof lineFragments[1]!="number") return false;
             gain=lineFragments[1]; 
             freq=0;
             qfact=0; 
             filterType="Preamp"
         } else {
-            i<10?name="Filter0"+i:name="Filter"+i;
+            //if (typeof lineFragments[2]!="number" || typeof lineFragments[4]!="number" || typeof lineFragments[7]!="number" || typeof lineFragments[10]!="number" ) return false;
+            i<10?name="Filter0"+i:name="Filter"+i;            
             filterType=lineFragments[2];
             freq=lineFragments[4];
             gain=lineFragments[7];

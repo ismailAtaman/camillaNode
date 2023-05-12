@@ -53,8 +53,9 @@
         <div class="section " id="DSPManagement">
             <div class="button" onclick="uploadClick()">Upload</div>
             <div class="button" onclick="downloadClick()">Download</div>
-            <!-- <div class="button" onclick="toggleSaved()">Saved Configs</div> -->
+            
             <div class="button" onclick="showAutoEQClick()">AutoEQ</div>            
+            <div class="button" onclick="importClick()">Import</div>            
         </div>        
         
         <div class="section eqSection" id="configManagement">
@@ -95,6 +96,17 @@
     </div>
 </dialog>
 
+
+<dialog id="importDialog">
+    <div id="importWindow">
+        <div class="button" onclick="importFromText()">Import</div>   
+        <div class="button" onclick="document.getElementById('importDialog').close()">Close</div>   
+        <div id="importText" contenteditable="true">
+        </div>
+    </div>
+    
+    
+</dialog>
 
 
 </body>
