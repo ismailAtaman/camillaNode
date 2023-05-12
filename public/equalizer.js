@@ -368,8 +368,9 @@ function refreshAutoEq() {
             records[headphone.path]=record;
         }
         window.localStorage.setItem("headphoneRecords",JSON.stringify(records));
+        loadHeadphoneList();
     })
-    loadHeadphoneList();
+    
 }
 
 
@@ -387,8 +388,9 @@ function refreshAutoEqIEM() {
             records[headphone.path]=record;
         }
         window.localStorage.setItem("headphoneRecords",JSON.stringify(records));
+        loadHeadphoneList();
     })
-    loadHeadphoneList();
+    
 }
 
 function loadHeadphoneList(filter) {    
@@ -427,6 +429,7 @@ function loadHeadphoneList(filter) {
                     let filterArrayJSON = convertFilterArayToJSON(filterArray);            
                     applyFilters(filterArrayJSON.filters);
                     document.getElementById('configName').value=this.innerText;
+                    document.getElementById('configShortcut').value='';
                     document.getElementById('autoEQDialog').close();
                 }))
             }))

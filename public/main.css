@@ -250,18 +250,21 @@ input, select {
     transition: all 350ms;    
 }
 
-#config::before {
-    content: url('headphone16.png');
+.config::before {
+    content: url('./headphone16.png');
     margin-right: 5px;
-
 }
 
 .config::after {
+    position: relative;
     font-family: 'Courier New', Courier, monospace;
     font-size: calc( 0.8 * var(--default-font-size));
     content: "[" attr(accessKey) "]";
     margin-left: 8px;  
+    top:-2px;    
 }
+
+
 
 #infoBar {
     display: grid;
@@ -454,6 +457,10 @@ input, select {
     overflow-y: scroll;
     background-color: hsl(var(--main-hue),var(--saturation), 40%);
     
+}
+
+#autoEQWindow .config::after {
+    content: '';
 }
 
 .hpVisible {
