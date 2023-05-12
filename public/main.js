@@ -80,8 +80,8 @@ function loadSettings() {
 function loadDefaultPreferences() {
     let legend = {"display":"Display Preferences","general":"General Preferences","equalizer":"Equalizer Preferences"}
     let display = {
-        "mainHue":{"title":"Main Hue","value":210,"params":{"format":"range","min":0,"max":360}},        
-        "headerHue":{"title":"Header Hue","value":210,"params":{"format":"range","min":0,"max":360}},        
+        "mainHue":{"title":"Main Hue","value":190,"params":{"format":"range","min":0,"max":360}},        
+        "headerHue":{"title":"Header Hue","value":190,"params":{"format":"range","min":0,"max":360}},        
         "saturation":{"title":"Saturation","value":30,"params":{"format":"range","min":10,"max":80}},
         "hueRotate" : {"title":"Change EQ Band Color With Chaning Gain","value":true,"params":{"format":"boolean"}},
         "eqparamFontSize": {"title":"Equalizer Parameter Font Size (px)","value":14,"params":{"format":"range","min":11,"max":16}},
@@ -98,7 +98,7 @@ function loadDefaultPreferences() {
         "levelmeterHeight":{"title":"Level bar height (px)","value":20,"params":{"format":"range","min":10,"max":40}},
         "autoUpload":{"title":"Automatically Upload Changes to DSP","value":false,"params":{"format":"boolean"}},
         "autoDownload":{"title":"Download EQ Config From DSP at Startup","value":true,"params":{"format":"boolean"}}, 
-        "configCount":{"title":"Saved configuration list length","value":6,"params":{"format":"range","min":3,"max":12}},           
+        "configCount":{"title":"Number of saved configurations to show","value":6,"params":{"format":"range","min":3,"max":12}},           
     }
     return {"legend":legend,"display":display,"general":general,"equalizer":equalizer}
 }

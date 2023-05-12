@@ -65,6 +65,9 @@ function handleDSPMessage(m) {
         case "GetClippedSamples":
             if (result=='Ok') return [true,value]; else return[false,value];           
             break;                
+        case "GetVolume":            
+            if (result=='Ok') return [true,value]; else return[false,value];           
+            break;         
         case "SetVolume":            
             if (result=='Ok') return [true,value]; else return[false,value];           
             break;         

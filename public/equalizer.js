@@ -64,7 +64,6 @@ async function initEQ() {
         })
     },1000)      
 
-
     let preampGainVal = document.getElementById('preampGainVal');
 
 
