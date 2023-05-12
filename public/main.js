@@ -1,3 +1,5 @@
+
+const camillaNodeVersion = "0.2.0"
 let preferences;
 
 
@@ -18,7 +20,7 @@ const levelmeterHeight = parseInt(getSettingValue("levelmeterHeight"));
 const showClippingIndicator = getSettingValue("showClippingIndicator");
 
 
-const defaultFreqList = [30,100,200,800,1000,2000,4000,6000,8000,12000]
+const defaultFreqList = [30,100,200,500,1000,2000,4000,6000,8000,12000]
 
 //////////////////////////////////////// Settings & Preferences Related Functions
 
@@ -87,7 +89,6 @@ function loadDefaultPreferences() {
 
     let general = {
         "messageboxDefaultTimeOut":{"title":"Message box default timeout duration","value":1500,"params":{"format":"range","min":500,"max":3000}},
-
     }
     let equalizer = { 
         "MaxDB":{"title":"Maximum Gain (dB)","value":16,"params":{"format":"range","min":6,"max":30}},

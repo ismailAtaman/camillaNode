@@ -151,7 +151,7 @@ input, select {
 .levelBar {
     position: relative;        
     right: 0px;
-    max-width: calc(var(--eqmain-width));
+    max-width: calc(-2 + var(--eqmain-width));
     height: var(--levelmeter_height);   
     opacity: 90%;
     background-color: var(--body-bgcolor1); 
@@ -224,7 +224,6 @@ input, select {
     overflow-y: scroll;
     background-color: hsl(var(--main-hue), var(--saturation), 40%);
     border-radius: 10px;
-
 }
 
 .config {
@@ -543,6 +542,33 @@ input, select {
 hr {
     margin-block: 20px;
 }
+
+#serverList {    
+    margin-block: 10px;
+    border: 1px solid #555;
+    padding: 0.5rem;
+    width: var(--eqmain-width);
+    height: calc( 10 * var(--default-font-size));
+    overflow-y: scroll;
+    background-color: hsl(var(--main-hue), var(--saturation), 40%);
+    border-radius: 10px;
+}
+
+.server {
+    font-size: var(--default-font-size);
+    cursor: pointer;
+    padding: 0.2rem;
+    user-select: none;
+    border-radius: 5px;
+}
+
+.server:hover {
+    color: #222;   
+    background-color: hsl(var(--main-hue), var(--saturation), 80%);    
+    transition: all 250ms;    
+}
+
+
 
 .tooltip {
     position: absolute;

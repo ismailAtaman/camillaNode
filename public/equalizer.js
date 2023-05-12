@@ -250,6 +250,8 @@ function deleteClick() {
     updateConfigList();    
 }
 
+let hoverConfig;
+
 async function updateConfigList() {      
     fetch('/getConfigList').then((res)=>res.json().then(data=>{
         const configList = document.getElementById('configList');
@@ -258,30 +260,28 @@ async function updateConfigList() {
         let savedConfigList = data;
         i=1;
         for (let config of savedConfigList) {
-            
+            let selectedConfig;
             const div = document.createElement('div');            
-            div.classList.add('config');
-            div.accessKey=i;
-            // div.innerText="["+i+"] " + config;
+            div.classList.add('config');                        
             div.innerText=config;
             i++
             
             // Load config from server when configName is clicked
-            div.addEventListener('click',function (){                               
+            div.addEventListener('click',function () {                               
                 document.getElementById('configName').value=this.innerText;
                 getConfigFromServer(this.innerText).then((config)=>{                    
-                let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
-                applyFilters(filterArrayJSON.filters);
-                if (autoUpload) {
-                    let filterArray= createFilterArray();                    
-                    uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
-                }
-
-                });
-            });
+                   let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
+                    applyFilters(filterArrayJSON.filters);
+                    if (autoUpload) {
+                        let filterArray= createFilterArray();                    
+                        uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
+                    }
+                });                
+            });            
             configList.appendChild(div);
         }
     }))    
+
 }
 
 
