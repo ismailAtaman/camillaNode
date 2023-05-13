@@ -425,6 +425,46 @@ input, select {
 }
 
 
+#volumeControler {
+    background-color: hsl(calc(10 + var(--main-hue)), var(--saturation), 30%);
+    border-radius: 7px;
+    height: 12px;
+    width: 50%;
+    margin-inline: 10px;    
+    margin-block: 5px;
+}
+
+#volumeLevel {
+    background-color: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+    color: white;
+    height: auto;
+    line-height: 1;
+    width: calc(3 * var(--default-font-size) );
+    user-select: none;
+    border: none;    
+    vertical-align: top;
+    
+}
+
+#volumeControl input[type="checkbox"] {
+    appearance: none;
+    width: 16px;
+    aspect-ratio: 1;
+    background-color: white;    
+    border-radius: 2px;
+    transition: all 300ms;
+}
+
+#volumeControl input[type="checkbox"]:checked {    
+    appearance: none;
+    width: 16px;
+    aspect-ratio: 1;
+    background-color: hsl( calc( 180 + var(--main-hue)), 50%, 50%);
+    border-radius: 2px;
+    transition: all 300ms;
+}
 
 /************************************************************ AUTOEQ *************************************************************/
 
@@ -631,7 +671,7 @@ hr {
     display: block;
     border: 1px solid white;
     width: 40vw;
-    height: 60vh;
+    height: 600px;
     padding: 10px;
     border-radius: 7px;
     transform: translate(-50%,-50%);        
@@ -640,7 +680,7 @@ hr {
 
 #importText {
     padding: 10px;   
-    height: 87%; 
+    height: 450px; 
     background-color: hsl(var(--main-hue), var(--saturation),5%);
     border-radius: 7px;    
     margin: 15px;

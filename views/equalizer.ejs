@@ -27,13 +27,22 @@
             <canvas id="eqcanvas" width="100%" height="100%"></canvas>
         </div>
 
+        <div class="section eqSection" id="volumeControl">
+            <span style="font-size: 14px; margin-left:6px; vertical-align: top;">Volume</span>
+            <input type="range" name="" id="volumeControler" max="100" min="0">          
+            <input type="text" name="volumeLevel" id="volumeLevel">
+            <input type="checkbox" name="mute" id="mute"><span style="font-size: 14px; margin-left:6px; vertical-align: top;">Mute</span>
+            <!-- <input type="checkbox" name="autoVolume" id="autoVolume"><span style="font-size: 14px; margin-left:6px; vertical-align: top;">Auto</span> -->
+        </div>
+
+
         <div class="section eqSection" id="preampGain">
            <span style="font-size: 14px; margin-left:6px">Pre-amp</span><input type="text" name="" id="preampGainVal" class="eqparam" style="width:75px;margin-inline:10px; display: inline-block;">            
            <div id="clipped"> </div>            
            <div id="clippedMessage"></div>            
         </div>
 
-        
+
         <div class="section" id="eqtools">
             <div class="button" onclick="flatten()">Flatten</div>
             <div class="button" onclick="reset()">Reset</div>
@@ -99,6 +108,7 @@
 
 <dialog id="importDialog">
     <div id="importWindow">
+        <p>Import EQ settings from a text file. Please paste the text to import below.</p>
         <div class="button" onclick="importFromText()">Import</div>   
         <div class="button" onclick="document.getElementById('importDialog').close()">Close</div>   
         <div id="importText" contenteditable="true">

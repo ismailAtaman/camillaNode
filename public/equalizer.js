@@ -3,6 +3,7 @@
 
 let selectedKnob = null;
 let mouseDownY = 0;
+let preMuteVolume;
 
 async function initEQ() {        
     let connectionResult = await connectToDsp();
@@ -10,11 +11,24 @@ async function initEQ() {
         displayMessage("Error connecting to server. Please configure server settings and make sure CamillaDSP service is running.",{"type":"error"})
         return;
     }
+    
     await updateConfigList();
 
-    if (autoDownload) downloadConfigFromDSP().then((DSPConfig)=>{        
-        let filters = DSPConfig.filters;
-        applyFilters(filters);     
+    if (autoDownload) downloadConfigFromDSP().then((DSPConfig)=>{       
+        // If no config is uploaded but volume control is enabled, add 1 filter with pre-amp set to 0 and volume 0
+        if (Object.keys(DSPConfig.filters).length==0 && showVolumeControl) {
+            let filterArray = new Array()
+            let filter = new Object();            
+            filter["Volume"] = {
+                "parameters":{}
+            }
+            filterArray.push(filter);                                               
+            uploadConfigToDSP(filterArray);
+            
+        }  else {
+            let filters = DSPConfig.filters;
+            applyFilters(filters);     
+        }
     }) 
 
     let levelMaxWidth=document.getElementById('levelBorder').getBoundingClientRect().width
@@ -66,7 +80,6 @@ async function initEQ() {
 
     let preampGainVal = document.getElementById('preampGainVal');
 
-
     preampGainVal.addEventListener('focus',function(){        
         this.value= this.value.replace('db','');                        
     })
@@ -77,6 +90,50 @@ async function initEQ() {
         if (isNaN(text)) text=0;                                
         this.value=text+'db';                                
     })
+
+
+    ///// Volume Controls 
+    if (showVolumeControl) {
+
+        document.getElementById('volumeControl').style.display='block';
+    
+        let volumeControler = document.getElementById('volumeControler');
+
+        volumeControler.addEventListener('input',function(){
+            sendDSPMessage({"SetVolume":this.value-100})
+            this.dispatchEvent(new Event('change'));
+        })
+
+        volumeControler.addEventListener('change',function(){        
+            document.getElementById('volumeLevel').value=this.value;
+        })
+
+        sendDSPMessage("GetVolume").then(vol=>{
+            let volume = 100+vol;
+            volumeControler.value=volume;    
+        })
+
+        preMuteVolume=volumeControler.value;
+
+        document.getElementById('mute').addEventListener('click',function(){
+            let volumeControler = document.getElementById('volumeControler');
+            if (this.checked) {
+                preMuteVolume=volumeControler.value;
+                volumeControler.value=0;
+                
+            } else { 
+                volumeControler.value=preMuteVolume;
+            }
+
+            volumeControler.dispatchEvent(new Event('input'));
+        })
+    } else {
+        document.getElementById('volumeControl').style.display='none';
+        sendDSPMessage({"SetVolume":0})
+
+    }
+    ////////////////////// End of Volume Controls ////////////////////
+
 
     for (i=0;i<=9;i++)  addBand();
     
@@ -123,20 +180,29 @@ function createFilterArray() {
         filterArray.push(filter);
     }
 
+    // Pre-amp filter
     preampGainVal=document.getElementById("preampGainVal").value.replace('db','');
     let filter = new Object();
     filter["Preamp"] = {        
         "gain"  : parseFloat(preampGainVal),        
     }
     filterArray.push(filter);
-    //console.log(filterArray)
+
+    filter = new Object();
+    // Volume filter
+    filter["Volume"] = {                
+    }
+    filterArray.push(filter);
+
+    console.log(filterArray)
     return filterArray;
 }
 
 function uploadClick() {
-    let filterArray= createFilterArray()
+    let filterArray= createFilterArray();
+
     //console.log(filterArray);
-    uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
+    uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"})).catch(err=>{displayMessage("Failed to upload EQ configuration",{"type":"error"}); console.log(err)});
     
 }
 

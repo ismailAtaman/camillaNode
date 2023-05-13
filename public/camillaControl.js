@@ -105,26 +105,35 @@ async function uploadConfigToDSP(filterArray) {
 
     for (let filter of filterArray) {
         let filterName=Object.keys(filter)[0];
-        if (filterName=="Preamp") {
-            filters["Preamp"] = {
-                "type": "Gain",
-                "parameters": {        
+        switch (filterName) {
+            case "Preamp":
+                filters["Preamp"] = {
+                    "type": "Gain",
+                    "parameters": {        
+                        "gain": filter[filterName].gain,
+                        "inverted":false,
+                        "mute":false
+                    }                    
+                }
+                break;
+            case "Volume":
+                filters["Volume"] = {
+                    "type":"Volume",           
+                    "parameters":{}         
+                }
+                break;
+            default:
+                filters[filterName] = {
+                    "type": "Biquad",
+                    "parameters": {
+                    "type": filter[filterName].type,
+                    "freq": filter[filterName].freq,
+                    "q": filter[filterName].q,
                     "gain": filter[filterName].gain,
-                    "inverted":false,
-                    "mute":false
-                }                    
-            }
-        } else {
-            filters[filterName] = {
-                "type": "Biquad",
-                "parameters": {
-                "type": filter[filterName].type,
-                "freq": filter[filterName].freq,
-                "q": filter[filterName].q,
-                "gain": filter[filterName].gain,
-                }                    
-            }       
-        }        
+                    }                    
+                }       
+         }
+
         filterNameArray.push(filterName);
     }
 
@@ -140,7 +149,7 @@ async function uploadConfigToDSP(filterArray) {
         "names": filterNameArray
     })
 
-    // console.log(filters);
+    console.log(filters);
     // console.log(pipeline)    
 
     DSPConfig.filters=filters;
