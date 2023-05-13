@@ -11,25 +11,28 @@ async function initEQ() {
         displayMessage("Error connecting to server. Please configure server settings and make sure CamillaDSP service is running.",{"type":"error"})
         return;
     }
-    
+
     await updateConfigList();
 
+    // If no config is uploaded but volume control is enabled, add a volume filter set to -40
     if (autoDownload) downloadConfigFromDSP().then((DSPConfig)=>{       
-        // If no config is uploaded but volume control is enabled, add 1 filter with pre-amp set to 0 and volume 0
-        if (Object.keys(DSPConfig.filters).length==0 && showVolumeControl) {
-            let filterArray = new Array()
-            let filter = new Object();            
-            filter["Volume"] = {
-                "parameters":{}
-            }
-            filterArray.push(filter);                                               
-            uploadConfigToDSP(filterArray);
+        
+    //     if (Object.keys(DSPConfig.filters).length==0 && showVolumeControl) {
+    //         let filterArray = new Array()
+    //         let filter = new Object();            
+    //         filter["Volume"] = {
+    //             "parameters":{
+    //                 "gain":"-40"
+    //             }
+    //         }
+    //         filterArray.push(filter);                                               
+    //         uploadConfigToDSP(filterArray);
             
-        }  else {
-            let filters = DSPConfig.filters;
-            applyFilters(filters);     
-        }
-    }) 
+    //     }  else {
+             let filters = DSPConfig.filters;
+             applyFilters(filters);     
+    })
+    // }) 
 
     let levelMaxWidth=document.getElementById('levelBorder').getBoundingClientRect().width
     
@@ -141,65 +144,13 @@ async function initEQ() {
     
 }
 
-function sliderUpdateVal(slider,val) {
-    const sliderKnobHeight = document.getElementsByClassName('slider-container')[0].children[0].children[0].getBoundingClientRect().height;        
-    const sliderMax = document.getElementsByClassName('slider-container')[0].getBoundingClientRect().height-sliderKnobHeight/2;
 
-    const sliderKnob = slider.children[0].children[0];            
-    const yPos = ((parseFloat(-val)+MaxDB)/(2*MaxDB))*sliderMax;
-    
-    sliderKnob.style.top=yPos+'px';
-    
-    let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/360));    
-    if (hueRotate) sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
+/// Helper functions
 
-    // console.log('Val : '+val)            
-    // console.log('sliderMax : '+sliderMax)       
-    // console.log("Move to : " + yPos);
-    // console.log(sliderKnob)
-    //slider.dispatchEvent(new Event('change'));    
-}
 
-function createFilterArray() {
-    let filterArray=new Array();
-    const sliders = document.getElementsByClassName('slider-container')       
-    for (i=0;i<sliders.length;i++) {                
-        let sliderId=i+1;
-        sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
-        let slider= document.getElementById(sliderId);
-
-        // console.log(sliderId);
-        // console.log(slider);
-        let filter = new Object();
-        filter[sliderId] = {
-            "type"  : slider.children['filterType'].value,
-            "freq"  : parseFloat(slider.children['freq'].value.replace('hz','')),
-            "gain"  : parseFloat(slider.children['gain'].value.replace('db','')),
-            "q"     : parseFloat(slider.children['qfact'].value)
-        }
-        filterArray.push(filter);
-    }
-
-    // Pre-amp filter
-    preampGainVal=document.getElementById("preampGainVal").value.replace('db','');
-    let filter = new Object();
-    filter["Preamp"] = {        
-        "gain"  : parseFloat(preampGainVal),        
-    }
-    filterArray.push(filter);
-
-    filter = new Object();
-    // Volume filter
-    filter["Volume"] = {                
-    }
-    filterArray.push(filter);
-
-    console.log(filterArray)
-    return filterArray;
-}
 
 function uploadClick() {
-    let filterArray= createFilterArray();
+    let filterArray= EQSlider.createFilterArray();
 
     //console.log(filterArray);
     uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"})).catch(err=>{displayMessage("Failed to upload EQ configuration",{"type":"error"}); console.log(err)});
@@ -237,18 +188,20 @@ function applyFilters(filters) {
             slider.children['gain'].value=filters[filterName].parameters.gain+'db';
             slider.children['qfact'].value=filters[filterName].parameters.q;            
             slider.children['filterType'].value=filters[filterName].parameters.type;            
-            sliderUpdateVal(slider,filters[filterName].parameters.gain);            
+            EQSlider.sliderUpdateVal(slider,filters[filterName].parameters.gain);            
             i++;
         }
     }
 }
+
+///////// EQ Management functions
 
 
 function flatten() {
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
         sliders[i].children['gain'].value='0db';
-        sliderUpdateVal(sliders[i],0);
+        EQSlider.sliderUpdateVal(sliders[i],0);
     }
 }
 
@@ -259,7 +212,7 @@ function reset() {
         sliders[i].children['qfact'].value='1.4';
         sliders[i].children['freq'].value=defaultFreqList[i % 10]+'hz';
         sliders[i].children['filterType'].value='Peaking';
-        sliderUpdateVal(sliders[i],0);
+        EQslider.sliderUpdateVal(sliders[i],0);
     }
     document.getElementById("preampGainVal").value='0db'
 }
@@ -275,6 +228,23 @@ function compress() {
     }
 }
 
+function addBand() {
+    
+    let s = new EQSlider();
+    let EQParent = document.getElementById('equalizer');
+    let nextId = parseInt(EQParent.childElementCount)+1;
+    if (nextId>maxBands) return;
+    nextId<10?nextId="0"+nextId:a=1;
+    s.id = "Filter"+ nextId;    
+    EQParent.appendChild(s);
+    if (autoUpload) {
+        s.addEventListener('change',function(){
+            console.log('DSP updated')
+            uploadClick();
+        })
+    }
+}
+
 function removeLast() {
     let sliders = document.getElementsByClassName('slider-container');    
     if (sliders.length<=1) return;
@@ -283,9 +253,38 @@ function removeLast() {
     lastSlider.parentElement.removeChild(lastSlider);
 }
 
+function sortByFreq() {    
+    let filterArray = EQSlider.createFilterArray()    
+    filterArray.sort((a,b)=>{
+        return a[Object.keys(a)[0]].freq - b[Object.keys(b)[0]].freq;
+    })
+    //console.log(filterArray);   
 
+    let tempfilterArray = new Array();
+    
 
-function saveClick() {    
+    for (i=1;i<=filterArray.length;i++) {
+        let tempFilter = new Object();
+        let filterName = i<10?'Filter0'+i:'Filter'+i;
+        // console.log(filterName);
+        // console.log(filterArray[i-1][Object.keys(filterArray[i-1])]);        
+
+        if (Object.keys(filterArray[i-1])!='Preamp') {
+            tempFilter[filterName]=filterArray[i-1][Object.keys(filterArray[i-1])]                        
+        } else {
+            tempFilter["Preamp"]=filterArray[i-1][Object.keys(filterArray[i-1])]
+        }
+        // console.log(tempFilter);
+        tempfilterArray.push(tempFilter)
+    }
+    //console.log(tempfilterArray)
+    let filterArrayJSON = convertFilterArayToJSON(tempfilterArray);            
+    applyFilters(filterArrayJSON.filters);    
+}
+
+////////// EQ Config management functions
+
+function saveConfigClick() {    
     let configNameObject = document.getElementById('configName');
     let configName = configNameObject.value.trim();    
     if (configName.length==0) return;8
@@ -297,7 +296,7 @@ function saveClick() {
     fetch('/configExists?configName='+configName).then((res)=>res.text().then(data=>{
         if (data=='true' && !confirm('Configuration with a same name already exists. Would you like to overwrite?')) return;       
 
-        let filterArray=createFilterArray();      
+        let filterArray=EQSlider.createFilterArray();      
         let accessKey= document.getElementById("configShortcut").value
         saveConfig(({"configName":configName,"accessKey":accessKey,"filterArray":filterArray}));
         configNameObject.value='';
@@ -305,7 +304,7 @@ function saveClick() {
     }));   
 }
 
-function deleteClick() {
+function deleteConfigClick() {
     let configNameObject = document.getElementById('configName');
     let configName = configNameObject.value;
     if (configName.length==0) return;
@@ -342,7 +341,7 @@ async function updateConfigList() {
                     let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
                     applyFilters(filterArrayJSON.filters);
                     if (autoUpload) {
-                        let filterArray= createFilterArray();                    
+                        let filterArray= EQSlider.createFilterArray();                    
                         uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
                     }
                 });                
@@ -354,7 +353,7 @@ async function updateConfigList() {
 }
 
 
-
+////////// Generic helper functions
 
 function displayMessage(message,options) {
 
@@ -401,23 +400,9 @@ function displayMessage(message,options) {
     if (!options.persist) setTimeout(function(){messageBox.style.display='none'},timeout)
 }
 
-function addBand() {
-    
-    let s = new EQSlider();
-    let EQParent = document.getElementById('equalizer');
-    let nextId = parseInt(EQParent.childElementCount)+1;
-    if (nextId>maxBands) return;
-    nextId<10?nextId="0"+nextId:a=1;
-    s.id = "Filter"+ nextId;    
-    EQParent.appendChild(s);
-    if (autoUpload) {
-        s.addEventListener('change',function(){
-            console.log('DSP updated')
-            uploadClick();
-        })
-    }
-}
 
+
+///////// AutoEQ Functions
 
 function refreshAutoEq() {
     let list = document.getElementById('headphoneList')
@@ -437,7 +422,6 @@ function refreshAutoEq() {
     })
     
 }
-
 
 function refreshAutoEqIEM() {
     let list = document.getElementById('headphoneList')
@@ -524,36 +508,6 @@ function autoEQSearchKeyDown() {
     if (event.keyCode==13) searchAutoEq()
 }
 
-
-function sortByFreq() {    
-    let filterArray = createFilterArray()    
-    filterArray.sort((a,b)=>{
-        return a[Object.keys(a)[0]].freq - b[Object.keys(b)[0]].freq;
-    })
-    //console.log(filterArray);   
-
-    let tempfilterArray = new Array();
-    
-
-    for (i=1;i<=filterArray.length;i++) {
-        let tempFilter = new Object();
-        let filterName = i<10?'Filter0'+i:'Filter'+i;
-        // console.log(filterName);
-        // console.log(filterArray[i-1][Object.keys(filterArray[i-1])]);        
-
-        if (Object.keys(filterArray[i-1])!='Preamp') {
-            tempFilter[filterName]=filterArray[i-1][Object.keys(filterArray[i-1])]                        
-        } else {
-            tempFilter["Preamp"]=filterArray[i-1][Object.keys(filterArray[i-1])]
-        }
-        // console.log(tempFilter);
-        tempfilterArray.push(tempFilter)
-    }
-    //console.log(tempfilterArray)
-    let filterArrayJSON = convertFilterArayToJSON(tempfilterArray);            
-    applyFilters(filterArrayJSON.filters);    
-}
-
 function importFromText() {
     let importText = document.getElementById('importText').innerText;    
     let filterArray = parseAutoEQText(importText);
@@ -570,6 +524,7 @@ function importFromText() {
 }
 
 
+// EQ Slider class 
 class EQSlider {    
     mousePos;
     selectedGain; 
@@ -738,6 +693,63 @@ class EQSlider {
        sliderKnob.style.top=sh+'px';       
        
        return sliderContainer;
+    }
+
+    static sliderUpdateVal(slider,val) {
+        const sliderKnobHeight = document.getElementsByClassName('slider-container')[0].children[0].children[0].getBoundingClientRect().height;        
+        const sliderMax = document.getElementsByClassName('slider-container')[0].getBoundingClientRect().height-sliderKnobHeight/2;
+    
+        const sliderKnob = slider.children[0].children[0];            
+        const yPos = ((parseFloat(-val)+MaxDB)/(2*MaxDB))*sliderMax;
+        
+        sliderKnob.style.top=yPos+'px';
+        
+        let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/360));    
+        if (hueRotate) sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
+    
+        // console.log('Val : '+val)            
+        // console.log('sliderMax : '+sliderMax)       
+        // console.log("Move to : " + yPos);
+        // console.log(sliderKnob)
+        //slider.dispatchEvent(new Event('change'));    
+    }
+
+    static createFilterArray() {
+        let filterArray=new Array();
+        const sliders = document.getElementsByClassName('slider-container')       
+        for (i=0;i<sliders.length;i++) {                
+            let sliderId=i+1;
+            sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
+            let slider= document.getElementById(sliderId);
+    
+            // console.log(sliderId);
+            // console.log(slider);
+            let filter = new Object();
+            filter[sliderId] = {
+                "type"  : slider.children['filterType'].value,
+                "freq"  : parseFloat(slider.children['freq'].value.replace('hz','')),
+                "gain"  : parseFloat(slider.children['gain'].value.replace('db','')),
+                "q"     : parseFloat(slider.children['qfact'].value)
+            }
+            filterArray.push(filter);
+        }
+    
+        // Pre-amp filter
+        preampGainVal=document.getElementById("preampGainVal").value.replace('db','');
+        let filter = new Object();
+        filter["Preamp"] = {        
+            "gain"  : parseFloat(preampGainVal),        
+        }
+        filterArray.push(filter);
+    
+        filter = new Object();
+        // Volume filter
+        filter["Volume"] = {                
+        }
+        filterArray.push(filter);
+    
+        console.log(filterArray)
+        return filterArray;
     }
 }
 
