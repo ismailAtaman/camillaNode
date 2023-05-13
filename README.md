@@ -18,6 +18,10 @@ npm install
 
 To start the web service just run it with `node .` Admin privialages might be required.
 
+Once it is running, go to the **Server** tab and enter a name, the ip address and the port of the machine running CamilaDSP. If you don't know the port,  check it in your camilladsp.service file in /lib/systemd/system/camilladsp.service. Port will be the value that follows -p option. If there is no such file try `sudo service camilladsp status` and see what is the path to the service file.
+
+If you are going to run cammillaNode on a seperate PC or Mac to control a CamillaDSP running on a separate device, you need to make sure CamillaDSP is initialized with `-a 0.0.0.0` option. That binds the websocket server to the external network interface so that you can reach camillaDSP from another computer running on your network.
+
 ### Usage
 
 There are four tabs in the app.
