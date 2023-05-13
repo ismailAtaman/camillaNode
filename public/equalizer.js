@@ -5,7 +5,7 @@ let selectedKnob = null;
 let mouseDownY = 0;
 let preMuteVolume;
 
-async function initEQ() {        
+async function EQPageOnload() {        
     let connectionResult = await connectToDsp();
     if (!connectionResult[0]) {
         displayMessage("Error connecting to server. Please configure server settings and make sure CamillaDSP service is running.",{"type":"error"})
@@ -144,10 +144,7 @@ async function initEQ() {
     
 }
 
-
 /// Helper functions
-
-
 
 function uploadClick() {
     let filterArray= EQSlider.createFilterArray();

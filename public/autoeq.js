@@ -5,6 +5,33 @@
 // https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08
 
 
+
+const AutoEQresults = {
+    "Crinicle":{
+        "IEM"                       :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/7e4de6a8936e7b43eb4d1f1679e679aac28f863b"},
+        "Headphones - Gras 43AG-7"  :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/06b43dba9ab7b9b112f912ba1a54c84f65b19df8"},
+        "Headphones - Ears 711"     :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/d998aa432cf36c2038214090f235ba524acbf537"},       
+    },
+    "headphones.com":{
+        "IEM"                       :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/d4ac1c091ce178666b8a372ba594afa9386f3631"},
+        "Headphones"                :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/2a83d7c0b570b7a1d485d769eb778bed888d939d"},
+    },
+    "InnerFidelity":{
+        "IEM"                       :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/2dc464db989b334054b35da6019df41d067e2a5c"},
+        "Headphones"                :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/ee14333aa5f44e1a846f57c48a108ee8139e820d"},
+    },
+
+    "Oratory1990":{
+        "IEM"                       :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/5d06a2a922b3fc34792d0115a39739cf7cff53b0"},
+        "Headphones"                :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08"},
+    },
+    
+    "Ratings.com":{
+        "IEM"                       :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/357240e589d25076066c20dd4cc51eb025c45774"},
+        "Headphones"                :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/3afb688cecf24697f5d0238830d3e0bebbb642ba"},
+    },
+}
+
 function getCongifText(url) {
     fetch(url).then((res)=>res.text().then(data=>{
         return data;
@@ -20,7 +47,6 @@ async function downloadHeadphoneList() {
     })    
 }
 
-
 async function downloadIEMList() {    
     // Cirnicle > harman_in-ear_2019v2
     url = 'https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/7e4de6a8936e7b43eb4d1f1679e679aac28f863b';
@@ -30,6 +56,16 @@ async function downloadIEMList() {
         }))
     })    
 }
+
+async function downloadEQList(url) {    
+    // Cirnicle > harman_in-ear_2019v2    
+    return new Promise((resolve)=>{;
+        fetch(url).then((res)=>res.text().then(data=>{        
+            resolve(data);
+        }))
+    })    
+}
+
 
 function parseAutoEQText(text) {    
     let lines = text.split('\n');

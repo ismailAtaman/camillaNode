@@ -91,6 +91,7 @@ function loadDefaultPreferences() {
     let general = {
         "messageboxDefaultTimeOut":{"title":"Message box default timeout duration","value":1500,"params":{"format":"range","min":500,"max":3000}},
     }
+    
     let equalizer = { 
         "MaxDB":{"title":"Maximum Gain (dB)","value":16,"params":{"format":"range","min":6,"max":30}},
         "MaxBands" : {"title":"Maximum Number of EQ Bands","value":24,"params":{"format":"range","min":6,"max":36}},
