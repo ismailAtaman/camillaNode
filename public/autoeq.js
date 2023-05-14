@@ -26,7 +26,7 @@ const AutoEQResults = {
         "Headphones"                :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/9127a8b6e8e3e84c22163bb4ad6bf49fc32a5e08"},
     },
     
-    "Ratings.com":{
+    "Rtings.com":{
         "IEM"                       :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/357240e589d25076066c20dd4cc51eb025c45774"},
         "Headphones"                :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/3afb688cecf24697f5d0238830d3e0bebbb642ba"},
     },
