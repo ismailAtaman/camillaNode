@@ -180,10 +180,10 @@ async function EQPageOnload() {
         document.getElementById('limit').checked=false;
         
         document.getElementById('limit').addEventListener('click',function(){
-            if (!this.checked) {
-                console.log("Limit unchecked")
+            if (!this.checked) {                
                 this.nextSibling.innerText='Limit';             
                 peakThreshold=undefined;
+                peakArray=[];
             }
         })
 
