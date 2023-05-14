@@ -52,17 +52,12 @@
             <div class="button" onclick="sortByFreq()">I have OCD</div>             
         </div>
 
-        
-
         <div class="section eqSection" id="equalizer">         
         </div>
-
-
         
         <div class="section " id="DSPManagement">
             <div class="button" onclick="uploadClick()">Upload</div>
-            <div class="button" onclick="downloadClick()">Download</div>
-            
+            <div class="button" onclick="downloadClick()">Download</div>            
             <div class="button" onclick="showAutoEQClick()">AutoEQ</div>            
             <div class="button" onclick="importClick()">Import</div>            
         </div>        
@@ -73,50 +68,43 @@
             <div class="button" onclick="saveConfigClick()">Save</div>
             <div class="button" onclick="deleteConfigClick()">Delete</div>            
 
-            <div id="configList">                
-            </div>
+            <div id="configList"></div>
         </div>
 
 
     </div>       
     
     <div id="messageBox"></div>
-    <div id="contextMenu">
-        <div class="button small" id="contexMenuApply">Apply</div>
-        <div class="button small" id="contextMenuDelete">Delete</div>
-    </div>
-<!-- 
-    <input type="text" name="cmd" id="cmd">
-    <input type="button" value="send" id="sendButton" onclick="sendCommand()">
-    <div id="response"></div> 
--->
 
-<dialog id="autoEQDialog">    
-    <div id="autoEQWindow">
-        <div>AutoEQ Search</div>
-        <input type="text" name="" id="autoEQSearch" onkeydown="autoEQSearchKeyDown()">
-        <div class="button" onclick="searchAutoEq()">Search</div>    
-        <div class="button" onclick="refreshAutoEq()">Load Headphones</div>
-        <div class="button" onclick="refreshAutoEqIEM()">Load IEMs</div>
-        <div class="button" onclick="document.getElementById('autoEQDialog').close()">Close</div>
-        <br>
-        <div id="headphoneList">
+
+
+    <dialog id="autoEQDialog">    
+        <div id="autoEQWindow">
+            <div>AutoEQ Search</div>
+            <select name="autoEQRepo" id="autoEQRepo">
+
+            </select>
+            <input type="text" name="" id="autoEQSearch" onkeydown="autoEQSearchKeyDown()">
+            <div class="button" onclick="searchAutoEq()">Search</div>               
+            <div class="button" onclick="document.getElementById('autoEQDialog').close()">Close</div>
+            <br>
+            <div id="headphoneList">
+            </div>
         </div>
-    </div>
-</dialog>
+    </dialog>
 
 
-<dialog id="importDialog">
-    <div id="importWindow">
-        <p>Import EQ settings from a text file. Please paste the text to import below.</p>
-        <div class="button" onclick="importFromText()">Import</div>   
-        <div class="button" onclick="document.getElementById('importDialog').close()">Close</div>   
-        <div id="importText" contenteditable="true">
+    <dialog id="importDialog">
+        <div id="importWindow">
+            <p>Import EQ settings from a text file. Please paste the text to import below.</p>
+            <div class="button" onclick="importFromText()">Import</div>   
+            <div class="button" onclick="document.getElementById('importDialog').close()">Close</div>   
+            <div id="importText" contenteditable="true">
+            </div>
         </div>
-    </div>
-    
-    
-</dialog>
+        
+        
+    </dialog>
 
 
 </body>

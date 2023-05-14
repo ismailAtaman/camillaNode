@@ -1,5 +1,5 @@
 
-const camillaNodeVersion = "0.2.0"
+const camillaNodeVersion = "0.3.0"
 let preferences;
 
 
@@ -22,6 +22,10 @@ const showVolumeControl = getSettingValue("showVolumeControl");
 const configCount = parseInt(getSettingValue("configCount"));
 
 const defaultFreqList = [30,100,200,500,1000,2000,4000,6000,8000,12000]
+
+// Initialize AutoEQ Database
+//initAutoEQDB();
+
 
 //////////////////////////////////////// Settings & Preferences Related Functions
 
@@ -103,6 +107,7 @@ function loadDefaultPreferences() {
         "autoDownload":{"title":"Download EQ Config From DSP at Startup","value":true,"params":{"format":"boolean"}}, 
         "configCount":{"title":"Number of saved configurations to show","value":6,"params":{"format":"range","min":3,"max":12}},           
     }
+
     return {"legend":legend,"display":display,"general":general,"equalizer":equalizer}
 }
 

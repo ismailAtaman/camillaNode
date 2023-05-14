@@ -476,7 +476,7 @@ input, select {
     top:50%;
     display: block;
     border: 1px solid white;
-    width: 40vw;
+    width: 70vw;
     height: 60vh;
     padding: 10px;
     border-radius: 7px;
@@ -497,13 +497,17 @@ input, select {
     width: auto;
     height: 87%;
     overflow-y: scroll;
-    background-color: hsl(var(--main-hue),var(--saturation), 40%);
-    
+    background-color: hsl(var(--main-hue),var(--saturation), 40%);    
 }
 
 #autoEQWindow .config::after {
-    content: '';
+    content: "[" attr(sourceName) "/" attr(repoName) "]";
+    font-size: 12px;
+    color: #DDD
 }
+
+
+
 
 .hpVisible {
     display: inline-block;

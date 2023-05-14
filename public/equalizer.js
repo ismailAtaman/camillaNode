@@ -214,7 +214,7 @@ function reset() {
         sliders[i].children['qfact'].value='1.4';
         sliders[i].children['freq'].value=defaultFreqList[i % 10]+'hz';
         sliders[i].children['filterType'].value='Peaking';
-        EQslider.sliderUpdateVal(sliders[i],0);
+        EQSlider.sliderUpdateVal(sliders[i],0);
     }
     document.getElementById("preampGainVal").value='0db'
 }
@@ -444,22 +444,26 @@ function refreshAutoEqIEM() {
     
 }
 
+
 function loadHeadphoneList(filter) {    
     const listObject = document.getElementById('headphoneList');
     listObject.replaceChildren();
-    const headphoneRecords = JSON.parse(window.localStorage.getItem('headphoneRecords'));
+    
+    let headphoneRecords = JSON.parse(window.localStorage.getItem('autoEQDB'));    
+
+    // Filter the array if any search filter is applied
+    if (filter!=undefined) headphoneRecords=headphoneRecords.filter(e=>e.deviceName.toLowerCase().match(filter));    
+
+    // console.log(headphoneRecords)    
     let div;    
 
-    for (let headphone of Object.keys(headphoneRecords)) {
-        if (filter!=undefined) {                
-            // console.log(headphone+" "+headphone.search(filter.text))
-            if (headphone.toLowerCase().search(filter.text)==-1) continue;            
-        }
-
+    for (let headphone of headphoneRecords) {
         div = document.createElement('div');
         div.className='config';        
-        div.innerText=headphone;
-        div.setAttribute('url',headphoneRecords[headphone].url);
+        div.innerText=headphone.deviceName;
+        div.setAttribute('url',headphone.url);
+        div.setAttribute('repoName',headphone.repoName);
+        div.setAttribute('sourceName',headphone.sourceName);
 
         
         div.addEventListener('dblclick',function(){
@@ -491,9 +495,35 @@ function loadHeadphoneList(filter) {
 
 function showAutoEQClick() {
     let autoEQDialog = document.getElementById('autoEQDialog')
-    autoEQDialog.showModal();
+    autoEQDialog.showModal();    
+    loadRepoList();
     loadHeadphoneList();
 }
+
+
+function loadRepoList() {
+    let repoList = document.getElementById('autoEQRepo');
+    repoList.replaceChildren();
+    let o = document.createElement('option');
+    o.innerText="[All]";
+    repoList.appendChild(o);
+
+    for (let source of Object.keys(AutoEQResults)) {        
+        let o = document.createElement('option');
+        o.innerText=source;
+        o.value=source;
+        repoList.appendChild(o)
+    }
+    
+    let lastVal = window.localStorage.getItem('lastRepo');
+    if (lastVal!=undefined) repoList.value=lastVal;
+
+    repoList.addEventListener('change',function(){
+        repoList.value=="[All]"?initAutoEQDB():initAutoEQDB(repoList.value);
+        window.localStorage.setItem('lastRepo',repoList.value);
+    })
+}
+
 
 function importClick() {
     let importDialogue = document.getElementById('importDialog')
@@ -501,9 +531,12 @@ function importClick() {
  
 }
 
-function searchAutoEq() {
-    const text = document.getElementById('autoEQSearch').value.toLowerCase();        
-    loadHeadphoneList({"text":text})
+async function searchAutoEq() {
+    let searchText = document.getElementById('autoEQSearch').value.toLowerCase();        
+    let sourceText = document.getElementById("autoEQRepo").value;
+
+    sourceText=='[All]'?sourceText=undefined:sourceText=sourceText;    
+    loadHeadphoneList(searchText);    
 }
 
 function autoEQSearchKeyDown() {
@@ -521,7 +554,7 @@ function importFromText() {
 
     let filterArrayJSON = convertFilterArayToJSON(filterArray);            
     applyFilters(filterArrayJSON.filters);
-    document.getElementById('autoEQDialog').close();
+    document.getElementById('importDialog').close()
     
 }
 
@@ -680,7 +713,7 @@ class EQSlider {
             let val=parseInt(10*(parseFloat(gain.value.replace('db',''))+dif))/10;
             gain.value=val+'db';
             e.preventDefault();
-            sliderUpdateVal(sliderContainer,val);
+            EQSlider.sliderUpdateVal(sliderContainer,val);
        })          
 
        sliderBody.appendChild(sliderKnob);
@@ -746,7 +779,9 @@ class EQSlider {
     
         filter = new Object();
         // Volume filter
-        filter["Volume"] = {                
+        filter["Volume"] = {         
+            "type":"Volume",           
+            "parameters":{}                
         }
         filterArray.push(filter);
     
