@@ -177,7 +177,7 @@ function applyFilters(filters) {
             case "Preamp":
                 document.getElementById("preampGainVal").value=filters[filterName].parameters.gain+'db';
                 break;
-            case "Volume":
+            case "Volume":                
                 break;
             default:        
                 let sliderId=i+1;
@@ -260,26 +260,33 @@ function sortByFreq() {
     filterArray.sort((a,b)=>{
         return a[Object.keys(a)[0]].freq - b[Object.keys(b)[0]].freq;
     })
-    //console.log(filterArray);   
+    //console.log(filterArray);       
+    let tempfilterArray = new Array();    
 
-    let tempfilterArray = new Array();
-    
-
-    for (i=1;i<=filterArray.length;i++) {
+    for (i=1;i<=filterArray.length-1;i++) {
         let tempFilter = new Object();
         let filterName = i<10?'Filter0'+i:'Filter'+i;
         // console.log(filterName);
         // console.log(filterArray[i-1][Object.keys(filterArray[i-1])]);        
-
-        if (Object.keys(filterArray[i-1])!='Preamp') {
-            tempFilter[filterName]=filterArray[i-1][Object.keys(filterArray[i-1])]                        
-        } else {
-            tempFilter["Preamp"]=filterArray[i-1][Object.keys(filterArray[i-1])]
+        console.log(Object.keys(filterArray[i-1])[0]);
+        switch (Object.keys(filterArray[i-1])[0]) {
+            case "Preamp":
+                // tempFilter["Preamp"]=filterArray[i-1][Object.keys(filterArray[i-1])]
+                continue;
+                break;
+            case "Volume":
+                // tempFilter["Volume"]=filterArray[i-1][Object.keys(filterArray[i-1])]
+                continue;
+                break;
+            default:
+                tempFilter[filterName]=filterArray[i-1][Object.keys(filterArray[i-1])]  
         }
+
+
         // console.log(tempFilter);
         tempfilterArray.push(tempFilter)
     }
-    //console.log(tempfilterArray)
+    console.log(tempfilterArray)
     let filterArrayJSON = convertFilterArayToJSON(tempfilterArray);            
     applyFilters(filterArrayJSON.filters);    
 }
