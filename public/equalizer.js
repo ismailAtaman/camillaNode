@@ -59,29 +59,42 @@ async function EQPageOnload() {
             document.getElementById('levelRBar').style.width=levelMaxWidth-(multiplier*levelR)+'px';
         })},50)
 
-
+    
         
     setInterval (function(){        
         sendDSPMessage("GetPlaybackSignalPeak").then(peak=>{   
-            let peakL = peak[0];                
-            let peakR = peak[1];
+            if (document.getElementById('limit').checked) {
+                let peakL = peak[0];                
+                let peakR = peak[1];
 
-            peakArray.push(peakL)
-            peakArray.push(peakR)
+                peakArray.push(peakL)                
+                peakArray.push(peakR)
 
-            while (peakArray.length>(20 * 3)) { peakArray.shift(); }
-            maxPeak =  (peakArray.reduce((a, b) => a + b, 0) / peakArray.length)+1;
-            //console.log(maxPeak);
+                if (peakArray.length<20 *3) return;                
 
-            if (document.getElementById('limit').checked && (maxPeak>peakThreshold)) {
-                let volumeControler = document.getElementById('volumeControler');
-                let currentVolume = parseInt(volumeControler.value);
-                volumeControler.value= currentVolume-1;
-                volumeControler.dispatchEvent(new Event('input'));                
-                maxPeak=peakThreshold;
-                // console.log("Volume adjusted to "+volumeControler.value);
+                while (peakArray.length>(20 * 3)) { peakArray.shift(); }
+                maxPeak =  peakArray.reduce((acc, cur) => Math.max(acc,cur),-1000);                
+                if (peakThreshold===undefined) {
+                    peakThreshold=maxPeak+1;
+                    document.getElementById('limit').nextSibling.innerText='Limit ('+parseInt(peakThreshold)+'db)';                
+                }
+                console.log(peakThreshold,maxPeak);                
+                
+               if (Math.max(peakL,peakR)>peakThreshold) {                    
+                    let currentVolume = parseInt(volumeControler.value);
+                    volumeControler.value= currentVolume-1;
+                    volumeControler.dispatchEvent(new Event('input'));                                    
+                    console.log("Volume adjusted to "+volumeControler.value);
+                }
 
-            }
+                if (Math.max(peakL,peakR)<peakThreshold-20) {    
+                    let currentVolume = parseInt(volumeControler.value);      
+                    volumeControler.value= currentVolume+1;
+                    volumeControler.dispatchEvent(new Event('input'));                                    
+                    console.log("Volume adjusted to "+volumeControler.value);
+                }
+            }                 
+            
         })}
     ,50);
     
@@ -167,17 +180,13 @@ async function EQPageOnload() {
         document.getElementById('limit').checked=false;
         
         document.getElementById('limit').addEventListener('click',function(){
-            if (this.checked) {
-                sendDSPMessage("GetPlaybackSignalPeak").then(peak=>{   
-                    peakThreshold = maxPeak;
-                    this.nextSibling.innerText='Limit ('+parseInt(peakThreshold)+'db)';
-                    // console.log("Threshold set to "+peakThreshold);
-                })
-            } else {
-                this.nextSibling.innerText='Limit'; 
+            if (!this.checked) {
+                console.log("Limit unchecked")
+                this.nextSibling.innerText='Limit';             
+                peakThreshold=undefined;
             }
-
         })
+
     } else {
         document.getElementById('volumeControl').style.display='none';
         sendDSPMessage({"SetVolume":0})
