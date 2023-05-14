@@ -627,7 +627,7 @@ class EQSlider {
             let text = this.value;               
             if (isNaN(text)) text=tempGain;
             this.value=text+'db';            
-            sliderUpdateVal(sliderContainer,text);
+            EQSlider.sliderUpdateVal(sliderContainer,text);
             dispatchEvent(new Event('change'));
         })
 
