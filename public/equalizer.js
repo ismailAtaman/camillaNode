@@ -4,9 +4,9 @@
 let selectedKnob = null;
 let mouseDownY = 0;
 let preMuteVolume;
-let maxPeakL=-1000;
-let maxPeakR=-1000;
-let peakThreshold=-30;
+let maxPeak=-1000;
+let peakThreshold;
+let peakArray = [];
 
 async function EQPageOnload() {        
     
@@ -59,21 +59,26 @@ async function EQPageOnload() {
             document.getElementById('levelRBar').style.width=levelMaxWidth-(multiplier*levelR)+'px';
         })},50)
 
+
+        
     setInterval (function(){        
         sendDSPMessage("GetPlaybackSignalPeak").then(peak=>{   
             let peakL = peak[0];                
             let peakR = peak[1];
-            
-            if (peakL>maxPeakL) maxPeakL=peak[0];                                            
-            if (peakR>maxPeakR) maxPeakR=peak[1];                
 
-            if (document.getElementById('limit').checked && (peakL>peakThreshold || peakR>peakThreshold)) {
+            peakArray.push(peakL)
+            peakArray.push(peakR)
+
+            while (peakArray.length>(20 * 3)) { peakArray.shift(); }
+            maxPeak =  (peakArray.reduce((a, b) => a + b, 0) / peakArray.length)+1;
+            //console.log(maxPeak);
+
+            if (document.getElementById('limit').checked && (maxPeak>peakThreshold)) {
                 let volumeControler = document.getElementById('volumeControler');
                 let currentVolume = parseInt(volumeControler.value);
                 volumeControler.value= currentVolume-1;
-                volumeControler.dispatchEvent(new Event('input'));
-                maxPeakL=peakThreshold;
-                maxPeakR=peakThreshold;
+                volumeControler.dispatchEvent(new Event('input'));                
+                maxPeak=peakThreshold;
                 // console.log("Volume adjusted to "+volumeControler.value);
 
             }
@@ -164,7 +169,7 @@ async function EQPageOnload() {
         document.getElementById('limit').addEventListener('click',function(){
             if (this.checked) {
                 sendDSPMessage("GetPlaybackSignalPeak").then(peak=>{   
-                    peakThreshold = Math.max(maxPeakL,maxPeakR);
+                    peakThreshold = maxPeak;
                     this.nextSibling.innerText='Limit ('+parseInt(peakThreshold)+'db)';
                     // console.log("Threshold set to "+peakThreshold);
                 })

@@ -1,5 +1,3 @@
-//// Global variables
-PORT = 80;
 
 
 //// Global Objects
@@ -8,6 +6,19 @@ const { json } = require('express');
 const app = express();
 const fs = require('fs');
 const WebSocket = require('ws');
+
+//// Global variables
+
+if (fs.existsSync('camillaNodeConfig.json')) {
+    strAppConfig = fs.readFileSync('camillaNodeConfig.json');
+} else {
+    strAppConfig = JSON.stringify({"port":80})
+    fs.writeFileSync('camillaNodeConfig.json',strAppConfig);   
+}
+let appConfig = JSON.parse(strAppConfig);
+
+PORT = appConfig.port;
+
 
 
 //// Global settings
