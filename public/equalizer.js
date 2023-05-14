@@ -87,12 +87,12 @@ async function EQPageOnload() {
                     console.log("Volume adjusted to "+volumeControler.value);
                 }
 
-                if (Math.max(peakL,peakR)<peakThreshold-20) {    
-                    let currentVolume = parseInt(volumeControler.value);      
-                    volumeControler.value= currentVolume+1;
-                    volumeControler.dispatchEvent(new Event('input'));                                    
-                    console.log("Volume adjusted to "+volumeControler.value);
-                }
+                // if (Math.max(peakL,peakR)<peakThreshold-20) {    
+                //     let currentVolume = parseInt(volumeControler.value);      
+                //     volumeControler.value= currentVolume+1;
+                //     volumeControler.dispatchEvent(new Event('input'));                                    
+                //     console.log("Volume adjusted to "+volumeControler.value);
+                // }
             }                 
             
         })}
