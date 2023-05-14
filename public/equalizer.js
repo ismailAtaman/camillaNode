@@ -172,21 +172,26 @@ function applyFilters(filters) {
 
     //console.log(filters)
     for (const filterName of Object.keys(filters).sort()) {        
-        if (filterName=="Preamp") {
-            document.getElementById("preampGainVal").value=filters[filterName].parameters.gain+'db';
-        } else {
-            let sliderId=i+1;
-            sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
-            let slider= document.getElementById(sliderId);
 
-            //console.log(filterName);
-            if (slider==null) { addBand(); slider= document.getElementById(sliderId); }
-            slider.children['freq'].value=filters[filterName].parameters.freq+'hz';
-            slider.children['gain'].value=filters[filterName].parameters.gain+'db';
-            slider.children['qfact'].value=filters[filterName].parameters.q;            
-            slider.children['filterType'].value=filters[filterName].parameters.type;            
-            EQSlider.sliderUpdateVal(slider,filters[filterName].parameters.gain);            
-            i++;
+        switch (filterName) {
+            case "Preamp":
+                document.getElementById("preampGainVal").value=filters[filterName].parameters.gain+'db';
+                break;
+            case "Volume":
+                break;
+            default:        
+                let sliderId=i+1;
+                sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
+                let slider= document.getElementById(sliderId);
+
+                //console.log(filterName);
+                if (slider==null) { addBand(); slider= document.getElementById(sliderId); }
+                slider.children['freq'].value=filters[filterName].parameters.freq+'hz';
+                slider.children['gain'].value=filters[filterName].parameters.gain+'db';
+                slider.children['qfact'].value=filters[filterName].parameters.q;            
+                slider.children['filterType'].value=filters[filterName].parameters.type;            
+                EQSlider.sliderUpdateVal(slider,filters[filterName].parameters.gain);            
+                i++;        
         }
     }
 }
