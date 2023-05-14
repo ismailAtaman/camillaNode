@@ -445,7 +445,7 @@ input, select {
     user-select: none;
     border: none;    
     vertical-align: top;
-    
+    transition: all 500ms;
 }
 
 #volumeControl input[type="checkbox"] {
@@ -461,7 +461,7 @@ input, select {
     appearance: none;
     width: 16px;
     aspect-ratio: 1;
-    background-color: hsl( calc( 180 + var(--main-hue)), 50%, 50%);
+    background-color: hsl( calc( 180 + var(--main-hue)), 60%, 40%);
     border-radius: 2px;
     transition: all 300ms;
 }

@@ -38,24 +38,19 @@ function handleDSPMessage(m) {
     switch (responseCommand) {
         case 'GetVersion':
             if (result=='Ok') return [true,JSON.parse(value)]; else return[false,value];            
-            break;        
-
+            break;
         case 'GetConfigJson':
             if (result=='Ok') return [true,JSON.parse(value)]; else return[false,value];          
-            break;                            
-                    
+            break;                    
         case 'SetConfigJson':
             if (result=='Ok') return [true,value]; else return[false,value];          
-            break;        
-
+            break;
         case 'GetState':
             if (result=='Ok') return [true,value]; else return[false,value];          
             break;
-
         case "GetPlaybackSignalPeak":
-            if (result=='Ok') return [true,JSON.parse(value)]; else return[false,value];          
+            if (result=='Ok') return [true,value]; else return[false,value];          
             break;
-
         case "GetPlaybackSignalRms":
             if (result=='Ok') return [true,value]; else return[false,value];           
             break;                
@@ -149,7 +144,7 @@ async function uploadConfigToDSP(filterArray) {
         "names": filterNameArray
     })
 
-    console.log(filters);
+    // console.log(filters);
     // console.log(pipeline)    
 
     DSPConfig.filters=filters;

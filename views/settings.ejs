@@ -19,26 +19,28 @@
 
     loadPreferences();
     loadSettings();
+    let timerId;
 
-    setInterval(function(){document.getElementById("tooltip").style.opacity='0'},3000);
+    // setInterval(function(){document.getElementById("tooltip").style.opacity='0'},3000);
 
     const inputElements = document.getElementsByTagName('input');
     for (i=0;i<inputElements.length;i++) {
         inputElements[i].addEventListener('input',function(){                        
             let val;            
+            clearTimeout(timerId);
             if (this.type=="checkbox") val=this.checked;            
             if (this.type=="range") val=this.value;
 
             let settingName=this.getAttribute('settingName');
             setSettingValue(settingName,val)
-            console.log(settingName+" : " + val);            
+            console.log(settingName+" : " + val);               
             
             let toolTip = document.getElementById("tooltip");
             toolTip.style.opacity='1';
             toolTip.style.left=parseInt(this.getBoundingClientRect().right)+30+'px';
             toolTip.style.top=this.getBoundingClientRect().top-3+'px';
             toolTip.innerText=val;                                  
-
+            timerId=setTimeout(()=>{document.getElementById("tooltip").style.opacity='0'},2000);
             window.localStorage.setItem('preferences',JSON.stringify(preferences));
         })
 

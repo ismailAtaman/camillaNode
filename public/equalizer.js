@@ -4,8 +4,12 @@
 let selectedKnob = null;
 let mouseDownY = 0;
 let preMuteVolume;
+let maxPeakL=-1000;
+let maxPeakR=-1000;
+let peakThreshold=-30;
 
 async function EQPageOnload() {        
+    
     let connectionResult = await connectToDsp();
     if (!connectionResult[0]) {
         displayMessage("Error connecting to server. Please configure server settings and make sure CamillaDSP service is running.",{"type":"error"})
@@ -55,7 +59,26 @@ async function EQPageOnload() {
             document.getElementById('levelRBar').style.width=levelMaxWidth-(multiplier*levelR)+'px';
         })},50)
 
-    
+    setInterval (function(){        
+        sendDSPMessage("GetPlaybackSignalPeak").then(peak=>{   
+            let peakL = peak[0];                
+            let peakR = peak[1];
+            
+            if (peakL>maxPeakL) maxPeakL=peak[0];                                            
+            if (peakR>maxPeakR) maxPeakR=peak[1];                
+
+            if (document.getElementById('limit').checked && (peakL>peakThreshold || peakR>peakThreshold)) {
+                let volumeControler = document.getElementById('volumeControler');
+                let currentVolume = parseInt(volumeControler.value);
+                volumeControler.value= currentVolume-1;
+                volumeControler.dispatchEvent(new Event('input'));
+                maxPeakL=peakThreshold;
+                maxPeakR=peakThreshold;
+                // console.log("Volume adjusted to "+volumeControler.value);
+
+            }
+        })}
+    ,50);
     
         //// This section handles clipping detection but needs some work
         // setInterval(function(){
@@ -96,8 +119,11 @@ async function EQPageOnload() {
 
 
     ///// Volume Controls 
+    let volumeTimerId;
+
     if (showVolumeControl) {
 
+        setTimeout(()=>document.getElementById('volumeLevel').style.opacity='0',2000);
         document.getElementById('volumeControl').style.display='block';
     
         let volumeControler = document.getElementById('volumeControler');
@@ -108,7 +134,10 @@ async function EQPageOnload() {
         })
 
         volumeControler.addEventListener('change',function(){        
+            clearTimeout(volumeTimerId);
+            document.getElementById('volumeLevel').style.opacity='1'
             document.getElementById('volumeLevel').value=this.value;
+            volumeTimerId=setTimeout(()=>document.getElementById('volumeLevel').style.opacity='0',2000);
         })
 
         sendDSPMessage("GetVolume").then(vol=>{
@@ -129,6 +158,20 @@ async function EQPageOnload() {
             }
 
             volumeControler.dispatchEvent(new Event('input'));
+        })
+        document.getElementById('limit').checked=false;
+        
+        document.getElementById('limit').addEventListener('click',function(){
+            if (this.checked) {
+                sendDSPMessage("GetPlaybackSignalPeak").then(peak=>{   
+                    peakThreshold = Math.max(maxPeakL,maxPeakR);
+                    this.nextSibling.innerText='Limit ('+parseInt(peakThreshold)+'db)';
+                    // console.log("Threshold set to "+peakThreshold);
+                })
+            } else {
+                this.nextSibling.innerText='Limit'; 
+            }
+
         })
     } else {
         document.getElementById('volumeControl').style.display='none';
@@ -792,7 +835,7 @@ class EQSlider {
         }
         filterArray.push(filter);
     
-        console.log(filterArray)
+        // console.log(filterArray)
         return filterArray;
     }
 }
