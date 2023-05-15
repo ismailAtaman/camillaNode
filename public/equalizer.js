@@ -121,6 +121,7 @@ async function EQPageOnload() {
             if (typeof state!="object") document.getElementById('state').innerText=state
         })
     },1000)      
+    
 
     let preampGainVal = document.getElementById('preampGainVal');
 
@@ -199,6 +200,8 @@ async function EQPageOnload() {
     
     if (showLevelBars==false) document.getElementById('eqLevel').style.display='none'; else document.getElementById('eqLevel').style.display='block';
     
+
+
 }
 
 /// Helper functions
@@ -223,6 +226,11 @@ async function downloadClick() {
     })
 }
 
+function exportClick() {
+    let configText = EQSlider.convertConfigToText();
+    downloadFile('camillaNode EQ settings',configText);
+}
+
 function applyFilters(filters) {
     i=0;     
     document.getElementById('equalizer').replaceChildren();
@@ -243,7 +251,7 @@ function applyFilters(filters) {
 
                 //console.log(filterName);
                 if (slider==null) { addBand(); slider= document.getElementById(sliderId); }
-                slider.children['freq'].value=filters[filterName].parameters.freq+'hz';
+                slider.children['freq'].value=filters[filterName].parameters.freq+'Hz';
                 slider.children['gain'].value=filters[filterName].parameters.gain+'db';
                 slider.children['qfact'].value=filters[filterName].parameters.q;            
                 slider.children['filterType'].value=filters[filterName].parameters.type;            
@@ -269,7 +277,7 @@ function reset() {
     for (i=0;i<sliders.length;i++) {
         sliders[i].children['gain'].value='0db';
         sliders[i].children['qfact'].value='1.4';
-        sliders[i].children['freq'].value=defaultFreqList[i % 10]+'hz';
+        sliders[i].children['freq'].value=defaultFreqList[i % 10]+'Hz';
         sliders[i].children['filterType'].value='Peaking';
         EQSlider.sliderUpdateVal(sliders[i],0);
     }
@@ -466,6 +474,18 @@ function displayMessage(message,options) {
     if (!options.persist) setTimeout(function(){messageBox.style.display='none'},timeout)
 }
 
+function downloadFile(filename, text) {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+  
+    element.style.display = 'none';
+    document.body.appendChild(element);
+  
+    element.click();
+  
+    document.body.removeChild(element);
+  }
 
 
 ///////// AutoEQ Functions
@@ -647,18 +667,18 @@ class EQSlider {
 
         freq.addEventListener('click',function(){
             tempFreq=this.value;
-            this.value= this.value.replace('hz','');
+            this.value= this.value.replace('Hz','');
         })
 
         freq.addEventListener('focus',function(){
             tempFreq=this.value;
-            this.value= this.value.replace('hz','');                        
+            this.value= this.value.replace('Hz','');                        
         })
         
         freq.addEventListener('focusout',function(){            
             let text = this.value;               
             if (isNaN(text) || text<0) text=tempFreq;                        
-            this.value=text+'hz';                   
+            this.value=text+'Hz';                   
             dispatchEvent(new Event('change'));     
         })
 
@@ -826,7 +846,7 @@ class EQSlider {
             let filter = new Object();
             filter[sliderId] = {
                 "type"  : slider.children['filterType'].value,
-                "freq"  : parseFloat(slider.children['freq'].value.replace('hz','')),
+                "freq"  : parseFloat(slider.children['freq'].value.replace('Hz','')),
                 "gain"  : parseFloat(slider.children['gain'].value.replace('db','')),
                 "q"     : parseFloat(slider.children['qfact'].value)
             }
@@ -851,6 +871,30 @@ class EQSlider {
     
         // console.log(filterArray)
         return filterArray;
+    }
+
+    static convertConfigToText() {
+        let preampGain = document.getElementById('preampGainVal').value;
+        let configText=`Preamp: ${preampGain} dB\n`
+        let sliders = document.getElementsByClassName('slider-container');
+        for (let filterNo=0;filterNo<sliders.length;filterNo++) {
+            let filterTypeText = sliders[filterNo].children['filterType'].value;            
+            let filterType ='PK';
+            
+            if (filterTypeText=='Highshelf') filterType='HS';
+            if (filterTypeText=='Lowshelf') filterType='LS';
+            
+            let freq = sliders[filterNo].children['freq'].value.toLowerCase().replace('hz','');
+            let gain = sliders[filterNo].children['gain'].value.replace('db','');
+            let qfact = sliders[filterNo].children['qfact'].value;
+
+            configText+=`Filter ${filterNo+1}: ON ${filterType} Fc ${freq} Hz Gain ${gain} dB Q ${qfact}\n`;
+        }
+        
+        
+        //console.log(configText);
+        return(configText);
+        
     }
 }
 
