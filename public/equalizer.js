@@ -881,8 +881,8 @@ class EQSlider {
             let filterTypeText = sliders[filterNo].children['filterType'].value;            
             let filterType ='PK';
             
-            if (filterTypeText=='Highshelf') filterType='HS';
-            if (filterTypeText=='Lowshelf') filterType='LS';
+            if (filterTypeText=='Highshelf') filterType='HSC';
+            if (filterTypeText=='Lowshelf') filterType='LSC';
             
             let freq = sliders[filterNo].children['freq'].value.toLowerCase().replace('hz','');
             let gain = sliders[filterNo].children['gain'].value.replace('db','');
