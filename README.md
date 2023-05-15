@@ -73,7 +73,7 @@ Now camillaNode service will start automatically after boot.
 
 To update camillaNode, you need to stop the camillaNode service, download the updated files from github, and restart the service. All of this can be achieved simply with a straightforward bash script, provided below. 
 
-Save this script in a .sh file (i.e. update.sh) and run it with bash `update.sh`.
+Save this script in a .sh file (i.e. update.sh) and run it with `sudo bash update.sh`.
 
 Before doing so, do not forget to make sure  **username**, **service name** and **path** are correct please.
 
