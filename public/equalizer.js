@@ -126,14 +126,14 @@ async function EQPageOnload() {
     let preampGainVal = document.getElementById('preampGainVal');
 
     preampGainVal.addEventListener('focus',function(){        
-        this.value= this.value.replace('db','');                        
+        this.value= this.value.replace('dB','');                        
     })
     
     preampGainVal.addEventListener('focusout',function(){                  
         let text = this.value;   
         if (text.length==0) text=0;
         if (isNaN(text)) text=0;                                
-        this.value=text+'db';                                
+        this.value=text+'dB';                                
     })
 
 
@@ -240,7 +240,7 @@ function applyFilters(filters) {
 
         switch (filterName) {
             case "Preamp":
-                document.getElementById("preampGainVal").value=filters[filterName].parameters.gain+'db';
+                document.getElementById("preampGainVal").value=filters[filterName].parameters.gain+'dB';
                 break;
             case "Volume":                
                 break;
@@ -252,7 +252,7 @@ function applyFilters(filters) {
                 //console.log(filterName);
                 if (slider==null) { addBand(); slider= document.getElementById(sliderId); }
                 slider.children['freq'].value=filters[filterName].parameters.freq+'Hz';
-                slider.children['gain'].value=filters[filterName].parameters.gain+'db';
+                slider.children['gain'].value=filters[filterName].parameters.gain+'dB';
                 slider.children['qfact'].value=filters[filterName].parameters.q;            
                 slider.children['filterType'].value=filters[filterName].parameters.type;            
                 EQSlider.sliderUpdateVal(slider,filters[filterName].parameters.gain);            
@@ -287,10 +287,10 @@ function reset() {
 function compress() {
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
-        let gain=parseFloat(sliders[i].children['gain'].value.replace('db',''));
+        let gain=parseFloat(sliders[i].children['gain'].value.replace('dB',''));
         gain==0?gain=0:gain<0?gain++:gain--; 
         if (Math.abs(gain)<1) gain=0;
-        sliders[i].children['gain'].value=gain+'db';
+        sliders[i].children['gain'].value=gain+'dB';
         sliderUpdateVal(sliders[i],gain);
     }
 }
@@ -692,18 +692,18 @@ class EQSlider {
 
         gain.addEventListener('click',function(){
             tempGain=this.value;
-            this.value= this.value.replace('db','');            
+            this.value= this.value.replace('dB','');            
         })
 
         gain.addEventListener('focus',function(){
             tempGain=this.value;
-            this.value= this.value.replace('db','');                        
+            this.value= this.value.replace('dB','');                        
         })
         
         gain.addEventListener('focusout',function(){            
             let text = this.value;               
             if (isNaN(text)) text=tempGain;
-            this.value=text+'db';            
+            this.value=text+'dB';            
             EQSlider.sliderUpdateVal(sliderContainer,text);
             dispatchEvent(new Event('change'));
         })
@@ -786,7 +786,7 @@ class EQSlider {
 
             const num = MaxDB-(MaxDB*2*yPos/sliderMax);
             sliderContainer.value = Math.round((num + Number.EPSILON)*10)/10;            
-            gain.value = sliderContainer.value+'db';            
+            gain.value = sliderContainer.value+'dB';            
 
             let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/360));    
             if (hueRotate) sliderBody.style.filter='hue-rotate('+hueAngle+'deg)';
@@ -794,8 +794,8 @@ class EQSlider {
 
        sliderContainer.addEventListener('wheel',function(e) {
             let dif = e.deltaY<0?0.1:-0.1;            
-            let val=parseInt(10*(parseFloat(gain.value.replace('db',''))+dif))/10;
-            gain.value=val+'db';
+            let val=parseInt(10*(parseFloat(gain.value.replace('dB',''))+dif))/10;
+            gain.value=val+'dB';
             e.preventDefault();
             EQSlider.sliderUpdateVal(sliderContainer,val);
        })          
@@ -847,14 +847,14 @@ class EQSlider {
             filter[sliderId] = {
                 "type"  : slider.children['filterType'].value,
                 "freq"  : parseFloat(slider.children['freq'].value.replace('Hz','')),
-                "gain"  : parseFloat(slider.children['gain'].value.replace('db','')),
+                "gain"  : parseFloat(slider.children['gain'].value.replace('dB','')),
                 "q"     : parseFloat(slider.children['qfact'].value)
             }
             filterArray.push(filter);
         }
     
         // Pre-amp filter
-        preampGainVal=document.getElementById("preampGainVal").value.replace('db','');
+        preampGainVal=document.getElementById("preampGainVal").value.replace('dB','');
         let filter = new Object();
         filter["Preamp"] = {        
             "gain"  : parseFloat(preampGainVal),        
@@ -885,7 +885,7 @@ class EQSlider {
             if (filterTypeText=='Lowshelf') filterType='LSC';
             
             let freq = sliders[filterNo].children['freq'].value.toLowerCase().replace('hz','');
-            let gain = sliders[filterNo].children['gain'].value.replace('db','');
+            let gain = sliders[filterNo].children['gain'].value.replace('dB','');
             let qfact = sliders[filterNo].children['qfact'].value;
 
             configText+=`Filter ${filterNo+1}: ON ${filterType} Fc ${freq} Hz Gain ${gain} dB Q ${qfact}\n`;
