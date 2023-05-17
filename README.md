@@ -1,6 +1,6 @@
 # camilllaNode
 ### What is camillaNode
-camillaNode is a web based interface to control CamillaDSP and use it as an Equalizer.
+camillaNode is a web based interface to control [CamillaDSP](https://github.com/HEnquist/camilladsp) and use it as an Equalizer.
 
 
 ### Installation
