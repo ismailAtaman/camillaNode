@@ -58,11 +58,13 @@ app.post('/saveConfigName',(req,res)=>{
 
 app.get('/getConfigName',(req,res)=>{    
     if (fs.existsSync("currentConfig.json")) {
-        let currentConfig = fs.readFileSync("currentConfig.json")
+        let currentConfig = fs.readFileSync("currentConfig.json");
+        res.write(JSON.stringify(currentConfig.toString('utf-8')));    
     } else {
         let currentConfig = JSON.stringify({"configName":"","configShortcut":""})
+        res.write(JSON.stringify(currentConfig));    
     }    
-    res.write(JSON.stringify(currentConfig.toString('utf-8')));    
+
     res.end()
 })
 
