@@ -59,7 +59,7 @@ async function EQPageOnload() {
             document.getElementById('levelRBar').style.width=levelMaxWidth-(multiplier*levelR)+'px';
         })},50)
 
-    
+    //git sendDSPMessage("GetCaptureRate").then(r=>console.log(r))
         
     setInterval (function(){        
         sendDSPMessage("GetPlaybackSignalPeak").then(peak=>{   
