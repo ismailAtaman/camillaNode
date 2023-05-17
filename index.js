@@ -56,13 +56,15 @@ app.post('/saveConfigName',(req,res)=>{
     })
 })
 
-app.get('/getConfigName',(req,res)=>{
-    let currentConfig = fs.readFileSync("currentConfig.json")
+app.get('/getConfigName',(req,res)=>{    
+    if (fs.existsSync("currentConfig.json")) {
+        let currentConfig = fs.readFileSync("currentConfig.json")
+    } else {
+        let currentConfig = JSON.stringify({"configName":"","configShortcut":""})
+    }    
     res.write(JSON.stringify(currentConfig.toString('utf-8')));    
     res.end()
 })
-
-
 
 app.post('/saveConfig',(req,res)=>{
     let queryResponse="";
