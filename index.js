@@ -8,6 +8,7 @@ const fs = require('fs');
 const WebSocket = require('ws');
 
 //// Global variables
+let strAppConfig;
 
 if (fs.existsSync('camillaNodeConfig.json')) {
     strAppConfig = fs.readFileSync('camillaNodeConfig.json');
@@ -18,6 +19,8 @@ if (fs.existsSync('camillaNodeConfig.json')) {
 let appConfig = JSON.parse(strAppConfig);
 
 PORT = appConfig.port;
+let currentConfigName="";
+
 
 
 
@@ -43,6 +46,23 @@ app.get('/device',(req,res)=>{
 app.get('/settings',(req,res)=>{
     res.render('settings');     
 }) 
+
+
+app.post('/saveConfigName',(req,res)=>{
+    let queryResponse="";
+    req.on('data', function(chunk) {queryResponse+=chunk;}).on('end', function(){
+        //let currentConfig= JSON.parse(queryResponse);        
+        fs.writeFileSync("currentConfig.json",queryResponse)
+    })
+})
+
+app.get('/getConfigName',(req,res)=>{
+    let currentConfig = fs.readFileSync("currentConfig.json")
+    res.write(JSON.stringify(currentConfig.toString('utf-8')));    
+    res.end()
+})
+
+
 
 app.post('/saveConfig',(req,res)=>{
     let queryResponse="";

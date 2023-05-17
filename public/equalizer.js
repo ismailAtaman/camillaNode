@@ -35,6 +35,13 @@ async function EQPageOnload() {
     //     }  else {
              let filters = DSPConfig.filters;
              applyFilters(filters);     
+
+             fetch('/getConfigName').then((res)=>res.text().then(data=>{
+                let config =JSON.parse(JSON.parse(data));
+                //console.log(config)
+                document.getElementById("configName").value=config.configName;
+                document.getElementById("configShortcut").value=config.configShortcut;        
+            }))
     })
     // }) 
 
@@ -210,7 +217,11 @@ function uploadClick() {
     let filterArray= EQSlider.createFilterArray();
 
     //console.log(filterArray);
-    uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"})).catch(err=>{displayMessage("Failed to upload EQ configuration",{"type":"error"}); console.log(err)});
+    let configName = document.getElementById('configName').value;
+    let configShortcut = document.getElementById('configShortcut').value;
+    let currentConfig = {"configName":configName,"configShortcut":configShortcut};
+
+    uploadConfigToDSP(filterArray,currentConfig).then(displayMessage("Upload successful",{"type":"success"})).catch(err=>{displayMessage("Failed to upload EQ configuration",{"type":"error"}); console.log(err)});
     
 }
 
@@ -220,6 +231,14 @@ async function downloadClick() {
         applyFilters(filters);        
         console.log("Config download successful.");        
         displayMessage("Download successful");
+
+        fetch('/getConfigName').then((res)=>res.text().then(data=>{
+            let config =JSON.parse(JSON.parse(data));
+            //console.log(config)
+            document.getElementById("configName").value=config.configName;
+            document.getElementById("configShortcut").value=config.configShortcut;        
+        }))
+
     }).catch((err)=>{
         console.log("Failed to download config.")
         console.log(err)

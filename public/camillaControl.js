@@ -88,9 +88,23 @@ async function sendDSPMessage(message) {
     })     
 }
 
-async function uploadConfigToDSP(filterArray) {        
+async function uploadConfigToDSP(filterArray,configName) {        
     if (filterArray.length==0) return;    
     let DSPConfig = await sendDSPMessage('GetConfigJson');
+
+
+    // Save the name of the active configuration to server
+    if (configName!=undefined) {
+        console.log(configName);
+        fetch('/saveConfigName',{
+            method: "POST",
+            headers: {
+                'Accept' : 'application/json',
+                'content-type' : 'application/json'
+            },
+            body: JSON.stringify(configName)});    
+
+    }
 
     let filters = new Object();
     let pipeline = new Array();      
