@@ -34,7 +34,7 @@
     --success-background: hsl(175, 70%, 20%);
     --success-color: #fff;
 
-    overflow-x: hidden;
+    overflow-x: hidden;    
 }
 
 body {    
@@ -77,17 +77,17 @@ input, select {
 
 #header {
     display: block;
-
     background: linear-gradient(45deg, var(--header-bgcolor1), var(--header-bgcolor2));
     height: max(5vh,65px);
 }
 
 #title {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     display: block;  
     padding: auto;
     margin-left:10px;
+    
 }
 
 .menu {
