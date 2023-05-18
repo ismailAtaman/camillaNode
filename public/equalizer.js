@@ -35,6 +35,7 @@ async function EQPageOnload() {
     //     }  else {
              let filters = DSPConfig.filters;
              applyFilters(filters);     
+             //console.log(filters)
 
              fetch('/getConfigName').then((res)=>res.text().then(data=>{
                 let config =JSON.parse(JSON.parse(data));
