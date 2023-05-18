@@ -84,7 +84,7 @@ async function EQPageOnload() {
                 maxPeak =  peakArray.reduce((acc, cur) => Math.max(acc,cur),-1000);                
                 if (peakThreshold===undefined) {
                     peakThreshold=maxPeak+1;
-                    document.getElementById('limit').nextSibling.innerText='Limit ('+parseInt(peakThreshold)+'db)';                
+                    document.getElementById('limit').nextSibling.innerText='Limit ('+parseInt(peakThreshold)+'dB)';                
                 }
                 console.log(peakThreshold,maxPeak);                
                 
@@ -287,7 +287,7 @@ function applyFilters(filters) {
 function flatten() {
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
-        sliders[i].children['gain'].value='0db';
+        sliders[i].children['gain'].value='0dB';
         EQSlider.sliderUpdateVal(sliders[i],0);
     }
 }
@@ -295,13 +295,13 @@ function flatten() {
 function reset() {
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
-        sliders[i].children['gain'].value='0db';
+        sliders[i].children['gain'].value='0dB';
         sliders[i].children['qfact'].value='1.4';
         sliders[i].children['freq'].value=defaultFreqList[i % 10]+'Hz';
         sliders[i].children['filterType'].value='Peaking';
         EQSlider.sliderUpdateVal(sliders[i],0);
     }
-    document.getElementById("preampGainVal").value='0db'
+    document.getElementById("preampGainVal").value='0dB'
 }
 
 function compress() {
@@ -705,7 +705,7 @@ class EQSlider {
         let gain = document.createElement('input');
         gain.type='text';
         gain.className='eqparam';
-        gain.value='0db'
+        gain.value='0dB'
         gain.id='gain';
 
         let tempGain;
