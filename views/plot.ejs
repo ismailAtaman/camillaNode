@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=100vw, initial-scale=1.0">
+    <title>CamillaDSP</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="eqplot.js"></script>
+</head>
+<body>
+
+<%- include('header.ejs'); %>
+
+<div id="canvasContainer">
+    <canvas id="EQPlot" width="800" height="600" onclick="canvasOnClick(event)"></canvas>
+</div>
+
+<style>
+
+</style>
+
+<script defer>
+    let canvas = document.getElementById("EQPlot");    
+    var ctx = canvas.getContext("2d");
+    var h = canvas.height;    
+    var w = canvas.width;
+    var cw = w / 2; // centers
+    var ch = h / 2; 
+  
+    
+    function plotArray(canvas, array, col, lineWidth, dashArray){       
+        let x,y;
+        if (dashArray==undefined) dashArray=[];
+        ctx.beginPath();
+        ctx.setLineDash(dashArray);
+        
+        ctx.strokeStyle = col;        
+        ctx.lineWidth = lineWidth;
+        stepSize = w / array.length;
+        heightScale= h / (2 * 6);       
+
+        for (i=0;i<array.length;i++) {            
+            // console.log(array[i])
+            //x = array[i][0];            
+            x=i*stepSize;
+            y = ch-(heightScale* array[i][1]);
+            ctx.lineTo(x,y);
+            
+        }        
+        ctx.stroke();               
+    }
+        
+    function createGrid(canvas) {
+        let verticalLineCount= 12;        
+        let verticalStepSize = h /verticalLineCount
+
+        ctx.strokeStyle = "#333";        
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5,5])        
+
+        for (i=1;i<verticalLineCount;i++) {            
+            ctx.moveTo(0,verticalStepSize * i);
+            ctx.lineTo(w,verticalStepSize * i)            
+            // ctx.strokeText(i,0,verticalStepSize * i)
+        }        
+        
+        ctx.stroke();        
+    }
+    
+    let totalArray = [];
+
+    let f2 = calcBiquad("Lowshelf", 100, 3, 0.71);        
+    let f1 = calcBiquad("Peaking", 200, -2, 3);    
+    let f3 = calcBiquad("Peaking", 4000, 3, 2 );
+
+    for (i=0;i<f1.length;i++) {
+        totalArray.push([f1[i][0], f1[i][1]+f2[i][1]+f3[i][1]]);        
+    }
+    
+    // console.log(totalArray)
+
+    let c1="rgba(0,255,0,0.25)"
+    let c2="rgba(255,255,0,0.25)"
+    let c3="rgba(255,0,0,0.25)"
+    let c4="rgba(250,250,250,1)"
+
+
+    createGrid(canvas)
+
+    plotArray(canvas, f1, c1, 12);
+    plotArray(canvas, f2, c2, 12);    
+    plotArray(canvas, f3, c3, 12); 
+    plotArray(canvas, totalArray, c4, 2);  
+
+    //calcBiquad("peak",1000,48000,1.41,3,"linear")
+    
+
+    function plotFilterArray(canvas,filterArray) {
+        let totalArray = [];        
+
+        var ctx = canvas.getContext("2d");
+        var h = canvas.height;    
+        var w = canvas.width;
+        var cw = w / 2; 
+        var ch = h / 2; 
+
+        let filterName;
+        let resultArray = [];
+        let arrayList=[];
+
+        let hueStep = parseInt(180 / filterArray.length);
+
+        for (i=0;i<filterArray.length;i++) {
+            filterName=Object.keys(filterArray[i])
+            if (filterName.indexOf('Filter') > 0) {
+                let type = filterArray[filterName].type;
+                let freq = filterArray[filterName].freq;
+                let gain = filterArray[filterName].gain;
+                let qfact = filterArray[filterName].q;
+                resultArray = calcBiquad(type,freq,gain,qfact) 
+                let c = "hsla("+hueStep*i+", 30, 50,0.25)"
+                plotArray(canvas,resultArray,c,12)                
+            }
+        }
+    }
+
+
+    function canvasOnClick(e) {
+        alert(e.clientX)
+    }
+
+    
+</script>

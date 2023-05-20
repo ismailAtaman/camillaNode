@@ -200,6 +200,13 @@ input, select {
 }
 
 
+canvas {        
+    background-color: hsl(var(--main-hue), 10%, 20%);        
+    border-radius: 7px;        
+    
+    width: var(--eqmain-width);
+}
+
 #configManagement {
     border: 1px solid white;
     border-radius: 7px;

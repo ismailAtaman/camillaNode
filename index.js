@@ -42,6 +42,9 @@ app.get('/device',(req,res)=>{
     res.render('device');     
 }) 
 
+app.get('/plot',(req,res)=>{
+    res.render('plot');     
+}) 
 
 app.get('/settings',(req,res)=>{
     res.render('settings');     

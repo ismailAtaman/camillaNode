@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
     <title>CamillaDSP</title>    
-    <script src="equalizer.js"></script>
+    <script src="equalizer.js"></script>    
+    <script src="eqplot.js"></script>
     <link rel="stylesheet" href="main.css">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -21,10 +22,6 @@
            <div id="levelBorder">
                 <div id="levelRBar" class="levelBar"></div>
             </div>
-        </div>
-
-        <div class="section" id="eqgraph">
-            <canvas id="eqcanvas" width="100%" height="100%"></canvas>
         </div>
 
         <div class="section eqSection" id="volumeControl">
@@ -51,6 +48,10 @@
             <div class="button" onclick="addBand()">Add Band</div>            
             <div class="button" onclick="removeLast()">Remove Last</div>            
             <div class="button" onclick="sortByFreq()">I have OCD</div>             
+        </div>
+
+        <div class="section eqSection" id="eqGraph">
+            <canvas id="EQPlot" width="800" height="400" onclick="canvasClick(event)"></canvas>
         </div>
 
         <div class="section eqSection" id="equalizer">         

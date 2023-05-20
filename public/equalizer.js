@@ -37,6 +37,9 @@ async function EQPageOnload() {
              applyFilters(filters);     
              //console.log(filters)
 
+
+             canvasClick();
+
              fetch('/getConfigName').then((res)=>res.text().then(data=>{
                 let config =JSON.parse(JSON.parse(data));
                 //console.log(config)
@@ -208,7 +211,7 @@ async function EQPageOnload() {
     
     if (showLevelBars==false) document.getElementById('eqLevel').style.display='none'; else document.getElementById('eqLevel').style.display='block';
     
-
+    if (showEQGraph) document.getElementById("eqGraph").style.display='block'; else document.getElementById('eqGraph').style.display='none';
 
 }
 
@@ -265,12 +268,15 @@ function applyFilters(filters) {
             case "Volume":                
                 break;
             default:        
-                let sliderId=i+1;
-                sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
-                let slider= document.getElementById(sliderId);
+                let sliderId=parseInt(i+1);
+                if (sliderId<10) sliderId="Filter0"+sliderId; else sliderId="Filter"+sliderId;        
+                let slider= document.getElementById(filterName);                
+                
+                if (slider===null) { 
+                    sliderId=addBand();                     
+                    slider=document.getElementById(sliderId); 
+                }
 
-                //console.log(filterName);
-                if (slider==null) { addBand(); slider= document.getElementById(sliderId); }
                 slider.children['freq'].value=filters[filterName].parameters.freq+'Hz';
                 slider.children['gain'].value=filters[filterName].parameters.gain+'dB';
                 slider.children['qfact'].value=filters[filterName].parameters.q;            
@@ -281,15 +287,22 @@ function applyFilters(filters) {
     }
 }
 
+function canvasClick() {
+    let canvas = document.getElementById('EQPlot');
+    EQSlider.plotFilterArray(canvas, EQSlider.createFilterArray());
+}
+
 ///////// EQ Management functions
 
 
 function flatten() {
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
-        sliders[i].children['gain'].value='0dB';
-        EQSlider.sliderUpdateVal(sliders[i],0);
+        sliders[i].children['gain'].value='0dB';        
     }
+
+    for (i=0;i<sliders.length;i++) EQSlider.sliderUpdateVal(sliders[i],0);
+    canvasClick();
 }
 
 function reset() {
@@ -298,10 +311,15 @@ function reset() {
         sliders[i].children['gain'].value='0dB';
         sliders[i].children['qfact'].value='1.4';
         sliders[i].children['freq'].value=defaultFreqList[i % 10]+'Hz';
-        sliders[i].children['filterType'].value='Peaking';
-        EQSlider.sliderUpdateVal(sliders[i],0);
+        sliders[i].children['filterType'].value='Peaking';        
+        
     }
+
+    for (i=0;i<sliders.length;i++)  EQSlider.sliderUpdateVal(sliders[i],0);           
+
     document.getElementById("preampGainVal").value='0dB'
+
+    canvasClick();
 }
 
 function compress() {
@@ -311,12 +329,11 @@ function compress() {
         gain==0?gain=0:gain<0?gain++:gain--; 
         if (Math.abs(gain)<1) gain=0;
         sliders[i].children['gain'].value=gain+'dB';
-        sliderUpdateVal(sliders[i],gain);
+        EQSlider.sliderUpdateVal(sliders[i],gain);
     }
 }
 
-function addBand() {
-    
+function addBand() {    
     let s = new EQSlider();
     let EQParent = document.getElementById('equalizer');
     let nextId = parseInt(EQParent.childElementCount)+1;
@@ -324,12 +341,11 @@ function addBand() {
     nextId<10?nextId="0"+nextId:a=1;
     s.id = "Filter"+ nextId;    
     EQParent.appendChild(s);
-    if (autoUpload) {
-        s.addEventListener('change',function(){
-            console.log('DSP updated')
-            uploadClick();
-        })
-    }
+    s.addEventListener('change',function(){
+        canvasClick();
+        if (autoUpload) {uploadClick()}
+    });    
+    return s.id;
 }
 
 function removeLast() {
@@ -434,6 +450,7 @@ async function updateConfigList() {
                 getConfigFromServer(this.innerText).then((config)=>{                    
                     let filterArrayJSON = convertFilterArayToJSON(config.filterArray);            
                     applyFilters(filterArrayJSON.filters);
+                    canvasClick();
                     if (autoUpload) {
                         let filterArray= EQSlider.createFilterArray();                    
                         uploadConfigToDSP(filterArray).then(displayMessage("Upload successful",{"type":"success"}));
@@ -587,6 +604,7 @@ function loadHeadphoneList(filter) {
                     let filterArray = parseAutoEQText(paramEQText);
                     let filterArrayJSON = convertFilterArayToJSON(filterArray);            
                     applyFilters(filterArrayJSON.filters);
+                    canvasClick();
                     document.getElementById('configName').value=this.innerText;
                     document.getElementById('configShortcut').value='';
                     document.getElementById('autoEQDialog').close();
@@ -769,8 +787,8 @@ class EQSlider {
        HS.innerText="HS"
        filterType.appendChild(HS)
 
-       filterType.addEventListener('change',function(){
-            dispatchEvent(new Event('change'));
+       filterType.addEventListener('change',function(event){            
+            this.dispatchEvent(new Event('change'));
        })
     
        const sliderTop = parseInt(sliderBody.getBoundingClientRect().top);
@@ -788,13 +806,13 @@ class EQSlider {
 
        sliderKnob.addEventListener('mouseup',function() {
            selected=false;           
-           dispatchEvent(new Event('change'));
+           this.dispatchEvent(new Event('change'));
        })
 
 
        sliderContainer.addEventListener('mouseup',function() {
            selected=false;
-           dispatchEvent(new Event('change'));
+           this.dispatchEvent(new Event('change'));
        })
        
        sliderContainer.addEventListener('mousemove',function(event) {
@@ -810,6 +828,7 @@ class EQSlider {
 
             let hueAngle = parseInt((sliderMax/2-yPos) * (sliderMax/360));    
             if (hueRotate) sliderBody.style.filter='hue-rotate('+hueAngle+'deg)';
+            this.dispatchEvent(new Event('change'));
        })
 
        sliderContainer.addEventListener('wheel',function(e) {
@@ -818,6 +837,7 @@ class EQSlider {
             gain.value=val+'dB';
             e.preventDefault();
             EQSlider.sliderUpdateVal(sliderContainer,val);
+            this.dispatchEvent(new Event('change'));
        })          
 
        sliderBody.appendChild(sliderKnob);
@@ -830,6 +850,8 @@ class EQSlider {
        let sh = getComputedStyle(document.body).getPropertyValue('--slider-height').replace('rem','');
        sh *= getComputedStyle(document.body).fontSize.replace('px','')/2
        sliderKnob.style.top=sh+'px';       
+
+       
        
        return sliderContainer;
     }
@@ -847,10 +869,11 @@ class EQSlider {
         if (hueRotate) sliderKnob.parentElement.style.filter='hue-rotate('+hueAngle+'deg)';
     
         // console.log('Val : '+val)            
+
         // console.log('sliderMax : '+sliderMax)       
         // console.log("Move to : " + yPos);
-        // console.log(sliderKnob)
-        //slider.dispatchEvent(new Event('change'));    
+        // console.log(sliderKnob)          
+     
     }
 
     static createFilterArray() {
@@ -889,7 +912,7 @@ class EQSlider {
         }
         filterArray.push(filter);
     
-        // console.log(filterArray)
+        //console.log(filterArray)
         return filterArray;
     }
 
@@ -916,6 +939,54 @@ class EQSlider {
         return(configText);
         
     }
+
+    static plotFilterArray(canvas,filterArray) {
+        
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height)
+        createGrid(canvas);
+        
+        // Initialize totalArray
+        let totalArray = [];                
+        for (i=0;i<QUADLEN;i++) {
+            totalArray.push([0,0])
+        }
+        //console.log(totalArray)
+
+        let filterName;
+        let resultArray = [];
+        let arrayList=[];
+
+        let hueStep = parseInt(360/(filterArray.length-1));                
+
+        for (i=0;i<filterArray.length;i++) {            
+            filterName=Object.keys(filterArray[i])[0]                        
+            if (filterName.indexOf('Filter') > -1) {                
+                let type = filterArray[i][filterName].type;
+                let freq = filterArray[i][filterName].freq;
+                let gain = filterArray[i][filterName].gain;
+                let qfact = filterArray[i][filterName].q;                
+                resultArray = calcBiquad(type,freq,gain,qfact)           
+                // console.log(resultArray)    
+                for (let k=0;k<resultArray.length;k++) {                     
+                    totalArray[k][0] = resultArray[k][0]  
+                    totalArray[k][1] += resultArray[k][1]  
+                }                                                    
+                let c=HSLAToRGBAText(hueStep*i, 20, 40 , 0.25);                                    
+                arrayList.push({"array":resultArray,"color":c,"size":9})
+            }
+        }
+
+        arrayList.push({"array":totalArray,"color":"rgba(255,255,255,1)","size":3})
+
+        arrayList.forEach(e=>{
+            plotArray(canvas, e.array,e.color,e.size);
+        })
+
+        //console.log(arrayList[1])
+
+    }
+
+
 }
 
 

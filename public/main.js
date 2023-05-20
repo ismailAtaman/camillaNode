@@ -20,6 +20,8 @@ const levelmeterHeight = parseInt(getSettingValue("levelmeterHeight"));
 const showClippingIndicator = getSettingValue("showClippingIndicator");
 const showVolumeControl = getSettingValue("showVolumeControl");
 const configCount = parseInt(getSettingValue("configCount"));
+const showEQGraph = getSettingValue("showEQGraph");
+
 
 const defaultFreqList = [30,100,200,500,1000,2000,4000,6000,8000,12000]
 
@@ -101,6 +103,7 @@ function loadDefaultPreferences() {
         "MaxBands" : {"title":"Maximum Number of EQ Bands","value":24,"params":{"format":"range","min":6,"max":36}},
         "showLevelBars" :{"title":"Show Level Bars","value":true,"params":{"format":"boolean"}},      
         "showVolumeControl" :{"title":"Show Volume Controls","value":true,"params":{"format":"boolean"}},      
+        "showEQGraph" :{"title":"Show EQ Graph","value":true,"params":{"format":"boolean"}},      
         // "showClippingIndicator" :{"title":"Show Clipping Indicator","value":true,"params":{"format":"boolean"}},      
         "levelmeterHeight":{"title":"Level bar height (px)","value":20,"params":{"format":"range","min":10,"max":40}},
         "autoUpload":{"title":"Automatically Upload Changes to DSP","value":false,"params":{"format":"boolean"}},
@@ -171,6 +174,25 @@ function JSONToYaml(jsonObject) {
 
 //////////////////////////////////////// Generic UI Functions ///////////////
 
+function HSLAToRGBA (h, s, l, alpha){
+    s /= 100;
+    l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n =>
+      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [255 * f(0), 255 * f(8), 255 * f(4),alpha];
+  };
+
+function HSLAToRGBAText (h, s, l, alpha){
+    s /= 100;
+    l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n =>
+      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return "rgba("+255 * f(0)+","+ 255 * f(8)+","+ 255 * f(4)+","+alpha+")";
+  };
 
 
 ////////////////////////////////////////// Server Configuration 
