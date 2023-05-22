@@ -133,22 +133,18 @@ input, select {
     margin-bottom: 2px;
 }
 
-.levelBorder {
-    margin-inline: 1rem;
-    width: 98%;
-    height: var(--levelmeter_height);
-    border: 0px solid white;
-    margin: 5px;    
-    border-radius: 5px;
-    /* filter:saturate(50%);     */
+.levelBorder {    
+    width: 100%;
+    height: var(--levelmeter_height);      
+    margin-block: 10px;  
+    padding: auto;
+    border-radius: 7px;    
+    filter:saturate(0.6);    
 }
 
-.levelBorderBox {        
-    position: relative;
-    top:0;
-    display: inline-block;    
-    width: 8px;
-    height: 90%;
+.levelBorderBox {            
+    display: inline-block;        
+    height: 100%;
     padding: 0;  
     margin-left: 3px;
     border-radius: 2px;     
