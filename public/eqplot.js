@@ -1,6 +1,6 @@
 const QUADLEN = 1024;
 
-function calcBiquad(type, freq, gain, qfact, sampleRate) {
+function calculateFilterDataMatrix(type, freq, gain, qfact, sampleRate) {
 	let  plotType="log";
 	if (sampleRate==undefined) sampleRate=48000;
 
@@ -16,14 +16,14 @@ function calcBiquad(type, freq, gain, qfact, sampleRate) {
             b1 = -b1;
 			a1 = a2 = b2 = 0;
 			break;
-            
+
 		case "one-pole hp":
 			b1 = -Math.exp(-2.0 * Math.PI * (0.5 - freq /sampleRate));
             a0 = 1.0 + b1;
             b1 = -b1;
 			a1 = a2 = b2 = 0;
-			break;
-            
+			break;            
+
 		case "lowpass":
 			norm = 1 / (1 + K /qfact + K * K);
 			a0 = K * K * norm;
@@ -78,6 +78,7 @@ function calcBiquad(type, freq, gain, qfact, sampleRate) {
 				b2 = (1 - V/qfact * K + K * K) * norm;
 			}
 			break;
+
 		case "Lowshelf":
 			if (gain >= 0) {
 				norm = 1 / (1 + Math.SQRT2 * K + K * K);
@@ -96,6 +97,7 @@ function calcBiquad(type, freq, gain, qfact, sampleRate) {
 				b2 = (1 - Math.sqrt(2*V) * K + V * K * K) * norm;
 			}
 			break;
+
 		case "Highshelf":
             if (gain >= 0) {
                 norm = 1 / (1 + Math.SQRT2 * K + K * K);
@@ -175,20 +177,6 @@ function calcBiquad(type, freq, gain, qfact, sampleRate) {
 		
     //console.log(magPlot);
 	return magPlot;
-
-	
-	// list coefficients
-	// var coefsList = "a0 = " + a0 + "\n";
-	// coefsList += "a1 = " + a1 + "\n";
-	// coefsList += "a2 = " + a2 + "\n";
-	// coefsList += "b1 = " + b1 + "\n";
-	// coefsList += "b2 = " + b2;
-    // var taNode = document.getElementById("biquad_coefsList");
-    // // remove existing child txt node
-    // while (taNode.firstChild)
-    //   taNode.removeChild(taNode.firstChild);
-    // var listNode = document.createTextNode(coefsList);
-    // taNode.appendChild(listNode);
 }
 
 function plotArray(canvas, array, col, lineWidth){       

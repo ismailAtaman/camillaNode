@@ -12,13 +12,13 @@
     --main-hue: 210;
     --saturation: 50%;    
 
-    --body-bgcolor1: hsl(var(--main-hue), 5%, 20%);
-    --body-bgcolor2: hsl(var(--main-hue), 5%, 25%);
+    --body-bgcolor1: hsl(var(--main-hue), 15%, 25%);
+    --body-bgcolor2: hsl(var(--main-hue), 15%, 25%);
 
     --levelmeter_height: 20px;
-    --eqmain-width: 650px;
+    --eqmain-width: 40vw;
 
-    --slider-width: 3.4em;
+    --slider-width: 3.5em;
     --slider-height: 15rem;
 
     --header-bgcolor1: hsl(var(--header-hue), 30%, 20%);
@@ -52,28 +52,28 @@ input, select {
     font-style:normal;
 }
 
-.section {    
-    height: auto;    
-    padding: 0.5rem;
+#eqmain {
+    display: flex;               
+    flex-direction: column;
+    flex-wrap: wrap; 
+    margin: 10px;     
+    gap:10px;    
 }
 
-.eqSection {    
-    border: 1px solid hsl(var(--main-hue), 5%, 15%);    
-    border-radius: 7px;
-    margin-inline: 10px;
+.eqSection {        
+    display: block;
+    flex: content;
+    flex-grow: 1;
+    /* border: 1px solid hsl(var(--main-hue), 5%, 15%);     */
+    box-shadow: 3px 3px 5px hsl(var(--main-hue), 5%, 15%);;
+    border-radius: 7px;    
     background-color: hsl(var(--main-hue), 10%, 20%);        
+    padding-inline: 10px;
+    padding-block: 5px;    
+    width: 800px;    
 }
-/* .eqSection::after {
-    position: relative;
-    display: flex;
-    content: ' ';
-    width:10px;
-    aspect-ratio: 1;    
-    left: -10px;
-    top: -100%;   
-    background-color: yellow; 
-    border-radius:2px ;
-} */
+
+
 
 #header {
     display: block;
@@ -160,59 +160,24 @@ input, select {
     border-radius: 5px 0px 0px 5px;        
 }
 
-
-#eqmain {
-    display: grid;
-    width: var(--eqmain-width);
-    grid-template-columns: 1fr;
-    grid-auto-rows: auto;
-    gap: 10px;     
-}
-
-#eqgraph {
-    display: none;
-    grid-column: 1/ span 2 ;    
-    height: 300px;
-}
-
-
-#equalizer {
-    display: block;
-    padding-bottom: 20px;
-    padding-left: auto;
-}
-
 #equalizer select {
     background-color: hsl(var(--main-hue), 100%, 93%);
     height: 20px;
     width: 50px;    
 }
 
-#eqcanvas {
-    border: 1px solid white;
-    width:  max(700px,30vw);
-    height: 100%;
-}
-
 #eqtools {
-    display: flex;
-    width: 100%   
+    display: flex;    
 }
-
 
 canvas {        
     background-color: hsl(var(--main-hue), 10%, 20%);        
     border-radius: 7px;        
-    
-    width: var(--eqmain-width);
 }
 
-#configManagement {
-    border: 1px solid white;
-    border-radius: 7px;
-    margin-inline: 10px;
+#configManagement {    
+    border-radius: 7px;    
     height: fit-content;
-
 }
 
 #configName {
@@ -221,7 +186,8 @@ canvas {
     padding: 3px;
     font-weight: bold;
     font-size: 14px;
-    width:401px;
+    width:auto;
+    min-width:300px;
 }
 
 #configShortcut {
@@ -237,8 +203,7 @@ canvas {
 #configList {    
     margin-block: 10px;
     border: 1px solid #555;
-    padding: 0.5rem;
-    width: var(--eqmain-width);
+    padding: 0.5rem;    
     height: calc( ( var(--configCount) * 1.645) * var(--default-font-size)  );
     overflow-y: scroll;
     background-color: hsl(var(--main-hue), var(--saturation), 40%);
@@ -273,13 +238,10 @@ canvas {
     top:-2px;    
 }
 
-
-
 #infoBar {
     display: grid;
     grid-template-rows: 30% 50% 30%;
 }
-
 
 #messageBox {
     position:absolute;    
@@ -294,14 +256,39 @@ canvas {
     border-radius: 7px;
     background-color: #234e7a;
     color:white;        
-    z-index: -1;    
+    z-index: 0;    
 }
 
-
-#contextMenu {
+#EQcontextMenu {
+    display: none;
     position: absolute;
-    display: none;       
-    z-index: 0;
+    font-size: 14px;
+    width: max-content;
+    background-color: hsl(var(--main-hue), var(--saturation),15%);    
+    border-radius: 5px;
+    margin: 0;    
+}
+
+#EQcontextMenu ul {
+    padding: 0px;
+    margin: 0;
+    border-radius: 5px;
+    box-shadow: 7px 7px 14px #222;
+}
+
+#EQcontextMenu li {
+    padding-inline: 15px;
+    min-width: 80px;
+    padding-block: 5px;
+    list-style: none;
+    border-radius: 5px;
+    background-color: hsl(var(--main-hue), var(--saturation),15%);
+    cursor: pointer;
+}
+
+#EQcontextMenu li:hover {
+    background-color: hsl(var(--main-hue), var(--saturation),35%);
+    transition: all 250ms;    
 }
 
 /******************************** SLIDER ********************************************/
@@ -318,12 +305,12 @@ canvas {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;    
-    transition: filter 350ms;
+    transition: filter 150ms;
 }
 
 .slider-container:hover { 
     filter: brightness(120%) saturate(120%);
-    transition: filter 350ms;
+    transition: filter 150ms;
 }
 
 .slider-body {
@@ -400,8 +387,8 @@ canvas {
 }
 .button {
     display: inline-block;
-    line-height: 2;
-    min-height: 30px;    
+    line-height: 2;    
+    height: 30px;
     width: 100px;
     font-size: 14px;
     background-color: hsl(var(--main-hue), var(--saturation), 40%);
@@ -697,6 +684,9 @@ hr {
     margin: 15px;
     color:white;
 }
+
+
+
 
 
 /**************************************************************************************************************/

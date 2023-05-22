@@ -7,6 +7,7 @@ let preMuteVolume;
 let maxPeak=-1000;
 let peakThreshold;
 let peakArray = [];
+let contextSlider;
 
 async function EQPageOnload() {        
     
@@ -213,6 +214,10 @@ async function EQPageOnload() {
     
     if (showEQGraph) document.getElementById("eqGraph").style.display='block'; else document.getElementById('eqGraph').style.display='none';
 
+
+    window.addEventListener('click',()=>document.getElementById('EQcontextMenu').style.display='none')
+    document.getElementById('equalizer').addEventListener('dblclick',()=>{addBand()})
+
 }
 
 /// Helper functions
@@ -308,11 +313,11 @@ function flatten() {
 function reset() {
     const sliders = document.getElementsByClassName('slider-container');
     for (i=0;i<sliders.length;i++) {
-        sliders[i].children['gain'].value='0dB';
-        sliders[i].children['qfact'].value='1.4';
-        sliders[i].children['freq'].value=defaultFreqList[i % 10]+'Hz';
-        sliders[i].children['filterType'].value='Peaking';        
-        
+        EQSlider.reset(sliders[i]);
+        // sliders[i].children['gain'].value='0dB';
+        // sliders[i].children['qfact'].value='1.4';
+        // sliders[i].children['freq'].value=defaultFreqList[i % 10]+'Hz';
+        // sliders[i].children['filterType'].value='Peaking';                
     }
 
     for (i=0;i<sliders.length;i++)  EQSlider.sliderUpdateVal(sliders[i],0);           
@@ -680,6 +685,17 @@ function importFromText() {
     
 }
 
+/////////////////////////// Context Menu Functions
+
+function sliderReset() {    
+    EQSlider.reset(contextSlider);
+}
+
+function sliderRemove() {
+    contextSlider.parentElement.removeChild(contextSlider);
+    contextSlider=null;
+}
+
 
 // EQ Slider class 
 class EQSlider {    
@@ -840,6 +856,15 @@ class EQSlider {
             this.dispatchEvent(new Event('change'));
        })          
 
+       sliderContainer.addEventListener('contextmenu',function(event){
+            event.preventDefault();
+            let contextMenu = document.getElementById('EQcontextMenu')
+            contextMenu.style.left=event.clientX+ 'px';
+            contextMenu.style.top=event.clientY+window.scrollY+'px';
+            contextMenu.style.display='block';
+            contextSlider=this;
+       })
+
        sliderBody.appendChild(sliderKnob);
        sliderContainer.appendChild(sliderBody);
        sliderContainer.appendChild(freq)
@@ -879,10 +904,13 @@ class EQSlider {
     static createFilterArray() {
         let filterArray=new Array();
         const sliders = document.getElementsByClassName('slider-container')       
+        
         for (i=0;i<sliders.length;i++) {                
+            
             let sliderId=i+1;
             sliderId<10?sliderId="Filter0"+sliderId:sliderId="Filter"+sliderId;        
             let slider= document.getElementById(sliderId);
+            if (slider===null) continue;
     
             // console.log(sliderId);
             // console.log(slider);
@@ -965,13 +993,13 @@ class EQSlider {
                 let freq = filterArray[i][filterName].freq;
                 let gain = filterArray[i][filterName].gain;
                 let qfact = filterArray[i][filterName].q;                
-                resultArray = calcBiquad(type,freq,gain,qfact)           
+                resultArray = calculateFilterDataMatrix(type,freq,gain,qfact)           
                 // console.log(resultArray)    
                 for (let k=0;k<resultArray.length;k++) {                     
                     totalArray[k][0] = resultArray[k][0]  
                     totalArray[k][1] += resultArray[k][1]  
                 }                                                    
-                let c=HSLAToRGBAText(hueStep*i, 20, 40 , 0.25);                                    
+                let c=HSLAToRGBAText(hueStep*i, 30, 40 , 0.25);                                    
                 arrayList.push({"array":resultArray,"color":c,"size":9})
             }
         }
@@ -986,6 +1014,15 @@ class EQSlider {
 
     }
 
+    static reset(slider) {
+        let i = parseInt(slider.getAttribute('id').substring(6,8))        
+        slider.children['gain'].value='0dB';
+        slider.children['qfact'].value='1.4';
+        slider.children['freq'].value=defaultFreqList[i % 10]+'Hz';
+        slider.children['filterType'].value='Peaking';        
+        this.sliderUpdateVal(slider,0)
+        setTimeout(()=>canvasClick(),100);
+    }
 
 }
 

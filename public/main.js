@@ -96,11 +96,12 @@ function loadDefaultPreferences() {
 
     let general = {
         "messageboxDefaultTimeOut":{"title":"Message box default timeout duration","value":1500,"params":{"format":"range","min":500,"max":3000}},
+        "linearStyle" : {"title":"Show EQ Section in a single column","value":true,"params":{"format":"boolean"}},
     }
     
     let equalizer = { 
         "MaxDB":{"title":"Maximum Gain (dB)","value":16,"params":{"format":"range","min":6,"max":30}},
-        "MaxBands" : {"title":"Maximum Number of EQ Bands","value":24,"params":{"format":"range","min":6,"max":36}},
+        "MaxBands" : {"title":"Maximum Number of EQ Bands","value":14,"params":{"format":"range","min":6,"max":36}},
         "showLevelBars" :{"title":"Show Level Bars","value":true,"params":{"format":"boolean"}},      
         "showVolumeControl" :{"title":"Show Volume Controls","value":true,"params":{"format":"boolean"}},      
         "showEQGraph" :{"title":"Show EQ Graph","value":true,"params":{"format":"boolean"}},      

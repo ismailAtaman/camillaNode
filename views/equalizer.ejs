@@ -15,7 +15,7 @@
     <%- include('header.ejs'); %>
     <div id="eqmain" class="section">      
 
-        <div class="section eqSection" id="eqLevel">            
+        <div class="eqSection" id="eqLevel">            
             <div id="levelBorder">
                 <div id="levelLBar" class="levelBar"></div>
             </div>                    
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div class="section eqSection" id="volumeControl">
+        <div class="eqSection" id="volumeControl" style="flex-grow: 0;">
             <span style="font-size: 14px; margin-left:6px; vertical-align: top;">Volume</span>
             <input type="range" name="" id="volumeControler" max="100" min="0">          
             <input type="text" name="volumeLevel" id="volumeLevel">
@@ -33,15 +33,19 @@
             <!-- <input type="checkbox" name="autoVolume" id="autoVolume"><span style="font-size: 14px; margin-left:6px; vertical-align: top;">Auto</span> -->
         </div>
 
+        <div class="eqSection" id="eqGraph">
+            <canvas id="EQPlot" width="800" height="400" onclick="canvasClick(event)"></canvas>
+        </div>
+        
 
-        <div class="section eqSection" id="preampGain">
-           <span style="font-size: 14px; margin-left:6px">Pre-amp</span><input type="text" name="" id="preampGainVal" class="eqparam" style="width:75px;margin-inline:10px; display: inline-block;">            
+        <div class="eqSection" id="preampGain">
+           <span style="font-size: 14px; margin-left:6px">Pre-amp</span>
+           <input type="text" name="" id="preampGainVal" class="eqparam" style="width:75px;margin-inline:10px; display: inline-block;">            
            <div id="clipped"> </div>            
            <div id="clippedMessage"></div>            
         </div>
 
-
-        <div class="section" id="eqtools">
+        <div class="eqSection" id="eqtools">
             <div class="button" onclick="flatten()">Flatten</div>
             <div class="button" onclick="reset()">Reset</div>
             <div class="button" onclick="compress()">Compress</div>
@@ -50,14 +54,10 @@
             <div class="button" onclick="sortByFreq()">I have OCD</div>             
         </div>
 
-        <div class="section eqSection" id="eqGraph">
-            <canvas id="EQPlot" width="800" height="400" onclick="canvasClick(event)"></canvas>
-        </div>
-
-        <div class="section eqSection" id="equalizer">         
+        <div class="eqSection" id="equalizer">         
         </div>
         
-        <div class="section " id="DSPManagement">
+        <div class="eqSection" id="DSPManagement">
             <div class="button" onclick="uploadClick()">Upload</div>
             <div class="button" onclick="downloadClick()">Download</div>            
             <div class="button" onclick="showAutoEQClick()">AutoEQ</div>            
@@ -66,7 +66,7 @@
             
         </div>        
         
-        <div class="section eqSection" id="configManagement">
+        <div class="eqSection" id="configManagement">
             <input type="text" name="configName" id="configName">
             <input type="text" name="configShortcut" id="configShortcut" maxlength="1" onkeypress="this.value=event.key.toUpperCase();">
             <div class="button" onclick="saveConfigClick()">Save</div>
@@ -75,12 +75,12 @@
             <div id="configList"></div>
         </div>
 
-
     </div>       
     
+
+
+
     <div id="messageBox"></div>
-
-
 
     <dialog id="autoEQDialog">    
         <div id="autoEQWindow">
@@ -97,7 +97,6 @@
         </div>
     </dialog>
 
-
     <dialog id="importDialog">
         <div id="importWindow">
             <p>Import EQ settings from a text file. Please paste the text to import below.</p>
@@ -110,6 +109,14 @@
         
     </dialog>
 
+    <div id="EQcontextMenu">
+        <ul>
+            <li onclick="addBand()">Add</li>
+            <li onclick="sliderRemove(event)">Remove</li>            
+            <li onclick="contextSlider.children['gain'].value='0dB'; EQSlider.sliderUpdateVal(contextSlider,0); canvasClick() ">Flatten</li>
+            <li onclick="sliderReset(event)">Reset</li>
+        </ul>
+    </div>
 
 </body>
 
