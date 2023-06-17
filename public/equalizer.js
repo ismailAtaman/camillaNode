@@ -999,8 +999,8 @@ class EQSlider {
                     totalArray[k][0] = resultArray[k][0]  
                     totalArray[k][1] += resultArray[k][1]  
                 }                                                    
-                let c=HSLAToRGBAText(hueStep*i, 30, 40 , 0.25);                                    
-                arrayList.push({"array":resultArray,"color":c,"size":9})
+                let c=HSLAToRGBAText(hueStep*i, 30, 40 , 0.5);                                    
+                arrayList.push({"array":resultArray,"color":c,"size":2})
             }
         }
 
