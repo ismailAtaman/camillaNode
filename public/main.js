@@ -87,8 +87,8 @@ function loadSettings() {
 function loadDefaultPreferences() {
     let legend = {"display":"Display Preferences","general":"General Preferences","equalizer":"Equalizer Preferences"}
     let display = {
-        "mainHue":{"title":"Main Hue","value":190,"params":{"format":"range","min":0,"max":360}},        
-        "headerHue":{"title":"Header Hue","value":190,"params":{"format":"range","min":0,"max":360}},        
+        "mainHue":{"title":"Main Hue","value":180,"params":{"format":"range","min":0,"max":360}},        
+        "headerHue":{"title":"Header Hue","value":180,"params":{"format":"range","min":0,"max":360}},        
         "saturation":{"title":"Saturation","value":30,"params":{"format":"range","min":10,"max":80}},
         "hueRotate" : {"title":"Change EQ Band Color With Chaning Gain","value":true,"params":{"format":"boolean"}},
         "eqparamFontSize": {"title":"Equalizer Parameter Font Size (px)","value":14,"params":{"format":"range","min":11,"max":16}},

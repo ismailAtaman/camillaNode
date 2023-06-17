@@ -50,26 +50,81 @@ async function EQPageOnload() {
     })
     // }) 
 
-    let levelMaxWidth=document.getElementById('levelBorder').getBoundingClientRect().width
+        
+
+    let lBorder=document.getElementById('lBorder');
+    let rBorder=document.getElementById('rBorder');
+    
+    let levelMaxWidth=document.getElementById('lBorder').getBoundingClientRect().width;    
+    let marginLeft = 3;
+    let boxWidth=parseInt(levelmeterHeight/5); 
+
+    let barCount = (levelMaxWidth/(marginLeft+boxWidth))-1;
+    console.log(barCount)
+    let hueOffset = 170 / barCount
+
+    for (i=0;i<barCount;i++) {
+        let d = document.createElement('div');
+        d.innerText=' ';
+        d.className='levelBorderBox';
+        d.style.width= boxWidth+'px';
+        d.style.marginLeft=marginLeft;
+        d.style.filter='opacity(0.1)';
+        let hue = 170 - (hueOffset * i );
+        d.style.backgroundColor='hsl('+hue+',50% , 50%)';
+        lBorder.appendChild(d);
+
+         d = document.createElement('div');
+        d.innerText=' ';
+        d.className='levelBorderBox';
+        d.style.width=boxWidth+'px';
+        d.style.marginLeft=marginLeft;
+        d.style.filter='opacity(0.1)';
+        hue = 170 - (hueOffset * i);
+        d.style.backgroundColor='hsl('+hue+',50% , 50%)';
+        rBorder.appendChild(d);
+    }
+
     
     setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
-            if (r==undefined) return;
-             let levelL=isNaN(r[0])?-100:r[0];
-            let levelR=isNaN(r[1])?-100:r[1];          
+        if (r==undefined) return;
+
+        let levelL=r[0];
+        let levelR=r[1];
+
+        if (levelL<-100) levelL=-100;
+        if (levelR<-100) levelR=-100;
+     
+        let lBars = parseInt(barCount * (100+levelL) * 0.01 );
+        let rBars = parseInt(barCount * (100+levelR) * 0.01 );
+        lBarGroup = lBorder.children;
+        rBarGroup = rBorder.children;
+        
+        for (i=0;i<barCount;i++) {            
+            if (i<lBars) lBarGroup[i].style.filter='opacity(1)'; else lBarGroup[i].style.filter='opacity(0.1)';
+            if (i<rBars) rBarGroup[i].style.filter='opacity(1)'; else rBarGroup[i].style.filter='opacity(0.1)';
+        }
+        //console.log(lBars,levelL)
+        
+        
+    })},50)
+
+
+    // setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
+    //         if (r==undefined) return;
+
+    //         let levelL=r[0];
+    //         let levelR=r[1];
+
+    //         if (levelL<-100) levelL=-100;
+    //         if (levelR<-100) levelR=-100;            
             
-            levelL<-100?levelL=-100:a=1
-            levelR<-100?levelR=-100:a=1
-
-            levelL = 100 + levelL
-            levelR = 100 + levelR            
-
-            // console.log(levelL+' : ' + levelR);
-
-            let multiplier = levelMaxWidth>=500?4:2
-
-            document.getElementById('levelLBar').style.width=levelMaxWidth-(multiplier*levelL)+'px';
-            document.getElementById('levelRBar').style.width=levelMaxWidth-(multiplier*levelR)+'px';
-        })},50)
+    //         let deductWidthL=parseInt(barLength * (100 + levelL) * 0.01);
+    //         let deductWidthR=parseInt(barLength * (100 + levelR) * 0.01);
+            
+    //         lBar.style.width=barLength-deductWidthL+'px';
+    //         rBar.style.width=barLength-deductWidthR+'px';
+    //     })},50)
 
     //git sendDSPMessage("GetCaptureRate").then(r=>console.log(r))
         

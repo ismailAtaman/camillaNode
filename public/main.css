@@ -133,31 +133,31 @@ input, select {
     margin-bottom: 2px;
 }
 
-#levelBorder {
-    margin-inline: 1rem;
-    width: 98%;
-    height: var(--levelmeter_height);
-    border: 0px solid white;
-    --bar-saturation: calc(var(--saturation) + 20%);
-    --color-1 : hsl(0,var(--bar-saturation),50%);
-    --color-2 : hsl(60,var(--bar-saturation),50%);
-    --color-3 : hsl(120,var(--bar-saturation),50%);
+.levelBorder {    
+    width: 100%;
+    height: var(--levelmeter_height);      
+    margin-block: 10px;  
+    padding: auto;
+    border-radius: 7px;    
+    filter:saturate(0.6);    
+}
 
-    background: linear-gradient(90deg, var(--color-1),var(--color-2),var(--color-3) );
-    margin: 5px;
-    transform: rotate(180deg);
-    border-radius: 5px;
-    filter:saturate(50%);
+.levelBorderBox {            
+    display: inline-block;        
+    height: 100%;
+    padding: 0;  
+    margin-left: 3px;
+    border-radius: 2px;     
 }
 
 .levelBar {
-    position: relative;        
-    right: 0px;
+    position: relative;            
     max-width: calc(-2 + var(--eqmain-width));
     height: var(--levelmeter_height);   
     opacity: 90%;
     background-color: var(--body-bgcolor1); 
     border-radius: 5px 0px 0px 5px;        
+    z-index: 1;
 }
 
 #equalizer select {

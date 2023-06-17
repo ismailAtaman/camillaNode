@@ -6,6 +6,8 @@
 
 
 
+let autoEQDB= [];
+
 const AutoEQResults = {
     "Crinicle":{
         "IEM"                       :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/7e4de6a8936e7b43eb4d1f1679e679aac28f863b"},
@@ -31,8 +33,6 @@ const AutoEQResults = {
         "Headphones"                :{"url":"https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/3afb688cecf24697f5d0238830d3e0bebbb642ba"},
     },
 }
-
-let autoEQDB= [];
 
 async function initAutoEQDB(source) {    
     loadAutoEQDB(source).then(ret=>{        
@@ -66,8 +66,6 @@ async function loadAutoEQDB(source) {
     })  
     
 }
-
-
 
 function getCongifText(url) {
     fetch(url).then((res)=>res.text().then(data=>{
@@ -106,7 +104,6 @@ async function downloadEQList(url) {
         }
     })    
 }
-
 
 function parseAutoEQText(text) {    
     let lines = text.split('\n');
