@@ -1,0 +1,1 @@
+{"configName":"7HZ Sonus","accessKey":"","filterArray":[{"Filter01":{"type":"Peaking","freq":250,"gain":-1,"q":1.4}},{"Filter02":{"type":"Peaking","freq":710,"gain":0.7,"q":2}},{"Filter03":{"type":"Peaking","freq":1500,"gain":-3.4,"q":1.4}},{"Filter04":{"type":"Peaking","freq":3000,"gain":1.5,"q":1.7}},{"Preamp":{"gain":-6.6}},{"Volume":{"type":"Volume","parameters":{}}}]}

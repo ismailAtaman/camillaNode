@@ -1,0 +1,1 @@
+{"configName":"AKG K245 - Isostasy","accessKey":"","filterArray":[{"Filter01":{"type":"Lowshelf","freq":100,"gain":3,"q":0.8}},{"Filter02":{"type":"Peaking","freq":1430,"gain":3,"q":1.8}},{"Filter03":{"type":"Peaking","freq":4830,"gain":13,"q":4}},{"Preamp":{"gain":-13.1}},{"Volume":{"type":"Volume","parameters":{}}}]}
