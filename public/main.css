@@ -15,16 +15,15 @@
     --body-bgcolor1: hsl(var(--main-hue), 15%, 25%);
     --body-bgcolor2: hsl(var(--main-hue), 15%, 25%);
 
-    --levelmeter_height: 20px;
-    --eqmain-width: 40vw;
+    --levelmeter_height: 20px;    
 
-    --slider-width: 3.5em;
+    --slider-width: 3em;
     --slider-height: 15rem;
 
     --header-bgcolor1: hsl(var(--header-hue), 30%, 20%);
     --header-bgcolor2: hsl(var(--header-hue), 50%, 40%);
 
-    --eqparamFontSize: 14px;
+    --eqparamFontSize: 10px;
 
     --configCount: 6;
 
@@ -39,12 +38,12 @@
 
 body {    
     font-family: inherit;
-    background: linear-gradient(135deg, var(--body-bgcolor1), var(--body-bgcolor2));    
+    background: linear-gradient(135deg, var(--body-bgcolor1), var(--body-bgcolor2));        
     color: white;
     margin: 0;
     padding: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100vh;    
 }
 
 input, select {
@@ -53,11 +52,11 @@ input, select {
 }
 
 #eqmain {
-    display: flex;               
+    display: flex;             
     flex-direction: column;
     flex-wrap: wrap; 
     margin: 10px;     
-    gap:10px;    
+    gap:10px;        
 }
 
 .eqSection {        
@@ -70,10 +69,8 @@ input, select {
     background-color: hsl(var(--main-hue), 10%, 20%);        
     padding-inline: 10px;
     padding-block: 5px;    
-    width: 800px;    
+
 }
-
-
 
 #header {
     display: block;
@@ -163,7 +160,7 @@ input, select {
 #equalizer select {
     background-color: hsl(var(--main-hue), 100%, 93%);
     height: 20px;
-    width: 50px;    
+    width: 45px;    
 }
 
 #eqtools {
@@ -349,9 +346,15 @@ canvas {
     border: none; 
     background-color: #DDD;
     color: black;
-    border-radius: 3px;
-    padding:2px;    
+    border-radius: 2px;
+    padding:0px;
+    padding-block: 2px;        
     text-align: center;
+}
+
+.freq {
+    --hue: calc(var(--header-hue) + 180);
+    background-color: hsl(var(--hue), 20%, 80%);
 }
 
 .eqparam:hover {

@@ -336,8 +336,8 @@ function applyFilters(filters) {
                     sliderId=addBand();                     
                     slider=document.getElementById(sliderId); 
                 }
-                
-                slider.children['freq'].value=new Intl.NumberFormat('en-US').format(filters[filterName].parameters.freq);
+
+                slider.children['freq'].value=filters[filterName].parameters.freq+'Hz';
                 slider.children['gain'].value=filters[filterName].parameters.gain+'dB';
                 slider.children['qfact'].value=filters[filterName].parameters.q;            
                 slider.children['filterType'].value=filters[filterName].parameters.type;            
@@ -767,8 +767,8 @@ class EQSlider {
         
         let freq = document.createElement('input');
         freq.type='text';
-        freq.className='eqparam freq';
-        freq.value='1,000'
+        freq.className='eqparam';
+        freq.value='1000hz'
         freq.id='freq';
 
 
@@ -776,19 +776,18 @@ class EQSlider {
 
         freq.addEventListener('click',function(){
             tempFreq=this.value;
-            this.value= this.value.replace(',','');            
+            this.value= this.value.replace('Hz','');
         })
 
         freq.addEventListener('focus',function(){
             tempFreq=this.value;
-            this.value= this.value.replace(',','');                        
+            this.value= this.value.replace('Hz','');                        
         })
         
         freq.addEventListener('focusout',function(){            
             let text = this.value;               
             if (isNaN(text) || text<0) text=tempFreq;                        
-            this.value=  new Intl.NumberFormat('en-US').format(this.value);
-            //this.value=text+'Hz';                   
+            this.value=text+'Hz';                   
             dispatchEvent(new Event('change'));     
         })
 
@@ -904,7 +903,7 @@ class EQSlider {
        })
 
        sliderContainer.addEventListener('wheel',function(e) {
-            let dif = e.deltaY<0?0.5:-0.5;                           
+            let dif = e.deltaY<0?0.1:-0.1;            
             let val=parseInt(10*(parseFloat(gain.value.replace('dB',''))+dif))/10;
             gain.value=val+'dB';
             e.preventDefault();
@@ -973,7 +972,7 @@ class EQSlider {
             let filter = new Object();
             filter[sliderId] = {
                 "type"  : slider.children['filterType'].value,
-                "freq"  : parseFloat(slider.children['freq'].value.replace(',','')),
+                "freq"  : parseFloat(slider.children['freq'].value.replace('Hz','')),
                 "gain"  : parseFloat(slider.children['gain'].value.replace('dB','')),
                 "q"     : parseFloat(slider.children['qfact'].value)
             }
@@ -1011,7 +1010,7 @@ class EQSlider {
             if (filterTypeText=='Highshelf') filterType='HSC';
             if (filterTypeText=='Lowshelf') filterType='LSC';
             
-            let freq = sliders[filterNo].children['freq'].value.toLowerCase().replace(',','');
+            let freq = sliders[filterNo].children['freq'].value.toLowerCase().replace('hz','');
             let gain = sliders[filterNo].children['gain'].value.replace('dB','');
             let qfact = sliders[filterNo].children['qfact'].value;
 
@@ -1070,12 +1069,11 @@ class EQSlider {
 
     }
 
-
     static reset(slider) {
         let i = parseInt(slider.getAttribute('id').substring(6,8))        
         slider.children['gain'].value='0dB';
         slider.children['qfact'].value='1.4';
-        slider.children['freq'].value=new Intl.NumberFormat('en-US').format( defaultFreqList[i % defaultFreqList.length]);
+        slider.children['freq'].value=defaultFreqList[i % 10]+'Hz';
         slider.children['filterType'].value='Peaking';        
         this.sliderUpdateVal(slider,0)
         setTimeout(()=>canvasClick(),100);

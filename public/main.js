@@ -23,7 +23,7 @@ const configCount = parseInt(getSettingValue("configCount"));
 const showEQGraph = getSettingValue("showEQGraph");
 
 
-const defaultFreqList = [30,100,200,500,1000,2000,4000,6000,8000,12000]
+const defaultFreqList = [20,30,70,100,200,500,1000,2000,4000,6000,8000,10000,12000]
 
 // Initialize AutoEQ Database
 //initAutoEQDB();
@@ -101,15 +101,16 @@ function loadDefaultPreferences() {
     
     let equalizer = { 
         "MaxDB":{"title":"Maximum Gain (dB)","value":16,"params":{"format":"range","min":6,"max":30}},
-        "MaxBands" : {"title":"Maximum Number of EQ Bands","value":14,"params":{"format":"range","min":6,"max":36}},
+        "MaxBands" : {"title":"Maximum Number of EQ Bands","value":15,"params":{"format":"range","min":6,"max":36}},
         "showLevelBars" :{"title":"Show Level Bars","value":true,"params":{"format":"boolean"}},      
         "showVolumeControl" :{"title":"Show Volume Controls","value":true,"params":{"format":"boolean"}},      
-        "showEQGraph" :{"title":"Show EQ Graph","value":true,"params":{"format":"boolean"}},      
+        "showEQGraph" :{"title":"Show EQ Graph","value":false,"params":{"format":"boolean"}},      
         // "showClippingIndicator" :{"title":"Show Clipping Indicator","value":true,"params":{"format":"boolean"}},      
-        "levelmeterHeight":{"title":"Level bar height (px)","value":20,"params":{"format":"range","min":10,"max":40}},
+        "levelmeterHeight":{"title":"Level bar height (px)","value":35,"params":{"format":"range","min":10,"max":50}},
         "autoUpload":{"title":"Automatically Upload Changes to DSP","value":false,"params":{"format":"boolean"}},
         "autoDownload":{"title":"Download EQ Config From DSP at Startup","value":true,"params":{"format":"boolean"}}, 
-        "configCount":{"title":"Number of saved configurations to show","value":6,"params":{"format":"range","min":3,"max":12}},           
+        "configCount":{"title":"Number of saved configurations to show","value":6,"params":{"format":"range","min":3,"max":12}},      
+        "LRSeperate":{"title":"Seperate EQ for Left and Right channels","value":false,"params":{"format":"boolean"}},  
     }
 
     return {"legend":legend,"display":display,"general":general,"equalizer":equalizer}
