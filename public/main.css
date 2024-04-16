@@ -75,7 +75,7 @@ input, select {
 #header {
     display: block;
     background: linear-gradient(45deg, var(--header-bgcolor1), var(--header-bgcolor2));
-    height: max(5vh,65px);
+    height: max(5vh,75px);
 }
 
 #title {
@@ -97,12 +97,13 @@ input, select {
     display: inline;
     font-size: 16px;
     cursor: pointer; 
-    padding-bottom: 1rem;   
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;   
 }
 
 .menuItem:hover {
     color: hsl(calc(180 + var(--main-hue)), var(--saturation), 50%);
-    transition: all 250ms;    
+    transition: all 500ms;    
 }
 
 #state {
