@@ -50,6 +50,10 @@ app.get('/settings',(req,res)=>{
     res.render('settings');     
 }) 
 
+app.get('/test',(req,res)=>{
+    res.render('test');     
+}) 
+
 
 app.post('/saveConfigName',(req,res)=>{
     let queryResponse="";
