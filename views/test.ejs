@@ -12,20 +12,32 @@
 
 <style>
     .knob {
-        display: flex;
+        display: inline-flex;
         position: relative;
         align-items: center;
         justify-content: center;
-        width: 60px;
-        height: 60px;
-        margin: 20px;
+        width: 70px;
+        height: 70px;
+        margin: 15px;
+        margin-top: 35px;
         border-radius: 50%;
         background:hsl(180, 30%, 70%);   
         border: none;
-        /* box-shadow: inset 0px -6px 1px 2px rgba(0, 0, 0, 0.35), 0px 7px 40px 11px rgba(84, 81, 97, 0.4);  */
-        
+        box-shadow: inset 0px -6px 1px 2px rgba(0, 0, 0, 0.35), 0px 7px 40px 11px rgba(84, 81, 97, 0.4); 
+        filter: drop-shadow(5px 5px 2px #222);
+    }
 
-        
+    .knob::before {
+        content: attr(label);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top:-25px;
+        width: 100%;
+        height: auto;
+        font-size: 14px;
+        color: #DDD;
     }
 
 
@@ -35,30 +47,38 @@
         height: 85%;
         margin: auto;
         border-radius: 50%;
-        background: #555;     
+        background: radial-gradient(#777,#555);     
         border: none;             
-
+        cursor:grabbing;
+        box-shadow: inset 0px -3px 1px 1px black;
     }
 
     .knobHeadDot {         
         content: '';       
         display: block;        
-        background:white;
+        background:#aaa;
         border-radius: 50%;
-        width: 10px;
-        height: 10px;      
+        width: 12%;
+        height: 12%;      
         position: absolute;  
-        bottom: 8px;
+        bottom: 20%;
         left:50%;
         transform: translateX(-50%);
-        transform-origin: 0px -12px;      
+        transform-origin: 0px -180%;      
+    }
 
+    .knobVal {
+        position: absolute;
+        bottom: -25px;
+        font-size: 13px;
+        opacity: 1;
+        transition: all 500ms;
     }
 
 </style>
 
 
-<div class="knob">
+<div class="knob" label="Volume">
     <div class="knobHead">
         <div class="knobHeadDot" val="0"></div>        
     </div>
@@ -66,14 +86,14 @@
 </div>
 
 
-<div class="knob">
+<div class="knob" label="Crossfeed">
     <div class="knobHead">
         <div class="knobHeadDot" val="0"></div>        
     </div>
     <div class="knobVal"></div>
 </div>
 
-<div class="knob">
+<div class="knob" label="Other">
     <div class="knobHead">
         <div class="knobHeadDot" val="0"></div>        
     </div>
@@ -92,6 +112,10 @@
                 dot.style = 'transform: rotate('+val+'deg);'
                 const hue=180-val/2;
                 dot.parentElement.parentElement.style= 'background-color: hsl('+hue+',40%,50%)';
+                const valElement = dot.parentElement.parentElement.children[1];
+                valElement.innerText=(val-31)/10;
+                valElement.style.opacity='1';
+                setTimeout(function(e){e.style.opacity='0';},1000,valElement);                
             }
         })
     })
