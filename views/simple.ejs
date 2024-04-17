@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=100vw, initial-scale=1.0">        
+    <title>CamillaDSP</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+<%- include('header.ejs'); %>
+
+<style>
+    .knob {
+        --bck: 120;                
+        display: inline-flex;
+        position: relative;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        aspect-ratio: 1;
+        margin: 15px;
+        margin-top: 35px;
+        border-radius: 50%;
+        background:hsl(var(--bck), 30%, 70%);   
+        border: 0px solid 333;
+        /* box-shadow: inset 0px -6px 1px 2px rgba(0, 0, 0, 0.35), 0px 7px 40px 11px rgba(84, 81, 97, 0.4), 0px 0px 8px 0px hsl(var(--bck), 30%, 70%);      */
+        box-shadow: 0px 0px 8px 0px hsl(var(--bck), 30%, 70%); 
+    }
+
+    .knob::before {
+        content: attr(label);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top:-25px;
+        width: 100%;
+        height: auto;
+        font-size: 14px;
+        color: #DDD;
+    }
+
+    .knobHead {
+        display: block;
+        width: 85%;
+        height: 85%;
+        margin: auto;
+        border-radius: 50%;
+        background: radial-gradient(#777,#555);     
+        border: none;             
+        cursor:grabbing;
+        box-shadow: inset 0px -3px 1px 1px #222;
+        
+    }
+
+    .knobHeadDot {         
+        content: '';       
+        display: block;        
+        background:#999;
+        border-radius: 0%;
+        width: 3%;
+        height: 12%;      
+        position: absolute;  
+        bottom: 20%;
+        left:50%;
+        transform: translateX(-50%);
+        transform-origin: 0px -180%;      
+    }
+
+    .knobVal {
+        position: absolute;
+        bottom: -20px;
+        font-size: 12px;
+        opacity: 1;
+        transition: all 1000ms;
+    }
+
+</style>
+<div id="eqmain" class="section">      
+    <div class="eqSection" id="eqLevel">            
+        <!-- <div id="levelLBar" class="levelBar"></div> -->
+        <div class="levelBorder" id="lBorder"></div>                    
+
+        <!-- <div id="levelRBar" class="levelBar"></div> -->
+       <div class="levelBorder" id="rBorder"></div>
+    </div>
+
+    <div class="eqSection">
+        <div class="knob" label="Main volume" size="70">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="31"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+
+
+        <div class="knob" label="Balance" size="70px">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="181"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+
+        <div class="knob" label="Tilt" size="70px">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="181"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+
+        <div class="knob" label="Crossfeed" size="70px">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="31"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+
+    </div>
+
+    <div class="eqSection">
+        <div class="knob" label="Sub-bass" size="70">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="181" offset="-15"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+        <div class="knob" label="Bass" size="70">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="181" offset="-15"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+        <div class="knob" label="Mids" size="70">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="181" offset="-15"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+        <div class="knob" label="Upper Mids" size="70">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="181" offset="-15"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+        <div class="knob" label="Treble" size="70">
+            <div class="knobHead">
+                <div class="knobHeadDot" val="181" offset="-15"></div>        
+            </div>
+            <div class="knobVal"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script defer>
+    let connectionResult =  connectToDsp();
+    
+    
+    let lBorder=document.getElementById('lBorder');
+    let rBorder=document.getElementById('rBorder');
+    
+    let levelMaxWidth=document.getElementById('lBorder').getBoundingClientRect().width;    
+    let marginLeft = 3;
+    let boxWidth=parseInt(levelmeterHeight/5); 
+
+    let barCount = (levelMaxWidth/(marginLeft+boxWidth))-1;
+    console.log(barCount)
+    let hueOffset = 170 / barCount
+
+    for (i=0;i<barCount;i++) {
+        let d = document.createElement('div');
+        d.innerText=' ';
+        d.className='levelBorderBox';
+        d.style.width= boxWidth+'px';
+        d.style.marginLeft=marginLeft;
+        d.style.filter='opacity(0.1)';
+        let hue = 170 - (hueOffset * i );
+        d.style.backgroundColor='hsl('+hue+',50% , 50%)';
+        lBorder.appendChild(d);
+
+        d = document.createElement('div');
+        d.innerText=' ';
+        d.className='levelBorderBox';
+        d.style.width=boxWidth+'px';
+        d.style.marginLeft=marginLeft;
+        d.style.filter='opacity(0.1)';
+        hue = 170 - (hueOffset * i);
+        d.style.backgroundColor='hsl('+hue+',50% , 50%)';
+        rBorder.appendChild(d);
+    }
+
+setInterval (function(){sendDSPMessage("GetPlaybackSignalRms").then(r=>{
+        if (r==undefined) return;
+
+        let levelL=r[0];
+        let levelR=r[1];
+
+        if (levelL<-100) levelL=-100;
+        if (levelR<-100) levelR=-100;
+     
+        let lBars = parseInt(barCount * (100+levelL) * 0.01 );
+        let rBars = parseInt(barCount * (100+levelR) * 0.01 );
+        lBarGroup = lBorder.children;
+        rBarGroup = rBorder.children;
+        
+        for (i=0;i<barCount;i++) {            
+            if (i<lBars) lBarGroup[i].style.filter='opacity(1)'; else lBarGroup[i].style.filter='opacity(0.1)';
+            if (i<rBars) rBarGroup[i].style.filter='opacity(1)'; else rBarGroup[i].style.filter='opacity(0.1)';
+        }
+        //console.log(lBars,levelL)
+        
+        
+    })},50)
+
+    const observer = new MutationObserver(function(muts){
+        muts.forEach(function(mut){
+            // console.log(mut)
+            if (mut.type=="attributes" && mut.attributeName=="val") {
+                // console.log("Mutation")
+                const dot = mut.target;
+                const val = dot.getAttribute(mut.attributeName);
+                let offset = parseInt(dot.getAttribute("offset"));
+                if (Number.isNaN(offset)) offset=0;
+                
+                dot.style = 'transform: rotate('+val+'deg);'
+                const hue=180-val/2;
+                dot.parentElement.parentElement.style= '--bck:'+hue;
+                const valElement = dot.parentElement.parentElement.children[1];
+                valElement.innerText=((val-31)/10)+offset;
+                valElement.style.opacity='1';
+                setTimeout(function(e){e.style.opacity='0';},1000,valElement);                
+            }
+        })
+    })
+
+    
+    const heads = document.getElementsByClassName('knobHead');        
+    for (let i=0;i<=heads.length-1;i++) {
+          
+        observer.observe(heads[i].children[0], {attributes:true});
+        heads[i].children[0].setAttribute('val',heads[i].children[0].getAttribute("val"));
+
+        heads[i].addEventListener("wheel",function(e){            
+            const direction = e.deltaY>0?1:-1;  
+            const dot=heads[i].children[0];          
+
+            let val=parseInt(dot.getAttribute("val"));
+            if (direction<0 && val==31) return;
+            if (direction>0 && val==331) return;
+            dot.setAttribute("val",val+10*direction);            
+        })        
+        
+    } 
+</script>
+
+</body>
+</html>

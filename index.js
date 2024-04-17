@@ -50,8 +50,8 @@ app.get('/settings',(req,res)=>{
     res.render('settings');     
 }) 
 
-app.get('/test',(req,res)=>{
-    res.render('test');     
+app.get('/simple',(req,res)=>{
+    res.render('simple');     
 }) 
 
 
