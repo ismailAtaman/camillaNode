@@ -59,7 +59,7 @@
 
 
 <div class="knob">
-    <div class="knobHead" val="12">
+    <div class="knobHead">
         <div class="knobHeadDot" val="0"></div>        
     </div>
     <div class="knobVal"></div>
@@ -67,14 +67,14 @@
 
 
 <div class="knob">
-    <div class="knobHead" val="12">
+    <div class="knobHead">
         <div class="knobHeadDot" val="0"></div>        
     </div>
     <div class="knobVal"></div>
 </div>
 
 <div class="knob">
-    <div class="knobHead" val="12">
+    <div class="knobHead">
         <div class="knobHeadDot" val="0"></div>        
     </div>
     <div class="knobVal"></div>
@@ -84,27 +84,34 @@
 
     const observer = new MutationObserver(function(muts){
         muts.forEach(function(mut){
+            // console.log(mut)
             if (mut.type=="attributes" && mut.attributeName=="val") {
+                // console.log("Mutation")
                 const dot = mut.target;
                 const val = dot.getAttribute(mut.attributeName);
                 dot.style = 'transform: rotate('+val+'deg);'
                 const hue=180-val/2;
-                dot.parentElement.parentElement.style= 'background-color: hsl('+hue+',30%,70%)';
+                dot.parentElement.parentElement.style= 'background-color: hsl('+hue+',40%,50%)';
             }
         })
     })
 
     
-    const heads = document.getElementsByClassName('knobHead');
-    console.log(heads)
-    for (let i=0;i<=heads.length-1;i++) {        
+    const heads = document.getElementsByClassName('knobHead');        
+    for (let i=0;i<=heads.length-1;i++) {
+          
+        observer.observe(heads[i].children[0], {attributes:true});
+        heads[i].children[0].setAttribute('val','31')
         heads[i].addEventListener("wheel",function(e){            
-            const dir = e.deltaY>0?1:-1;                        
-            const dot=heads[i].children[0];
-            observer.observe(dot, {attributes:true});
+            const direction = e.deltaY>0?1:-1;  
+            const dot=heads[i].children[0];          
+
             let val=parseInt(dot.getAttribute("val"));
-            dot.setAttribute("val",val+10*dir);            
-        })
+            if (direction<0 && val==31) return;
+            if (direction>0 && val==361) return;
+            dot.setAttribute("val",val+10*direction);            
+        })        
+        
     } 
 </script>
 
