@@ -156,8 +156,7 @@
 
 <script defer>
     let connectionResult =  connectToDsp();
-    
-    
+        
     let lBorder=document.getElementById('lBorder');
     let rBorder=document.getElementById('rBorder');
     
@@ -166,8 +165,9 @@
     let boxWidth=parseInt(levelmeterHeight/5); 
 
     let barCount = (levelMaxWidth/(marginLeft+boxWidth))-1;
-    console.log(barCount)
-    let hueOffset = 170 / barCount
+    const baseHue=100;
+    
+    let hueOffset = baseHue / barCount
 
     for (i=0;i<barCount;i++) {
         let d = document.createElement('div');
@@ -176,7 +176,7 @@
         d.style.width= boxWidth+'px';
         d.style.marginLeft=marginLeft;
         d.style.filter='opacity(0.1)';
-        let hue = 170 - (hueOffset * i );
+        let hue = baseHue - (hueOffset * i );
         d.style.backgroundColor='hsl('+hue+',50% , 50%)';
         lBorder.appendChild(d);
 
@@ -186,7 +186,7 @@
         d.style.width=boxWidth+'px';
         d.style.marginLeft=marginLeft;
         d.style.filter='opacity(0.1)';
-        hue = 170 - (hueOffset * i);
+        hue = baseHue - (hueOffset * i);
         d.style.backgroundColor='hsl('+hue+',50% , 50%)';
         rBorder.appendChild(d);
     }

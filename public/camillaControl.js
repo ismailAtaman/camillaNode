@@ -163,6 +163,8 @@ async function uploadConfigToDSP(filterArray,configName) {
 
     DSPConfig.filters=filters;
     DSPConfig.pipeline=pipeline;
+    
+    console.log(DSPConfig);
 
     return new Promise((resolve,reject)=>{
         let message={'SetConfigJson':JSON.stringify(DSPConfig)};    
@@ -170,6 +172,7 @@ async function uploadConfigToDSP(filterArray,configName) {
     })
     
     
+
 }
 
 async function downloadConfigFromDSP() {    

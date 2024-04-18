@@ -69,6 +69,7 @@ input, select {
     background-color: hsl(var(--main-hue), 10%, 20%);        
     padding-inline: 10px;
     padding-block: 5px;    
+    width: 800px;
 
 }
 

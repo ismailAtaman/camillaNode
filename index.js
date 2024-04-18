@@ -30,13 +30,22 @@ app.use(express.static('public'));
 app.set('view engine','ejs');
 
 //// Default gets
+app.get('/server',(req,res)=>{
+    res.render('server');     
+}) 
+
+app.get('/simple',(req,res)=>{
+    res.render('simple');     
+}) 
+
 app.get('/',(req,res)=>{
     res.render('equalizer');     
 }) 
 
-app.get('/server',(req,res)=>{
-    res.render('server');     
+app.get('/advanced',(req,res)=>{
+    res.render('advanced');     
 }) 
+
 
 app.get('/device',(req,res)=>{
     res.render('device');     
@@ -50,9 +59,7 @@ app.get('/settings',(req,res)=>{
     res.render('settings');     
 }) 
 
-app.get('/simple',(req,res)=>{
-    res.render('simple');     
-}) 
+
 
 
 app.post('/saveConfigName',(req,res)=>{
