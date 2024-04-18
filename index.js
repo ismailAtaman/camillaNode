@@ -39,7 +39,8 @@ app.get('/simple',(req,res)=>{
 }) 
 
 app.get('/',(req,res)=>{
-    res.render('equalizer');     
+    // res.render('equalizer');     
+    res.render("main")
 }) 
 
 app.get('/advanced',(req,res)=>{

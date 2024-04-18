@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jersey+25&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+:root {
+    --bck-hue: 180;
+    --bck-sat: 20%;
+    --bck-light : 20%;
+    --bck-color: hsl(var(--bck-hue),var(--bck-sat),var(--bck-light));   
+
+
+    --font-size: 16px;
+    --toolbar-width: 200px;
+
+    font-family: "Abel", sans-serif;
+    font-size: var(--font-size);
+
+    
+    width: 100vw;
+    height: 100vh;
+
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+
+
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    background-color:var(--bck-color);
+    color: white;
+    margin: 0px;
+    overflow: hidden;
+}
+
+header {
+    display: flex;
+    font-size: x-large;
+    height: 100px;
+    align-items: center;
+}
+
+main {
+    display: grid;
+    grid-template-columns: var(--toolbar-width) auto;    
+    grid-auto-rows: 100%;
+    gap:0px;
+    border: none;
+    height: 100%;   
+
+}
+
+section {
+    display: block;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding-block: 20px;
+    border-top: 1px solid #222;
+    
+}
+
+#sectionLeft {    
+    display: block;    
+    padding-block: 20px;
+    border-right: 1px solid #222;    
+}
+
+.navitage {
+    margin:15px;
+    cursor:pointer;    
+    transition: all 500ms;
+}
+
+.navitage:hover {
+    color: hsl(var(--bck-hue),var(--bck-sat),60%);
+
+}
+
+
+#sectionMain {    
+    overflow-y: scroll;
+}

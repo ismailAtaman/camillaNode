@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 :root {
-    font-family: 'Abel', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     --default-font-size: 16px;
 
     font-size: var(--default-font-size);
