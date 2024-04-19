@@ -30,12 +30,12 @@ app.use(express.static('public'));
 app.set('view engine','ejs');
 
 //// Default gets
-app.get('/server',(req,res)=>{
-    res.render('server');     
+app.get('/connections',(req,res)=>{
+    res.render('connections');     
 }) 
 
-app.get('/simple',(req,res)=>{
-    res.render('simple');     
+app.get('/basic',(req,res)=>{
+    res.render('basic');     
 }) 
 
 app.get('/',(req,res)=>{
@@ -48,16 +48,13 @@ app.get('/advanced',(req,res)=>{
 }) 
 
 
-app.get('/device',(req,res)=>{
-    res.render('device');     
+
+app.get('/equalizer',(req,res)=>{
+    res.render('equalizer');     
 }) 
 
-app.get('/plot',(req,res)=>{
-    res.render('plot');     
-}) 
-
-app.get('/settings',(req,res)=>{
-    res.render('settings');     
+app.get('/preferences',(req,res)=>{
+    res.render('preferences');     
 }) 
 
 

@@ -1,8 +1,9 @@
 const QUADLEN = 1024;
 
-function calculateFilterDataMatrix(type, freq, gain, qfact) {
-	
-	let sampleRate=48000;
+function calculateFilterDataMatrix(type, freq, gain, qfact, sampleRate) {
+	let  plotType="log";
+	if (sampleRate==undefined) sampleRate=48000;
+
 	var a0,a1,a2,b1,b2,norm;
 	var ymin, ymax, minVal, maxVal;
 	
@@ -59,7 +60,7 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 			b2 = (1 - K /qfact + K * K) * norm;
 			break;
 		
-		case "peaking":
+		case "Peaking":
 			if (gain >= 0) {
 				norm = 1 / (1 + 1/qfact * K + K * K);
 				a0 = (1 + V/qfact * K + K * K) * norm;
@@ -121,7 +122,10 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 	var magPlot = [];
 	for (var idx = 0; idx < len; idx++) {
 		var w;
-		w = Math.exp(Math.log(1 / 0.001) * idx / (len - 1)) * 0.001 * Math.PI;	// 0.001 to 1, times pi, log scale
+		if (plotType == "linear")
+			w = idx / (len - 1) * Math.PI;	// 0 to pi, linear scale
+		else
+			w = Math.exp(Math.log(1 / 0.001) * idx / (len - 1)) * 0.001 * Math.PI;	// 0.001 to 1, times pi, log scale
 
 		var phi = Math.pow(Math.sin(w/2), 2);
 		var y = Math.log(Math.pow(a0+a1+a2, 2) - 4*(a0*a1 + 4*a0*a2 + a1*a2)*phi + 16*a0*a2*phi*phi) - Math.log(Math.pow(1+b1+b2, 2) - 4*(b1 + 4*b2 + b1*b2)*phi + 16*b2*phi*phi);
@@ -129,8 +133,10 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 		if (y == -Infinity)
 			y = -200;
 
-		// magPlot.push([idx / (len - 1) / 2, y]);
-		magPlot.push([ idx / (len - 1) / 2, y]);		
+		if (plotType == "linear")
+			magPlot.push([idx / (len - 1) *sampleRate / 2, y]);
+		else
+			magPlot.push([idx / (len - 1) / 2, y]);
 
 		if (idx == 0)
 			minVal = maxVal = y;
@@ -176,7 +182,7 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 function plotArray(canvas, array, col, lineWidth){       
 	var ctx = canvas.getContext("2d");
     var h = canvas.height;    
-    var w = canvas.width;    
+    var w = canvas.width-60;    
     var ch = h / 2; 
 	let x,y;
 	
@@ -186,19 +192,14 @@ function plotArray(canvas, array, col, lineWidth){
 	ctx.setLineDash([]);
 
 	stepSize = w / array.length;
-	heightScale= 24; //h / (5 * 10);      	
-	let max=0;
-	let rounded=[];
+	heightScale= h / (2 * 10);      
+
 	for (i=0;i<array.length;i++) {            		
-		x=30 + i * stepSize;		
-		if (x<60) continue;
-		rounded[0]=Math.round(array[i][1],2);
-		if (rounded[0]>max) { max=rounded[0]; rounded[1]=i} 
-		y = -20+ch-(heightScale* array[i][1]);
-		ctx.lineTo(x,y);				
+		x=i*stepSize;
+		y = ch-(heightScale* array[i][1]);
+		ctx.lineTo(x+60,y);				
 	}        
 	ctx.stroke();               
-	console.log(rounded);
 	
 }
 
@@ -206,61 +207,37 @@ function createGrid(canvas) {
 	var ctx = canvas.getContext("2d");
 
     var h = canvas.height;	
-	var w = canvas.width;    		
-
-	let verticalLineCount= 30;        	
+	let verticalLineCount= 42;        	
 	let verticalStepSize = h /verticalLineCount -1
 
-	ctx.font="13px Abel";
-	ctx.fillStyle = "#EEE";  	
-	ctx.strokeStyle = "#CCC";        
-	ctx.lineWidth = 0.5;
-	ctx.setLineDash([1,5])
-	
+	var w = canvas.width;    
+	let horizontalLineCount=20;
+	let horizontalStepSize = w / horizontalLineCount -1;
 
-	ctx.beginPath();
-	for (i=1;i<verticalLineCount;i+=2) {    		
+
+	ctx.font="13px sans-serif";
+	ctx.fillStyle = "#EEE";  
+
+	ctx.strokeStyle = "#EEE";        
+	ctx.lineWidth = 0.2;
+	ctx.setLineDash([5,2]);
+
+	for (i=1;i<verticalLineCount;i+=2) {    	
 		ctx.moveTo(60,verticalStepSize * i);
 		ctx.lineTo(w-10,verticalStepSize * i) 
 		level = i + verticalLineCount/2 - verticalLineCount;
-		ctx.fillText(level+"dB", 10 ,verticalStepSize * i)		
-	}   
-	ctx.stroke();     	
-			
-	ctx.beginPath();
-	const freqList = [[30,28],[40, 71],[50, 104],[60, 131],[70, 154],[80, 174],[90, 191],[100, 207],[200, 309],[300, 369],[400, 412],[500, 445],[600, 472],[700, 495],[800, 515],[900, 532],[1000, 548],[2000, 650],[3000, 711],[4000, 753],[5000, 786],[6000, 814],[7000, 837],[8000, 857],[9000, 874],[10000, 890],[11000, 904],[12000, 918],[13000, 930],[14000, 941],[15000, 951],[16000, 961],[17000, 971],[18000, 979],[19000, 988],[20000, 996]]
-	for (i=0;i<freqList.length;i++) {		
-	
-		xPos= 35+freqList[i][1];
-		switch(freqList[i][0]) {
-			case 100:
-			case 1000:
-			case 10000:
-				ctx.fillText(freqList[i][0]+"Hz", xPos-15, h-25);				
-		}		
-		ctx.moveTo(xPos,18);
-		ctx.lineTo(xPos,h-50);						
+		ctx.fillText(level+"dB", 10 ,verticalStepSize * i)
+	}        	
+
+
+	for (i=1;i<horizontalLineCount;i+=2) {
+		ctx.moveTo(horizontalStepSize*i,18);
+		ctx.lineTo(horizontalStepSize*i,h-60);
+		ctx.fillText(i+"Hz", horizontalStepSize * i -10, h-40)
 	}
-	ctx.stroke();
-	
 
-	
-	ctx.strokeStyle = "#DDD";        
-	ctx.lineWidth = 0.8;
-	ctx.setLineDash([2,5]);
-	
-	ctx.beginPath();
-	ctx.moveTo(35 + 207,18);
-	ctx.lineTo(35 + 207,h-50);		
 
-	ctx.moveTo(35 + 548,18);
-	ctx.lineTo(35 + 548,h-50);		
-
-	ctx.moveTo(35 + 890,18);
-	ctx.lineTo(35 + 890,h-50);		
-
-	ctx.stroke();
-	
+	ctx.stroke();        
 }
 
 

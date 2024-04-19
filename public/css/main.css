@@ -71,18 +71,21 @@ section {
     border-right: 1px solid #222;    
 }
 
-.navitage {
+.navigate {
     margin:15px;
     cursor:pointer;    
     transition: all 500ms;
 }
 
-.navitage:hover {
+.navigate:hover {
     color: hsl(var(--bck-hue),var(--bck-sat),60%);
 
 }
 
-
-#sectionMain {    
+#mainframe {    
+    padding: 15px;
+    width: 100%;
+    height: 100%;
     overflow-y: scroll;
 }
+

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
     <title>CamillaNode</title>       
-    
+    <script src="src/main.js" defer></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
 </head>
@@ -21,15 +21,15 @@
 
     <main>
         <section id="sectionLeft">
-            <div class="navitage">Connections</div>
-            <div class="navitage">Basic</div>
-            <div class="navitage">Equalizer</div>
-            <div class="navitage">Advanced</div>
-            <div class="navitage">Settings</div>            
+            <div class="navigate" target="/connections">Connections</div>
+            <div class="navigate" target="/basic">Basic</div>
+            <div class="navigate" target="/equalizer">Equalizer</div>
+            <div class="navigate" target="/advanced">Advanced</div>
+            <div class="navigate" target="/preferences">Preferences</div>            
         </section>
 
         <section id="sectionMain">
-
+            <iframe id="mainframe" src="/basic" frameborder="0"></iframe>
         </section>
     </main>
 
