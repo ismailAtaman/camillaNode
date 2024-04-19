@@ -47,14 +47,13 @@ header {
 }
 
 main {
-    margin-top: 15px;
+    margin-top: 10px;
     display: grid;
     grid-template-columns: var(--toolbar-width) auto;    
     grid-auto-rows: 100%;
     gap:0px;
     border: none;
     height: 100%;   
-
 }
 
 section {
@@ -68,9 +67,8 @@ section {
 }
 
 #sectionLeft {    
-    margin-left: 10px;
-    display: block;    
-    padding-block: 20px;
+    margin-left: 0px;
+    display: block;        
     border-right: 1px solid #222;    
 }
 
@@ -89,17 +87,15 @@ section {
 }
 
 #mainframe {    
-    padding: 15px;
+    padding: 10px;
     width: 100%;    
     height: 90%;
     overflow-y: scroll;
 }
 
-canvas {
-    margin-block: 15px;
+canvas {    
     background-color: var(--bck-group);
-    border-radius: 10px; 
-    /* box-shadow: 5px 5px 5px #111;         */
+    border-radius: 10px;     
 }
 
 .group {

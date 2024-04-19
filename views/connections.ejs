@@ -16,9 +16,7 @@
 
 <body>
     <script type="module" >
-        import camillaDSP from "/src/camillaDSP.js"
-        
-        
+        import camillaDSP from "/src/camillaDSP.js"        
 
         const server = document.getElementById('server').value;        
         const port = document.getElementById('port').value;    
@@ -50,23 +48,13 @@
         DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.log(e));
         config = await DSP.sendDSPMessage("GetConfigJson");
         console.log(config)
-        
-        // console.log("Connecting..");
-        // a={"monomix":
-        //     {"channels":{"in":2,"out":2},
-        //         "mapping":[
-        //             {"dest":0,"sources":[{"channel":0,"gain":-6},{"channel":1,"gain":-6}],"mute":null},
-        //             {"dest":1,"sources":[{"channel":0,"gain":-6},{"channel":1,"gain":-6,}],"mute":null}
-        //         ]
-        //     }}
-
     
     </script>
 
     <div>
         <div><span>IP Address</span><input id="server" type="text" value="opizero2.local"></div>
         <div><span>Port</span><input id="port" type="text" value="1234"></div>
-        <button onclick="test()">Connect</button>        
+        <button onclick="connect()">Connect</button>        
     </div>
     <br>
     <div id="state"></div>
