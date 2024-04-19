@@ -1,5 +1,7 @@
 
 
+
+
 document.addEventListener('DOMContentLoaded',mainBodyOnLoad);
 
 
@@ -12,7 +14,9 @@ function mainBodyOnLoad() {
         navigates[i].addEventListener('click',function (){ 
             mainframe.src=this.getAttribute('target'); 
         })
-    }
-    
-
+    }    
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

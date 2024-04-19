@@ -243,8 +243,6 @@ function createGrid(canvas) {
 	}
 	ctx.stroke();
 	
-
-	
 	ctx.strokeStyle = "#DDD";        
 	ctx.lineWidth = 0.8;
 	ctx.setLineDash([2,5]);

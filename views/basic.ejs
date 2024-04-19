@@ -3,11 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="src/main.js" defer></script>
+    <script type="module" src="src/knob.js"></script>
     <title>basic</title>
+
+    <script type="module" >
+        import EQKnob from '/src/knob.js';
+        const basicControls = document.getElementById('basicControls');
+        
+        let vol = new EQKnob("Volume",31);
+        let tone = new EQKnob("Tone",181);
+        let balance = new EQKnob("Balance",181);
+        
+        basicControls.appendChild(vol);
+        basicControls.appendChild(tone)
+        basicControls.appendChild(balance)
+
+        let subBass = new EQKnob("Sub-bass",181);
+        let bass = new EQKnob("Bass",181);
+        let mids = new EQKnob("Mids",181);
+        let upperMids = new EQKnob("Upper Mids",181);
+        let treble = new EQKnob("Treble",181);
+
+        const toneControls = document.getElementById('toneControls');
+        toneControls.appendChild(subBass);
+        toneControls.appendChild(bass);
+        toneControls.appendChild(mids);
+        toneControls.appendChild(upperMids);
+        toneControls.appendChild(treble);
+
+    </script>
 </head>
-<body>
-    
+<body>    
 
     <%- include('plot.ejs'); %>
+
+    <div class="group" id="basicControls">
+    </div>    
+
+    <div class="group" id="toneControls">
+
+    </div>
 </body>
 </html>
