@@ -7,7 +7,7 @@
 
 :root {
     --bck-hue: 180;
-    --bck-sat: 20%;
+    --bck-sat: 30%;
     --bck-light : 20%;
     --bck-color: hsl(var(--bck-hue),var(--bck-sat),var(--bck-light));   
     --bck-group: hsl(var(--bck-hue),var(--bck-sat),15%);   
@@ -117,11 +117,12 @@ canvas {
     --hue2: calc(135 + var(--bck-hue));
     --col1: hsla(var(--bck-hue),30%,5%,90%);
     --col2: hsla(var(--bck-hue),30%,15%,90%);
-    background-image: linear-gradient(135deg,var(--col1),var(--col2));    
+    /* background-image: linear-gradient(135deg,var(--col1),var(--col2));     */
+    background-image: linear-gradient(45deg,#111,#222);    
     border-radius: 10px;     
     transform-origin: 0 0;
-    transform: scale(0.8);
-    margin-bottom: -120px;    
+    transform: scale(0.9);
+    margin-bottom: -60px;    
 }
 
 .group {
@@ -129,10 +130,17 @@ canvas {
     background-color: var(--bck-group);
     display: block;
     border-radius: 10px;
-    width: 820px;
+    width: 922px;
     padding-bottom: 10px;
 }
 
+.group::before {
+    content: attr(label);
+    display: block;        
+    border-radius: 10px 10px 0 0 ;    
+    padding-left: 10px;
+    padding-block: 5px;    
+}
 
 /*************************************************************************************************/
 
