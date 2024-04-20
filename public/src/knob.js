@@ -6,6 +6,7 @@ class EQKnob {
     knob;
     callback;
     defaultVal;
+    offAtDefault=false;
 
     constructor(label,val) {
         this.knob = document.createElement('div');
@@ -31,18 +32,25 @@ class EQKnob {
             muts.forEach(function(mut){                
                 if (mut.type=="attributes" && mut.attributeName=="val") {                    
                     const dot = mut.target;
+                    const knob = dot.parentElement.parentElement;
 
                     const change = new Event("change");
-                    dot.parentElement.parentElement.dispatchEvent(change);
+                    knob.dispatchEvent(change);
 
                     const val = dot.getAttribute(mut.attributeName);
                     let offset = parseInt(dot.getAttribute("offset"));
-                    if (Number.isNaN(offset)) offset=0;
-                    
+                    if (Number.isNaN(offset)) offset=0;      
+
                     dot.style = 'transform: rotate('+val+'deg);'
-                    const hue=170-val/2;
-                    dot.parentElement.parentElement.style= '--bck:'+hue;
-                    const valElement = dot.parentElement.parentElement.children[1];
+                    const hue=170-val/2;                    
+                    knob.style= '--bck:'+hue;
+
+                    // make the ring invisible if knob is at defailt value and offAtDefault is set to true
+                    if (knob.instance.offAtDefault && val == knob.instance.defaultVal) {                        
+                        knob.style="background: transparent; box-shadow: none;"                        
+                    }              
+
+                    const valElement = knob.children[1];
                     valElement.innerText=((val-31)/10)+offset;
                     valElement.style.opacity='1';
                     setTimeout(function(e){e.style.opacity='0';},1000,valElement);     

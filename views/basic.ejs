@@ -13,6 +13,9 @@
         import camillaDSP from "/src/camillaDSP.js";
         
         const basicControls = document.getElementById('basicControls');
+        const canvas = document.getElementById('plotCanvas');
+        console.log("Width",canvas.getBoundingClientRect().width)
+
 
         // Connect to camillaDSP
         const DSP = new camillaDSP();
@@ -23,6 +26,9 @@
         let vol = new EQKnob("Volume",31);        
         let balance = new EQKnob("Balance",181);
         let crossfeed = new EQKnob("Crossfeed",31);
+
+        crossfeed.knob.instance.offAtDefault=true;
+        balance.knob.instance.offAtDefault=true;
         
         basicControls.appendChild(vol.knob);        
         basicControls.appendChild(balance.knob)
@@ -33,6 +39,12 @@
         let mids = new EQKnob("Mids",181);
         let upperMids = new EQKnob("Upper Mids",181);
         let treble = new EQKnob("Treble",181);
+
+        subBass.knob.instance.offAtDefault=true;
+        bass.knob.instance.offAtDefault=true;
+        mids.knob.instance.offAtDefault=true;
+        upperMids.knob.instance.offAtDefault=true;
+        treble.knob.instance.offAtDefault=true;
 
         const toneControls = document.getElementById('toneControls');
         toneControls.appendChild(subBass.knob);

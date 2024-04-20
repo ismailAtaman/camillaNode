@@ -40,10 +40,28 @@ body {
 }
 
 header {
-    display: flex;
+    display: block ;
     font-size: x-large;
     height: 80px;
     align-items: center;
+}
+
+#title {
+    display: flex; 
+    align-items: center; 
+    justify-content: left;
+}
+
+#status , #version {
+    display: block;
+    width: 100%;
+    height: 20px;
+    font-size: 13px;
+    color: #666;
+    text-align: right;
+    padding-right: 20px;      
+    transform: translateX(-20px);
+    
 }
 
 main {
@@ -97,12 +115,13 @@ canvas {
     /* background:linear-gradient(45deg,var(--bck-color),#222); */
     --hue1: calc(45 + var(--bck-hue));
     --hue2: calc(135 + var(--bck-hue));
-    --col1: hsla(var(--hue1),var(--bck-sat),var(--bck-light),90%);
-    --col2: hsla(var(--hue2),var(--bck-sat),10%,90%);
+    --col1: hsla(var(--bck-hue),30%,5%,90%);
+    --col2: hsla(var(--bck-hue),30%,15%,90%);
     background-image: linear-gradient(135deg,var(--col1),var(--col2));    
-
     border-radius: 10px;     
-    
+    transform-origin: 0 0;
+    transform: scale(0.8);
+    margin-bottom: -120px;    
 }
 
 .group {
@@ -110,7 +129,7 @@ canvas {
     background-color: var(--bck-group);
     display: block;
     border-radius: 10px;
-    width: 1024px;
+    width: 820px;
     padding-bottom: 10px;
 }
 
@@ -118,7 +137,7 @@ canvas {
 /*************************************************************************************************/
 
 .knob {             
-    --bck: 120;
+    --bck: 120;       
     display: inline-flex;
     position: relative;
     align-items: center;
@@ -142,7 +161,7 @@ canvas {
     top:-25px;
     width: 100%;
     height: auto;
-    font-size: 12px;
+    font-size: 14px;
     color: #DDD;
     text-wrap: nowrap;
 }

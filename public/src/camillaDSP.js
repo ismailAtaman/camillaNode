@@ -133,8 +133,6 @@ class camillaDSP {
     async setBalance(bal) {
         let config = await this.sendDSPMessage("GetConfigJson");
 
-        console.log(config.mixers.recombine.mapping[0].sources[0].gain,config.mixers.recombine.mapping[1].sources[0].gain);
-
         config.mixers.recombine.mapping[0].sources[0].gain = -bal
         config.mixers.recombine.mapping[1].sources[0].gain = bal
 
@@ -179,7 +177,7 @@ class camillaDSP {
             config.mixers.recombine.mapping[1].sources[1].gain = crossfeedVal;
         }
 
-        console.log(config.mixers.recombine.mapping)
+        // console.log(config.mixers.recombine.mapping)
 
         this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.error(e));
     }

@@ -18,16 +18,25 @@
         const DSP = new camillaDSP();
         let connected =await DSP.connect()
 
+        let version = document.getElementById('version')
+        DSP.sendDSPMessage("GetVersion").then(r=>version.innerText="CamillaDSP Version "+r);
+
+        setInterval(()=>{
+            let status = document.getElementById('status')
+            DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);
+        },2000);
+
     </script>
 
     <header>
         <div id="header" class="section">
-            <div id="title" style="display: flex; align-items: center; justify-content: left;">
+            <div id="title">
                 <img src="img/icon.jpg" alt="" style="height: 50px; margin:10px">
                 <span>CamillaNode</span>
-            </div> 
-            <div id="status"></div>
+            </div>             
         </div>    
+        <div id="version"></div> 
+        <div id="status"></div>
     </header>
 
     <main>
