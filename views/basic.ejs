@@ -22,9 +22,11 @@
         // Create UI elements
         let vol = new EQKnob("Volume",31);        
         let balance = new EQKnob("Balance",181);
+        let crossfeed = new EQKnob("Crossfeed",31);
         
         basicControls.appendChild(vol.knob);        
         basicControls.appendChild(balance.knob)
+        basicControls.appendChild(crossfeed.knob)
 
         let subBass = new EQKnob("Sub-bass",181);
         let bass = new EQKnob("Bass",181);
@@ -40,23 +42,25 @@
         toneControls.appendChild(treble.knob);
 
         // Load data from DSP
-        DSP.sendDSPMessage("GetVolume").then(r=>{
-            console.log("Volume:",r);
+        DSP.sendDSPMessage("GetVolume").then(r=>{            
             let volMarker = r/3*10 + 181;
-            vol.setVal(volMarker);
-            console.log("Marker",volMarker)
+            vol.setVal(volMarker);            
         });
 
         vol.knob.addEventListener("change",function(e){
-            const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick
-            console.log("Vol:",volume);
+            const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
             DSP.sendDSPMessage({"SetVolume":volume})
         })
 
         balance.knob.addEventListener("change",function(e){
-            const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick
-            console.log("Bal:",bal);
+            const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
             DSP.setBalance(bal);
+        })
+
+        crossfeed.knob.addEventListener("change",function(e){
+            let crossfeedVal = (this.instance.getVal()-331)/20;
+            console.log(crossfeedVal)
+            DSP.setCrossfeed(crossfeedVal);
         })
 
 
@@ -78,7 +82,7 @@
             upperMidsVal = (parseInt(upperMidsVal)-181)/10
             trebleVal = (parseInt(trebleVal)-181)/10
             
-            console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
+            // console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
             DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
 
             /// Plot the curve 
@@ -93,8 +97,7 @@
 
         plot();
 
-        function plot() {
-            console.log("Ploting..")
+        function plot() {            
             const ctx = document.getElementById("plotCanvas");
             const knobs = document.getElementsByClassName('knob');
             
@@ -120,7 +123,7 @@
             createGrid(ctx); 
             let totalArray = [];
 
-            let f1 = calculateFilterDataMatrix("peaking", 30, subBassVal, 1.41);              
+            let f1 = calculateFilterDataMatrix("peaking", 40, subBassVal, 1.41);              
             let f2 = calculateFilterDataMatrix("peaking", 100, bassVal, 1.41);    
             let f3 = calculateFilterDataMatrix("peaking", 600, midsVal, 1.41);    
             let f4 = calculateFilterDataMatrix("peaking", 3000, upperMidsVal, 1.41);    
