@@ -59,10 +59,10 @@
             DSP.setBalance(bal);
         })
 
+
         function setTone(e) {
             const knobs = document.getElementsByClassName('knob');
-            let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;
-            const oneOfTheKnobs = knobs[0];
+            let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;            
 
             for (let knob of knobs) {
                 if (knob.getAttribute("label")=="Sub-bass") subBassVal= knob.instance.getVal();
@@ -80,14 +80,66 @@
             
             console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
             DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
+
+            /// Plot the curve 
+            plot()            
         }
 
-        subBass.knob.addEventListener("change",setTone(this));
+        subBass.knob.addEventListener("change",setTone);
         bass.knob.addEventListener("change",setTone);
         mids.knob.addEventListener("change",setTone);
         upperMids.knob.addEventListener("change",setTone);
         treble.knob.addEventListener("change",setTone);
 
+        plot();
+
+        function plot() {
+            console.log("Ploting..")
+            const ctx = document.getElementById("plotCanvas");
+            const knobs = document.getElementsByClassName('knob');
+            
+            const context = ctx.getContext('2d');             
+            context.clearRect(0, 0, ctx.width, ctx.height)
+
+            
+            let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;
+            for (let knob of knobs) {
+                if (knob.getAttribute("label")=="Sub-bass") subBassVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Bass") bassVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Mids") midsVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Upper Mids") upperMidsVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Treble") trebleVal= knob.instance.getVal();
+            }
+            
+            subBassVal = (parseInt(subBassVal)-181)/10
+            bassVal = (parseInt(bassVal)-181)/10
+            midsVal = (parseInt(midsVal)-181)/10
+            upperMidsVal = (parseInt(upperMidsVal)-181)/10
+            trebleVal = (parseInt(trebleVal)-181)/10
+
+            createGrid(ctx); 
+            let totalArray = [];
+
+            let f1 = calculateFilterDataMatrix("peaking", 30, subBassVal, 1.41);              
+            let f2 = calculateFilterDataMatrix("peaking", 120, bassVal, 1.41);    
+            let f3 = calculateFilterDataMatrix("peaking", 600, midsVal, 1.41);    
+            let f4 = calculateFilterDataMatrix("peaking", 3000, upperMidsVal, 1.41);    
+            let f5 = calculateFilterDataMatrix("peaking", 10000, trebleVal, 1.41);    
+            for (i=0;i<f1.length;i++) {
+                 totalArray.push([f1[i][0], f1[i][1]+f2[i][1]+f3[i][1]+f4[i][1]+f5[i][1]]);        
+            }
+
+            plotArray(ctx, f1,"#D20",2)
+            plotArray(ctx, f2,"#CC0",2)
+            plotArray(ctx, f3,"#0C2",2)
+            plotArray(ctx, f4,"#057",2)
+            plotArray(ctx, f5,"#02E",2)
+
+            
+            plotArray(ctx, totalArray,"#EEE",2)
+            
+
+        }
 
         
     </script>

@@ -186,7 +186,7 @@ function plotArray(canvas, array, col, lineWidth){
 	ctx.setLineDash([]);
 
 	stepSize = w / array.length;
-	heightScale= 24; //h / (5 * 10);      	
+	heightScale= 19; //h / (5 * 10);      	
 	let max=0;
 	let rounded=[];
 	for (i=0;i<array.length;i++) {            		
@@ -194,11 +194,11 @@ function plotArray(canvas, array, col, lineWidth){
 		if (x<60) continue;
 		rounded[0]=Math.round(array[i][1],2);
 		if (rounded[0]>max) { max=rounded[0]; rounded[1]=i} 
-		y = -20+ch-(heightScale* array[i][1]);
+		y = -16+ch-(heightScale* array[i][1]);
 		ctx.lineTo(x,y);				
 	}        
 	ctx.stroke();               
-	console.log(rounded);
+	
 	
 }
 
@@ -222,7 +222,7 @@ function createGrid(canvas) {
 	for (i=1;i<verticalLineCount;i+=2) {    		
 		ctx.moveTo(60,verticalStepSize * i);
 		ctx.lineTo(w-10,verticalStepSize * i) 
-		level = i + verticalLineCount/2 - verticalLineCount;
+		level = (i + verticalLineCount/2 - verticalLineCount)*-1;
 		ctx.fillText(level+"dB", 10 ,verticalStepSize * i)		
 	}   
 	ctx.stroke();     	
