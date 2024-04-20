@@ -20,8 +20,7 @@
         // Connect to camillaDSP
         const DSP = new camillaDSP();
         let connected =await DSP.connect()
-        
-        
+
         // Create UI elements
         let vol = new EQKnob("Volume",31);        
         let balance = new EQKnob("Balance",181);
@@ -107,6 +106,20 @@
         upperMids.knob.addEventListener("change",setTone);
         treble.knob.addEventListener("change",setTone);
 
+        // Load filters
+        let config = await DSP.sendDSPMessage("GetConfigJson");
+        
+        subBass.knob.instance.setVal(config.filters["subBass"].parameters.gain*10+181);
+        bass.knob.instance.setVal(config.filters["bass"].parameters.gain*10+181);
+        mids.knob.instance.setVal(config.filters["mids"].parameters.gain*10+181);
+        upperMids.knob.instance.setVal(config.filters["upperMids"].parameters.gain*10+181);
+        treble.knob.instance.setVal(config.filters["treble"].parameters.gain*10+181);
+
+        // load crossfeed
+        let crossfeedVal = await DSP.getCrossfeed() * 20 +331;        
+        crossfeed.knob.instance.setVal(crossfeedVal);
+
+
         plot();
 
         function plot() {            
@@ -148,12 +161,8 @@
             plotArray(ctx, f2,"#CC0",2)
             plotArray(ctx, f3,"#0C2",2)
             plotArray(ctx, f4,"#057",2)
-            plotArray(ctx, f5,"#02E",2)
-
-            
+            plotArray(ctx, f5,"#02E",2)            
             plotArray(ctx, totalArray,"#EEE",3)
-            
-
         }
 
         

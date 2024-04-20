@@ -14,7 +14,10 @@
 
 
     --font-size: 16px;
-    --toolbar-width: 200px;
+    --toolbar-width: 250px;
+
+    --slider-width: 3em;
+    --slider-height: 15rem;
 
     font-family: "Abel", sans-serif;
     font-size: var(--font-size);
@@ -36,7 +39,8 @@ body {
     background-color:var(--bck-color);
     color: white;
     margin: 0px;
-    overflow: hidden;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 header {
@@ -106,8 +110,8 @@ section {
 
 #mainframe {    
     padding: 10px;
-    width: 100%;    
-    height: 90%;
+    width: 100%;        
+    height:80%;
     overflow-y: scroll;
 }
 
@@ -208,4 +212,79 @@ canvas {
     transition: all 1000ms;
 }
 
-/********************************************************************************************************************/
+/**************************************** SLIDER ****************************************************************************/
+
+.sliderBody {
+    --bar-width: 10px;
+    --slider-width: calc(2 * var(--bar-width));    
+    --body-width: calc(30px + var(--slider-width));
+    --param-width: calc(-5px + var(--body-width));
+    display: inline-block;
+    width: var(--body-width);
+    height: 200px;        
+    
+}
+
+.sliderBody:first-of-type {
+    margin-left: 10px;
+}
+
+.bar {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    width:var(--bar-width);
+    height: 90%;
+    border-radius: 10px;
+    background-color: hsl(var(--bck-hue),var(--bck-sat),40%);
+    transform: translate(-50%,-50%);
+    margin-bottom: 25px;
+}
+
+.slider {    
+    position: relative;
+    width:var(--slider-width);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: hsl(var(--bck-hue),var(--bck-sat),70%);
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.peqParam {    
+    /* display: flex;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: none;
+    border-radius: 2px;
+    width: var(--param-width);        
+    font-size: 13px;
+    text-align: center;    
+    left: 50%;
+    transform: translateX(-50%);     */
+    display: flex;       
+    justify-content: center;
+    margin-top: 10px;
+    appearance: none;
+    width: var(--param-width);            
+    font-size: 13px;
+    cursor: pointer;
+    border: none; 
+    background-color: #DDD;
+    color: black;
+    border-radius: 2px;
+    padding:0px;
+    padding-block: 2px;        
+    text-align: center;
+}
+
+select {
+    width: var(--param-width);
+    border: none;
+    appearance: none;
+}
+
+/******************************************************************************************************************************/

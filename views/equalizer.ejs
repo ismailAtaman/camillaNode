@@ -8,5 +8,28 @@
 </head>
 <body>
     <%- include('plot.ejs'); %>
+
+    <script type="module">
+        import EQSlider from '/src/slider.js'
+
+        const PEQ = document.getElementById('PEQ');
+
+        const slider1 = new EQSlider();
+        const slider2 = new EQSlider();
+        const slider3 = new EQSlider();
+        const slider4 = new EQSlider();
+        const slider5 = new EQSlider();
+        PEQ.appendChild(slider1)
+        PEQ.appendChild(slider2)
+        PEQ.appendChild(slider3)
+        PEQ.appendChild(slider4)
+        PEQ.appendChild(slider5)
+
+
+    </script>
+
+    <div class="group" id="PEQ" label="Parametric EQ">
+
+    </div>    
 </body>
 </html>

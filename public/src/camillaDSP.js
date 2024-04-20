@@ -185,7 +185,13 @@ class camillaDSP {
         this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.error(e));
     }
 
+    async getCrossfeed() {
+        let config = await this.sendDSPMessage("GetConfigJson");
+        if (config.mixers.recombine.mapping[0].sources[1].mute == true) return -16.5; else return config.mixers.recombine.mapping[0].sources[1].gain;
+    }
 
+    
+    
     static createPeakFilterJSON(freq,gain,q) {         
         return {"type":"Biquad","parameters":{"type":"Peaking","freq":freq,"gain":gain,"q":q}};                
     }        
