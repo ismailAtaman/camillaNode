@@ -141,7 +141,36 @@ class camillaDSP {
         config.mixers.recombine.mapping[1].sources[0].gain = bal
 
         await this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)})
+
     }
+
+    async setTone(subBass, bass, mids, upperMids, treble) {
+        let config = await this.sendDSPMessage("GetConfigJson");
+
+        const subBassFilter = camillaDSP.createPeakFilterJSON(40,subBass,1.41);
+        const bassFilter = camillaDSP.createPeakFilterJSON(120,bass,1.41);
+        const midsFilter = camillaDSP.createPeakFilterJSON(800,mids,1.41);
+        const upperMidsFilter = camillaDSP.createPeakFilterJSON(2000,upperMids,1.41);
+        const trebleFilter = camillaDSP.createPeakFilterJSON(10000,treble,1.41);
+
+        config.filters={};
+        config.filters["subBass"]=subBassFilter;
+        config.filters["bass"]=bassFilter;
+        config.filters["mids"]=midsFilter;
+        config.filters["upperMids"]=upperMidsFilter;
+        config.filters["treble"]=trebleFilter;
+        
+        config.pipeline=[{"type":"Mixer","name":"recombine"}];
+        config.pipeline.push({"type":"Filter","channel":0,"names":["subBass","bass","mids","upperMids","treble"]})
+        config.pipeline.push({"type":"Filter","channel":1,"names":["subBass","bass","mids","upperMids","treble"]})
+        
+        this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.error(e));
+    }
+
+    static createPeakFilterJSON(freq,gain,q) {         
+        return {"type":"Biquad","parameters":{"type":"Peaking","freq":freq,"gain":gain,"q":q}};                
+    }        
+    
 }
 
 export default camillaDSP;

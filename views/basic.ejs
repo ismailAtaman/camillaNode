@@ -20,12 +20,10 @@
         
         
         // Create UI elements
-        let vol = new EQKnob("Volume",31);
-        let tone = new EQKnob("Tone",181);
+        let vol = new EQKnob("Volume",31);        
         let balance = new EQKnob("Balance",181);
         
-        basicControls.appendChild(vol.knob);
-        basicControls.appendChild(tone.knob)
+        basicControls.appendChild(vol.knob);        
         basicControls.appendChild(balance.knob)
 
         let subBass = new EQKnob("Sub-bass",181);
@@ -34,12 +32,12 @@
         let upperMids = new EQKnob("Upper Mids",181);
         let treble = new EQKnob("Treble",181);
 
-        // const toneControls = document.getElementById('toneControls');
-        // toneControls.appendChild(subBass);
-        // toneControls.appendChild(bass);
-        // toneControls.appendChild(mids);
-        // toneControls.appendChild(upperMids);
-        // toneControls.appendChild(treble);
+        const toneControls = document.getElementById('toneControls');
+        toneControls.appendChild(subBass.knob);
+        toneControls.appendChild(bass.knob);
+        toneControls.appendChild(mids.knob);
+        toneControls.appendChild(upperMids.knob);
+        toneControls.appendChild(treble.knob);
 
         // Load data from DSP
         DSP.sendDSPMessage("GetVolume").then(r=>{
@@ -60,6 +58,35 @@
             console.log("Bal:",bal);
             DSP.setBalance(bal);
         })
+
+        function setTone(e) {
+            const knobs = document.getElementsByClassName('knob');
+            let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;
+            const oneOfTheKnobs = knobs[0];
+
+            for (let knob of knobs) {
+                if (knob.getAttribute("label")=="Sub-bass") subBassVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Bass") bassVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Mids") midsVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Upper Mids") upperMidsVal= knob.instance.getVal();
+                if (knob.getAttribute("label")=="Treble") trebleVal= knob.instance.getVal();
+            }
+
+            subBassVal = (parseInt(subBassVal)-181)/10
+            bassVal = (parseInt(bassVal)-181)/10
+            midsVal = (parseInt(midsVal)-181)/10
+            upperMidsVal = (parseInt(upperMidsVal)-181)/10
+            trebleVal = (parseInt(trebleVal)-181)/10
+            
+            console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
+            DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
+        }
+
+        subBass.knob.addEventListener("change",setTone(this));
+        bass.knob.addEventListener("change",setTone);
+        mids.knob.addEventListener("change",setTone);
+        upperMids.knob.addEventListener("change",setTone);
+        treble.knob.addEventListener("change",setTone);
 
 
         
