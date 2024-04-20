@@ -5,6 +5,7 @@ class EQKnob {
 
     knob;
     callback;
+    defaultVal;
 
     constructor(label,val) {
         this.knob = document.createElement('div');
@@ -22,6 +23,7 @@ class EQKnob {
         knobHead.appendChild(this.knobHeadDot);
 
         this.knobHeadDot.setAttribute("val",val);
+        this.defaultVal=val;
         if (val=="181") this.knobHeadDot.setAttribute("offset",-15);
         this.knob.setAttribute("label",label);
 
@@ -60,6 +62,12 @@ class EQKnob {
             if (direction>0 && val==331) return;
             dot.setAttribute("val",val+10*direction);
             e.preventDefault();
+        })
+
+        // reset on double click
+        knobHead.addEventListener('dblclick',function(e){
+            const dot=this.children[0];
+            dot.setAttribute('val',this.parentElement.instance.defaultVal);      
         })
 
         this.knob.instance = this;

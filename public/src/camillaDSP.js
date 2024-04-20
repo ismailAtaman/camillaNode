@@ -147,10 +147,10 @@ class camillaDSP {
     async setTone(subBass, bass, mids, upperMids, treble) {
         let config = await this.sendDSPMessage("GetConfigJson");
 
-        const subBassFilter = camillaDSP.createPeakFilterJSON(40,subBass,1.41);
-        const bassFilter = camillaDSP.createPeakFilterJSON(120,bass,1.41);
-        const midsFilter = camillaDSP.createPeakFilterJSON(800,mids,1.41);
-        const upperMidsFilter = camillaDSP.createPeakFilterJSON(2000,upperMids,1.41);
+        const subBassFilter = camillaDSP.createPeakFilterJSON(30,subBass,1.41);
+        const bassFilter = camillaDSP.createPeakFilterJSON(100,bass,1.41);
+        const midsFilter = camillaDSP.createPeakFilterJSON(600,mids,1.41);
+        const upperMidsFilter = camillaDSP.createPeakFilterJSON(3000,upperMids,1.41);
         const trebleFilter = camillaDSP.createPeakFilterJSON(10000,treble,1.41);
 
         config.filters={};
