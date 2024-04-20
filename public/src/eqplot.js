@@ -211,7 +211,7 @@ function createGrid(canvas) {
 	let verticalLineCount= 30;        	
 	let verticalStepSize = h /verticalLineCount -1
 
-	ctx.font="13px Abel";
+	ctx.font="14px Abel";
 	ctx.fillStyle = "#EEE";  	
 	ctx.strokeStyle = "#CCC";        
 	ctx.lineWidth = 0.5;

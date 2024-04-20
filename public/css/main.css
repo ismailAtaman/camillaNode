@@ -42,7 +42,7 @@ body {
 header {
     display: flex;
     font-size: x-large;
-    height: 100px;
+    height: 80px;
     align-items: center;
 }
 
@@ -94,8 +94,15 @@ section {
 }
 
 canvas {    
-    background-color: var(--bck-group);
+    /* background:linear-gradient(45deg,var(--bck-color),#222); */
+    --hue1: calc(45 + var(--bck-hue));
+    --hue2: calc(135 + var(--bck-hue));
+    --col1: hsla(var(--hue1),var(--bck-sat),var(--bck-light),90%);
+    --col2: hsla(var(--hue2),var(--bck-sat),10%,90%);
+    background-image: linear-gradient(135deg,var(--col1),var(--col2));    
+
     border-radius: 10px;     
+    
 }
 
 .group {
