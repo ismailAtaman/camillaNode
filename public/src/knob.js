@@ -1,47 +1,56 @@
 
 
-class EQKnob {
+class EQKnob {    
+    #knobHeadDot; 
+
+    knob;
+    callback;
+
     constructor(label,val) {
-        const knob = document.createElement('div');
+        this.knob = document.createElement('div');
         const knobHead = document.createElement('div');
-        const knobHeadDot = document.createElement('div');
+        this.knobHeadDot = document.createElement('div');
         const knobVal = document.createElement('div');
 
-        knob.className='knob';
+        this.knob.className='knob';
         knobHead.className='knobHead';
-        knobHeadDot.className='knobHeadDot';
+        this.knobHeadDot.className='knobHeadDot';
         knobVal.className='knobVal';
 
+        this.knob.appendChild(knobHead);
+        this.knob.appendChild(knobVal);
+        knobHead.appendChild(this.knobHeadDot);
 
-
-        knob.appendChild(knobHead);
-        knob.appendChild(knobVal);
-        knobHead.appendChild(knobHeadDot);
-
-        knobHeadDot.setAttribute("val",val);
-        knob.setAttribute("label",label);
+        this.knobHeadDot.setAttribute("val",val);
+        if (val=="181") this.knobHeadDot.setAttribute("offset",-15);
+        this.knob.setAttribute("label",label);
 
         const observer = new MutationObserver(function(muts){
             muts.forEach(function(mut){                
                 if (mut.type=="attributes" && mut.attributeName=="val") {                    
                     const dot = mut.target;
+
+                    const change = new Event("change");
+                    dot.parentElement.parentElement.dispatchEvent(change);
+
                     const val = dot.getAttribute(mut.attributeName);
                     let offset = parseInt(dot.getAttribute("offset"));
                     if (Number.isNaN(offset)) offset=0;
                     
                     dot.style = 'transform: rotate('+val+'deg);'
-                    const hue=180-val/2;
+                    const hue=170-val/2;
                     dot.parentElement.parentElement.style= '--bck:'+hue;
                     const valElement = dot.parentElement.parentElement.children[1];
                     valElement.innerText=((val-31)/10)+offset;
                     valElement.style.opacity='1';
-                    setTimeout(function(e){e.style.opacity='0';},1000,valElement);                
+                    setTimeout(function(e){e.style.opacity='0';},1000,valElement);     
                 }
             })
         })        
             
-        observer.observe(knobHeadDot, {attributes:true});
-        knobHeadDot.setAttribute('val',knobHeadDot.getAttribute("val"));
+        observer.observe(this.knobHeadDot, {attributes:true});
+        this.knobHeadDot.setAttribute('val',this.knobHeadDot.getAttribute("val"));
+    
 
         knobHead.addEventListener('wheel',function(e){            
             const direction = e.deltaY>0?1:-1;  
@@ -49,15 +58,26 @@ class EQKnob {
             let val=parseInt(dot.getAttribute("val"));
             if (direction<0 && val==31) return;
             if (direction>0 && val==331) return;
-            dot.setAttribute("val",val+10*direction);             
-            e.bubbles=false;
-            e.preventDefault;                  
+            dot.setAttribute("val",val+10*direction);
+            e.preventDefault();
         })
 
-        return knob;
+        this.knob.instance = this;
+
+        return this;
     }
 
-    static val;
+    getVal() {
+        return this.knobHeadDot.getAttribute("val");        
+    }
+
+    setVal(v) {
+        this.knobHeadDot.setAttribute("val",v);
+        return v;
+    }
+
+
+
 
 
 }

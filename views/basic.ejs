@@ -10,15 +10,23 @@
 
     <script type="module" >
         import EQKnob from '/src/knob.js';
-        const basicControls = document.getElementById('basicControls');
+        import camillaDSP from "/src/camillaDSP.js";
         
+        const basicControls = document.getElementById('basicControls');
+
+        // Connect to camillaDSP
+        const DSP = new camillaDSP();
+        let connected =await DSP.connect()
+        
+        
+        // Create UI elements
         let vol = new EQKnob("Volume",31);
         let tone = new EQKnob("Tone",181);
         let balance = new EQKnob("Balance",181);
         
-        basicControls.appendChild(vol);
-        basicControls.appendChild(tone)
-        basicControls.appendChild(balance)
+        basicControls.appendChild(vol.knob);
+        basicControls.appendChild(tone.knob)
+        basicControls.appendChild(balance.knob)
 
         let subBass = new EQKnob("Sub-bass",181);
         let bass = new EQKnob("Bass",181);
@@ -26,13 +34,35 @@
         let upperMids = new EQKnob("Upper Mids",181);
         let treble = new EQKnob("Treble",181);
 
-        const toneControls = document.getElementById('toneControls');
-        toneControls.appendChild(subBass);
-        toneControls.appendChild(bass);
-        toneControls.appendChild(mids);
-        toneControls.appendChild(upperMids);
-        toneControls.appendChild(treble);
+        // const toneControls = document.getElementById('toneControls');
+        // toneControls.appendChild(subBass);
+        // toneControls.appendChild(bass);
+        // toneControls.appendChild(mids);
+        // toneControls.appendChild(upperMids);
+        // toneControls.appendChild(treble);
 
+        // Load data from DSP
+        DSP.sendDSPMessage("GetVolume").then(r=>{
+            console.log("Volume:",r);
+            let volMarker = r/3*10 + 181;
+            vol.setVal(volMarker);
+            console.log("Marker",volMarker)
+        });
+
+        vol.knob.addEventListener("change",function(e){
+            const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick
+            console.log("Vol:",volume);
+            DSP.sendDSPMessage({"SetVolume":volume})
+        })
+
+        balance.knob.addEventListener("change",function(e){
+            const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick
+            console.log("Bal:",bal);
+            DSP.setBalance(bal);
+        })
+
+
+        
     </script>
 </head>
 <body>    

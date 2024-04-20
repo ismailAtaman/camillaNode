@@ -2,19 +2,29 @@
 
 class camillaDSP {
     ws;    
-    
+    server;
+    port;
+    config;
 
     constructor() { 
         return this;        
     }
 
     async connect(server,port) {
-        await this.connectToDsp(server,port).then((r)=>{ 
-            this.ws = r[1];            
-            console.log("Connected.")
+        if (server==undefined) {
+            server = window.localStorage.getItem("server");
+            port = window.localStorage.getItem("port");
+        }
+
+        return await this.connectToDsp(server,port).then((r)=>{ 
+            this.ws = r[1];                                    
+            this.server=server;
+            this.port=port;
+            return true;
         }).catch((e)=>{
-            console.log("Connection error");
-            console.log(e);
+            console.error("Connection error");
+            console.error(e);            
+            return false;
         });        
     }
 
@@ -95,30 +105,43 @@ class camillaDSP {
                 let handleResult = camillaDSP.handleDSPMessage(m);
                 if (handleResult[0]) resolve(handleResult[1]); else reject(handleResult[1]);
 
-                //ws.removeEventListener('message',eventListener);
+                this.removeEventListener('message',eventListener);
             });
 
             this.ws.send(JSON.stringify(message));             
         })     
-    }    
+    }   
 
-    updateConfig() {
-        let config;
+
+    defaultConfig() {
+        let config = new Object;
         config["title"]="CamillaNode2";
         config["description"]="Config file created by CamillaNode 2";
+
         config["mixers"]={"recombine":{
                             "channels":{"in":2,"out":2},
                             "mapping":[
-                                {"dest":0,"sources":[{"channel":0,"gain":-6,"inverted":false},{"channel":1,"gain":-12,"inverted":false}],"mute":null},
-                                {"dest":1,"sources":[{"channel":0,"gain":-12,"inverted":false},{"channel":1,"gain":-6,"inverted":false}],"mute":null}
+                                {"dest":0,"sources":[{"channel":0,"gain":0,"inverted":false,"mute":false},{"channel":1,"gain":0,"inverted":false,"mute":true,"scale":"linear"}],"mute":false},
+                                {"dest":1,"sources":[{"channel":1,"gain":0,"inverted":false,"mute":false},{"channel":0,"gain":0,"inverted":false,"mute":true,"scale":"linear"}],"mute":false}
                                 ]
                             }
-                        }                    
-        config["pipeline"]=[{"type":"Mixer","name":"recombine"}];
+                        };                                     
+        config["filters"]={};
+        config["processors"]={};
+        config["pipeline"]=[{"type":"Mixer","name":"recombine"}];        
+        return config;
     }
 
-    
-     
+    async setBalance(bal) {
+        let config = await this.sendDSPMessage("GetConfigJson");
+
+        console.log(config.mixers.recombine.mapping[0].sources[0].gain,config.mixers.recombine.mapping[1].sources[0].gain);
+
+        config.mixers.recombine.mapping[0].sources[0].gain = -bal
+        config.mixers.recombine.mapping[1].sources[0].gain = bal
+
+        await this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)})
+    }
 }
 
 export default camillaDSP;
