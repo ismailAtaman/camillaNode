@@ -94,6 +94,13 @@ section {
     border-right: 1px solid #222;    
 }
 
+#sectionLeft span {
+    margin-left: 10px;
+    font-weight: 800;
+    text-decoration: underline;
+    width: 100%;
+}
+
 .navigate {
     margin:15px;
     cursor:pointer;    
@@ -140,7 +147,9 @@ canvas {
 
 .group::before {
     content: attr(label);
-    display: block;        
+    display: block;      
+    /* background-color: #113311; */
+    color: white;  
     border-radius: 10px 10px 0 0 ;    
     padding-left: 10px;
     padding-block: 5px;    
@@ -287,4 +296,87 @@ select {
     appearance: none;
 }
 
+/********************************************** PEQLINE *************************************************************************/
+.peqline {
+    display: flex;
+    justify-content: left;    
+    align-items: center;
+    overflow-y: hidden;
+    margin-left: 10px;
+    margin-right: 5px;
+    padding-block: 10px;
+    font-size: 15px;       
+    border-radius: 10px 0 0 10px;
+    /* border: 1px solid white; */
+}
+
+.peqline:first-of-type {
+    margin-top: 20px;
+}
+
+
+.peqline input, select, span {
+    height: 20px;
+    text-align: center;
+
+}
+
+.peqline input:hover, input:focus {
+    background-color: hsl(var(--bck-hue), 30%, 70%)
+}
+
+.peqline input[type="text"] {
+    margin-right: 10px;
+    appearance: none;    
+    border: none;
+    border-radius: 3px;    
+}
+
+.peqline input[type="checkbox"] {    
+    width: 15px;    
+    aspect-ratio: 1;    
+    border-radius: 3px;
+}
+
+.peqline input[type="checkbox"]:checked {     
+
+    color: green;   
+    background-color: green;    
+}
+
+.peqline select {
+    width: 40px;
+    text-align: center;
+    appearance: none;
+    border: none;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+.peqline span {
+    margin-inline: 10px;
+    user-select: none;
+}
+
+.peqline input[type="button"] {
+    appearance: none;
+    border: none;
+    width: 20px;
+    border-radius: 3px;
+    margin-inline: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#freq {
+    width: 8em ;
+}
+
+#gain {
+    width: 4em ;
+}
+
+#qfact {
+    width: 4em ;
+}
 /******************************************************************************************************************************/
+
