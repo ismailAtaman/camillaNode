@@ -27,7 +27,7 @@ class PEQLine {
         LS.value="Lowshelf";LS.innerText="LS";
         PK.value="Peaking";PK.innerText="PK"
         HS.value="Highshelf";HS.innerText="HS";
-        freq.type="text";freq.id="freq"; freq.setAttribute('value',1000)
+        freq.type="text";freq.id="freq"; freq.setAttribute('value',1000);
         gain.type="text";gain.id="gain"; gain.setAttribute("value",0)
         qfact.type="text";qfact.id="qfact"; qfact.setAttribute("value",1.41)
         addLineAfter.type="button";addLineAfter.value="+";
@@ -42,13 +42,12 @@ class PEQLine {
         peqline.appendChild(spanQfact); peqline.appendChild(qfact);
         peqline.appendChild(addLineAfter);peqline.appendChild(removeLine);
 
-                
-
         const observer = new MutationObserver(function(muts){
             muts.forEach(function(mut){                                                                                       
                 if (mut.target.id=='type' || mut.target.id=='freq' || mut.target.id=='gain' || mut.target.id=='qfact') {
                     // console.log("Mutation detected!",mut.oldValue,mut.target.getAttribute(mut.attributeName));                    
-                    // mut.target.parentElement.dispatchEvent(new Event('update'));
+                    // mut.target.parentElement.dispatchEvent(new Event('update'));                    
+                    // if (mut.target.id=="freq") mut.target.parentElement.setAttribute('freq',mut.target.value);
                     mut.target.dispatchEvent(new Event('focusout'));                
                 }
                 
@@ -76,6 +75,7 @@ class PEQLine {
             let oldValue = this.getAttribute("oldValue");              
             if (this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
         })
+   
 
         freq.addEventListener('focus',function(){                        
             this.value = this.value.replace(',','');                        
@@ -114,7 +114,7 @@ class PEQLine {
        })
 
         peqline.addEventListener("update",function(e){
-            console.log("update graph and config")
+            //console.log("update graph and config");
         })
 
         peqline.instance=this;
@@ -123,13 +123,84 @@ class PEQLine {
         return peqline;
     }
 
+    // Takes telement values and creates JSON config object
+    valuesToJSON() {
+        let sequence = this.peqline.getAttribute('sequence')
+        let type,freq,gain,qfact;
+        this.peqline.childNodes.forEach(element => {
+            if (element.id=="type") type=element.value;
+            if (element.id=="freq") freq=parseInt(element.value.replace(',',''));
+            if (element.id=="gain") gain=parseFloat(element.value);
+            if (element.id=="qfact") qfact=parseFloat(element.value);
+        });        
+        let tmpObj = new Object();        
+        
+        let filterName = this.peqline.getAttribute("filterName");
+        if (filterName==undefined) filterName="filter"+sequence;
+        
+        tmpObj[filterName]={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}}
+        return tmpObj;
+    }
+
+    // Takes a JSON config filter object and updates values from it 
+    JSONtoValues(filterObject) {
+        // console.log(filterObject);
+
+        let parameters=filterObject[Object.keys(filterObject)[0]].parameters;        
+        if (parameters==undefined) parameters=filterObject["parameters"];
+        //console.log(parameters);
+        
+
+        this.peqline.childNodes.forEach(element => {            
+            if (element.id=="type")  {  element.value =parameters.type; }
+            if (element.id=="freq")  { element.value = parameters.freq; element.oldValue=parameters.freq; }
+            if (element.id=="gain")  { element.value = parameters.gain; element.oldValue=parameters.gain }
+            if (element.id=="qfact") { element.value = parameters.q; element.oldValue=parameters.q }
+        });
+    }
+
+    getParams() {
+        let obj={}; 
+        this.peqline.childNodes.forEach(e=>{               
+            if (e.id.length>0) {                 
+                let name = e.id;
+                obj[name]=e.value;                
+            } 
+        })
+        return obj;
+    }
+
+    /**************************************************************************************************************************************/
+
     static addPEQLine(parent) {
         const tmpPEQLine = new PEQLine();
         const sequence = Array.from(PEQ.children).filter(child=>child.className=='peqline').length;
-        tmpPEQLine.setAttribute("sequence",sequence);
+        tmpPEQLine.setAttribute("sequence",sequence);        
         parent.appendChild(tmpPEQLine);
         return tmpPEQLine;
     }
+
+    static plot(filterObject,canvas) {
+        const ctx = canvas;        
+        const context = ctx.getContext('2d');             
+        context.clearRect(0, 0, ctx.width, ctx.height)        
+        
+        createGrid(ctx); 
+        let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
+
+        for (let filter of Object.keys(filterObject)) {            
+            let dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);            
+            //plotArray(ctx,dataMatrix,"#0C0",1);
+            for (i=0;i<dataMatrix.length;i++) {
+                totalArray[i][0]=dataMatrix[i][0]
+                totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
+            }    
+        }
+        plotArray(ctx, totalArray,"#EEE",3)
+    }
+
+    
+
 }
 
 export default PEQLine;

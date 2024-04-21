@@ -59,7 +59,7 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 			b2 = (1 - K /qfact + K * K) * norm;
 			break;
 		
-		case "peaking":
+		case "Peaking":
 			if (gain >= 0) {
 				norm = 1 / (1 + 1/qfact * K + K * K);
 				a0 = (1 + V/qfact * K + K * K) * norm;
@@ -140,34 +140,34 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 			maxVal = y;
 	}
 
-	// configure y-axis
-	switch (type) {
-		default:
-		case "lowpass":
-		case "highpass":
-		case "bandpass":
-		case "notch":
-			ymin = -100;
-			ymax = 0;
-			if (maxVal > ymax)
-				ymax = maxVal;
-			break;
-		case "Peaking":
-		case "Lowshelf":
-		case "Highshelf":
-			ymin = -10;
-			ymax = 10;
-			if (maxVal > ymax)
-				ymax = maxVal;
-			else if (minVal < ymin)
-				ymin = minVal;
-			break;
-        case "one-pole lp":
-        case "one-pole hp":
-			ymin = -40;
-			ymax = 0;
-            break;
-	}
+	// // configure y-axis
+	// switch (type) {
+	// 	default:
+	// 	case "lowpass":
+	// 	case "highpass":
+	// 	case "bandpass":
+	// 	case "notch":
+	// 		ymin = -100;
+	// 		ymax = 0;
+	// 		if (maxVal > ymax)
+	// 			ymax = maxVal;
+	// 		break;
+	// 	case "Peaking":
+	// 	case "Lowshelf":
+	// 	case "Highshelf":
+	// 		ymin = -10;
+	// 		ymax = 10;
+	// 		if (maxVal > ymax)
+	// 			ymax = maxVal;
+	// 		else if (minVal < ymin)
+	// 			ymin = minVal;
+	// 		break;
+    //     case "one-pole lp":
+    //     case "one-pole hp":
+	// 		ymin = -40;
+	// 		ymax = 0;
+    //         break;
+	// }
 		
     //console.log(magPlot);
 	return magPlot;
@@ -260,5 +260,4 @@ function createGrid(canvas) {
 	ctx.stroke();
 	
 }
-
 

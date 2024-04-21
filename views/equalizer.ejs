@@ -10,25 +10,55 @@
     <%- include('plot.ejs'); %>
 
     <script type="module">
-        import PEQline from '/src/PEQLine.js'
+        import PEQline from '/src/PEQLine.js';
+        import camillaDSP from "/src/camillaDSP.js";
 
-        const PEQ = document.getElementById("PEQ");
-        PEQline.addPEQLine(PEQ);
-        PEQline.addPEQLine(PEQ);
-        PEQline.addPEQLine(PEQ);
-        PEQline.addPEQLine(PEQ);
-        PEQline.addPEQLine(PEQ);
-        PEQline.addPEQLine(PEQ);
-        PEQline.addPEQLine(PEQ);
+        const PEQ = document.getElementById('PEQ');
+        const ctx = document.getElementById("plotCanvas")
+
+        const DSP = new camillaDSP();
+        let connected =await DSP.connect()
+
+        // Load filters
+        let config = await DSP.sendDSPMessage("GetConfigJson");
         
-
+        for (let filterName of Object.keys(config.filters)) {            
+            let line = PEQline.addPEQLine(PEQ);
+            line.setAttribute("filterName",filterName);
+            line.instance.JSONtoValues(config.filters[filterName]);
+            console.log(line);
+        }
         
+        sortByFreq(PEQ);
+        PEQline.plot(config.filters,ctx);
+                
+    </script>
+    <script> 
+        function sortByFreq(parent) {            
+            let elementArray=[];
+            parent.childNodes.forEach(element => {                
+                if (element.className=="peqline") {
+                    elementArray.push(element);                        
+                }
+                //parent.removeChild(element)
+            });
 
+            function compareLines(a,b) {    
+                return parseInt(a.instance.getParams().freq) - parseInt(b.instance.getParams().freq);                
+            }
+
+            elementArray.sort(compareLines);
+            console.log(elementArray)
+            for (let element of elementArray) {
+                parent.appendChild(element);
+            }
+        }
     </script>
 
-    <div class="group" id="PEQ" label="Parametric EQ">
-      
-        
+
+    <div class="group" id="PEQ" label="Parametric EQ">         
     </div>    
+
+    
 </body>
 </html>
