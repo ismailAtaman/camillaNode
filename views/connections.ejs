@@ -17,32 +17,33 @@
 <body>
     <script type="module" >
         import camillaDSP from "/src/camillaDSP.js"        
-
-        const server = document.getElementById('server').value;        
-        const port = document.getElementById('port').value;    
-
-        let DSP = new camillaDSP();        
-
-        let connected = await DSP.connect(server,port)
-        if (connected) {
-            window.localStorage.setItem("server",server);
-            window.localStorage.setItem("port",port);            
-        }
-
-        let config = await DSP.sendDSPMessage("GetConfigJson");
-        console.log("Before--")
-        console.log(config.devices)             
-        config = camillaDSP.getDefaultConfig(config);
-        console.log("After--")
-        console.log(config.devices)
-
-        DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.log(e));
-        let downLoadconfig = await DSP.sendDSPMessage("GetConfigJson");
-        console.log(config==downLoadconfig)
-        
-    
+        window.camillaDSP = camillaDSP;
     </script>
 
+        
+    <script>
+        async function connect() {
+            const server = document.getElementById('server').value;        
+            const port = document.getElementById('port').value;    
+            const DSP = new camillaDSP();                
+
+            let connected = await DSP.connect(server,port)
+            if (connected) {
+                window.localStorage.setItem("server",server);
+                window.localStorage.setItem("port",port);            
+            }
+
+            let config =  await DSP.sendDSPMessage("GetConfigJson");
+            config = camillaDSP.getDefaultConfig(config);
+            if (config.pipeline[0].name!="recombine") config = camillaDSP.getDefaultConfig(config,true)
+
+            DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.log(e));
+            let downLoadconfig = await DSP.sendDSPMessage("GetConfigJson");
+            //console.log(downLoadconfig)
+        }          
+
+
+    </script>
     <div>
         <div><span>IP Address</span><input id="server" type="text" value="opizero2.local"></div>
         <div><span>Port</span><input id="port" type="text" value="1234"></div>

@@ -14,12 +14,15 @@
         
         const basicControls = document.getElementById('basicControls');
         const canvas = document.getElementById('plotCanvas');
-        console.log("Width",canvas.getBoundingClientRect().width)
+        // console.log("Width",canvas.getBoundingClientRect().width)
 
 
         // Connect to camillaDSP
         const DSP = new camillaDSP();
         let connected =await DSP.connect()
+
+        if (!connected) throw new Error("Can not connect to DSP!"); else console.log("Connected");
+            
 
         // Create UI elements
         let vol = new EQKnob("Volume",31);        
@@ -70,12 +73,12 @@
 
         crossfeed.knob.addEventListener("change",function(e){
             let crossfeedVal = (this.instance.getVal()-331)/20;
-            console.log(crossfeedVal)
+            // console.log(crossfeedVal)
             DSP.setCrossfeed(crossfeedVal);
         })
 
 
-        function setTone(e) {
+        function setTone() {
             const knobs = document.getElementsByClassName('knob');
             let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;            
 
@@ -108,6 +111,16 @@
 
         // Load filters
         let config = await DSP.sendDSPMessage("GetConfigJson");
+        console.log(config.pipeline)
+        if (config.filters["subBass"]==undefined) {
+            let r = await DSP.setTone(0,0,0,0,0);
+            console.log(r)
+            let config = await DSP.sendDSPMessage("GetConfigJson");
+            console.log(config.filters)
+        }
+
+
+        console.log(config.filters);
         
         subBass.knob.instance.setVal(config.filters["subBass"].parameters.gain*10+181);
         bass.knob.instance.setVal(config.filters["bass"].parameters.gain*10+181);
