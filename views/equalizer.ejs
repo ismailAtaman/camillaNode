@@ -31,12 +31,8 @@
             let config = await document.DSP.sendDSPMessage("GetConfigJson");
 
             for (let filterName of Object.keys(config.filters)) {            
-                let line = PEQline.addPEQLine(PEQ);            
-                line.setAttribute("filterName",filterName);
+                let line = addLine(PEQ,filterName);                
                 line.instance.JSONtoValues(config.filters[filterName]);                
-                line.addEventListener("update",peqlineUpdate);            
-                line.addEventListener("remove",function(e){peqlineRemove(this)});     
-                // console.log(line);
             }
             
             sortByFreq(PEQ);
@@ -48,6 +44,15 @@
 
 
             // setInterval(function(){document.DSP.sendDSPMessage("GetConfigJson").then(r=>console.log(r.filters))},5000);
+        }
+
+        function addLine(parent,filterName,insertBefore) {
+            let line = PEQline.addPEQLine(parent,insertBefore);            
+            line.setAttribute("filterName",filterName);            
+            line.addEventListener("update",peqlineUpdate);            
+            line.addEventListener("remove",function(e){peqlineRemove(this)});     
+            line.addEventListener("add",function(e){peqlineAdd(this)});  
+            return line;   
         }
 
         function sortByFreq(parent) {            
@@ -98,10 +103,12 @@
             if (document.loading) return;
             const PEQ = document.getElementById('PEQ');
             PEQ.removeChild(peqline);
-
-            
-
             peqlineUpdate();
+        }
+
+        function peqlineAdd(peqline) {
+            const PEQ = document.getElementById('PEQ');
+            addLine(PEQ,"NewFilter"+PEQ.children.length+1,peqline)
         }
     
     </script>

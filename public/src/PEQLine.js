@@ -116,7 +116,8 @@ class PEQLine {
         //     console.log("Update config")
         // })
 
-        removeLine.addEventListener('click',function(){console.log("Remove");peqline.dispatchEvent(new Event("remove"))});  
+        removeLine.addEventListener('click',function(){peqline.dispatchEvent(new Event("remove"))});  
+        addLineAfter.addEventListener('click',function(){peqline.dispatchEvent(new Event("add"))});  
 
         peqline.instance=this;
         this.peqline=peqline;
@@ -176,11 +177,11 @@ class PEQLine {
 
     /**************************************************************************************************************************************/
 
-    static addPEQLine(parent) {
+    static addPEQLine(parent,insertBefore) {
         const tmpPEQLine = new PEQLine();
         const sequence = Array.from(PEQ.children).filter(child=>child.className=='peqline').length;
         tmpPEQLine.setAttribute("sequence",sequence);        
-        parent.appendChild(tmpPEQLine);
+        if (insertBefore==undefined) parent.appendChild(tmpPEQLine); else if(insertBefore.nextSibling) parent.insertBefore(tmpPEQLine,insertBefore.nextSibling); else parent.appendChild(tmpPEQLine)
         return tmpPEQLine;
     }
 
