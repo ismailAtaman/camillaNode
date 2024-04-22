@@ -90,6 +90,15 @@ class PEQLine {
             this.value=this.value+'Hz';        
         })
 
+        freq.addEventListener("wheel",function(e){            
+            const direction = e.deltaY>0?-1:1;              
+            let val = parseInt(this.value.replace('Hz','').replace(',',''));
+            this.value= parseInt(val+direction*0.1*val);
+            // this.oldValue=this.value;
+            this.dispatchEvent(new Event("focusout"))
+            e.preventDefault();
+        })
+
         gain.addEventListener('focus',function(){            
             this.value = this.value.replace('dB','');
             this.setAttribute("oldValue",this.value);                 
@@ -99,17 +108,39 @@ class PEQLine {
             let oldValue = this.getAttribute("oldValue");
             if (isNaN(this.value)) this.value=oldValue;                        
             if (this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
-            this.value=this.value+'dB';                                    
+            this.value=this.value+'dB';                                                
+        })
+
+        gain.addEventListener("wheel",function(e){            
+            const direction = e.deltaY>0?-1:1;              
+            let val = parseFloat(this.value.replace('dB',''))+direction*0.5;
+            if (val<-14) val=-14;
+            if (val>14) val=14;
+            val = Math.round(val * 100)/100;
+            this.value= val;
+            // this.oldValue=this.value;
+            this.dispatchEvent(new Event("focusout"))
+            e.preventDefault();
         })
 
         qfact.addEventListener('focus',function(){                     
             this.setAttribute("oldValue",this.value);
         })
 
-        qfact.addEventListener('focusout',function(){            
+        qfact.addEventListener('focusout',function(){                        
             let oldValue = this.getAttribute("oldValue");
             if (isNaN(this.value)) this.value=oldValue;                                    
             if (this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
+        })
+
+        qfact.addEventListener("wheel",function(e){            
+            const direction = e.deltaY>0?-1:1;              
+            let val = parseFloat(this.value)+direction*0.5
+            if (val<0.2) val=0.2;
+            this.value= Math.round(val * 100) /100;
+            // this.oldValue=this.value;
+            this.dispatchEvent(new Event("focusout"))
+            e.preventDefault();
         })
 
         // peqline.addEventListener("update",function(){
@@ -196,10 +227,8 @@ class PEQLine {
         let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
         let dataMatrix;
         for (let filter of Object.keys(filterObject)) {  
-            console.log(filterObject)
-            
-            if (filterObject[filter].parameters==undefined) console.log(filter,filterObject); else dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);            
-            
+            // console.log(filterObject)                        
+            dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
             for (i=0;i<dataMatrix.length;i++) {
                 totalArray[i][0]=dataMatrix[i][0]
                 totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        

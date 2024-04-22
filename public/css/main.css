@@ -316,11 +316,10 @@ select {
 .peqline input, select, span {
     height: 20px;
     text-align: center;
-
 }
 
 .peqline input:hover, input:focus {
-    background-color: hsl(var(--bck-hue), 30%, 70%)
+    background-color: hsl(var(--bck-hue), 50%, 70%)
 }
 
 .peqline input[type="text"] {
