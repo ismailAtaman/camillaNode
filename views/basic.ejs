@@ -111,12 +111,12 @@
 
         // Load filters
         let config = await DSP.sendDSPMessage("GetConfigJson");
-        console.log(config.pipeline)
+        // console.log(config.pipeline)
         if (config.filters["subBass"]==undefined) {
             let r = await DSP.setTone(0,0,0,0,0);
             console.log(r)
             let config = await DSP.sendDSPMessage("GetConfigJson");
-            console.log(config.filters)
+            // console.log(config.filters)
         }
 
 

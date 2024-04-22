@@ -8,32 +8,47 @@
 </head>
 <body>
     <%- include('plot.ejs'); %>
-
     <script type="module">
         import PEQline from '/src/PEQLine.js';
-        import camillaDSP from "/src/camillaDSP.js";
-
-        const PEQ = document.getElementById('PEQ');
-        const ctx = document.getElementById("plotCanvas")
-
-        const DSP = new camillaDSP();
-        let connected =await DSP.connect()
-
-        // Load filters
-        let config = await DSP.sendDSPMessage("GetConfigJson");
-        
-        for (let filterName of Object.keys(config.filters)) {            
-            let line = PEQline.addPEQLine(PEQ);
-            line.setAttribute("filterName",filterName);
-            line.instance.JSONtoValues(config.filters[filterName]);
-            console.log(line);
-        }
-        
-        sortByFreq(PEQ);
-        PEQline.plot(config.filters,ctx);
-                
+        import camillaDSP from "/src/camillaDSP.js";                
+        window.PEQline = PEQline;
+        window.camillaDSP = camillaDSP;                        
     </script>
+
     <script> 
+        document.loading=false;
+        document.DSP = {};
+        document.addEventListener("DOMContentLoaded",equalizerOnLoad);
+        
+        async function equalizerOnLoad() {            
+            document.loading=true;
+            const PEQ = document.getElementById('PEQ');
+            const ctx = document.getElementById("plotCanvas")
+        
+            document.DSP = new camillaDSP();            
+            let connected =await document.DSP.connect()            
+            
+            let config = await document.DSP.sendDSPMessage("GetConfigJson");
+
+            for (let filterName of Object.keys(config.filters)) {            
+                let line = PEQline.addPEQLine(PEQ);            
+                line.setAttribute("filterName",filterName);
+                line.instance.JSONtoValues(config.filters[filterName]);                
+                line.addEventListener("update",peqlineUpdate);            
+                // console.log(line);
+            }
+            
+            sortByFreq(PEQ);
+            PEQline.plot(config.filters,ctx);         
+
+
+            // change loading to false after 100ms to avoud update running multiple times during loading.            
+            setInterval(function(){document.loading=false},50);
+
+
+            // setInterval(function(){document.DSP.sendDSPMessage("GetConfigJson").then(r=>console.log(r.filters))},5000);
+        }
+
         function sortByFreq(parent) {            
             let elementArray=[];
             parent.childNodes.forEach(element => {                
@@ -47,11 +62,34 @@
                 return parseInt(a.instance.getParams().freq) - parseInt(b.instance.getParams().freq);                
             }
 
-            elementArray.sort(compareLines);
-            console.log(elementArray)
+            elementArray.sort(compareLines);            
             for (let element of elementArray) {
                 parent.appendChild(element);
             }
+        }
+
+        async function peqlineUpdate() {                        
+            if (document.loading) return;
+
+            const ctx = document.getElementById("plotCanvas")
+            let filters = generateFiltersObject();
+            PEQline.plot(filters,ctx);  
+            
+            let config = await document.DSP.sendDSPMessage("GetConfigJson");
+            config.filters=filters;       
+                 
+            await document.DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});                                                                           
+        }
+
+        function generateFiltersObject() {
+            let filters={};
+            const PEQ = document.getElementById('PEQ');
+            PEQ.childNodes.forEach(e=>{
+                if (e.className=="peqline") {                                   
+                    filters[e.getAttribute("filterName")] = e.instance.valuesToJSON();
+                }
+            })
+            return filters;
         }
     </script>
 

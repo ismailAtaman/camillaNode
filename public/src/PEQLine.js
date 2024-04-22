@@ -22,7 +22,7 @@ class PEQLine {
         const spanGain = document.createElement('span')
         const spanQfact = document.createElement('span')
 
-        peqline.className="peqline";enabled.type="checkbox";peqline.setAttribute("sequence","-1")
+        peqline.className="peqline";enabled.type="checkbox";peqline.setAttribute("sequence","-1"); enabled.id="enabled";
         type.id="type";type.value="PK";
         LS.value="Lowshelf";LS.innerText="LS";
         PK.value="Peaking";PK.innerText="PK"
@@ -54,7 +54,7 @@ class PEQLine {
             })
         })                  
 
-        
+
         observer.observe(peqline,{attributeFilter:["value","text","innerText"],attributes:true,subtree:true,childList:true, attributeOldValue:true});
 
         enabled.checked=true;
@@ -70,19 +70,18 @@ class PEQLine {
         type.addEventListener("focus",function(e){
             this.setAttribute("oldValue",this.value);  
         })       
-        
+
         type.addEventListener("change", function(e){
             let oldValue = this.getAttribute("oldValue");              
             if (this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
-        })
-   
+        })   
 
         freq.addEventListener('focus',function(){                        
             this.value = this.value.replace(',','');                        
             this.value = this.value.replace('Hz','');
             this.setAttribute("oldValue",this.value);
         })
-        
+
         freq.addEventListener('focusout',function(){                                                      
             let oldValue = this.getAttribute("oldValue");  
             if (isNaN(this.value)) this.value=oldValue;  
@@ -95,7 +94,7 @@ class PEQLine {
             this.value = this.value.replace('dB','');
             this.setAttribute("oldValue",this.value);                 
         })
-        
+
         gain.addEventListener('focusout',function(){                                    
             let oldValue = this.getAttribute("oldValue");
             if (isNaN(this.value)) this.value=oldValue;                        
@@ -111,11 +110,13 @@ class PEQLine {
             let oldValue = this.getAttribute("oldValue");
             if (isNaN(this.value)) this.value=oldValue;                                    
             if (this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
-       })
-
-        peqline.addEventListener("update",function(e){
-            //console.log("update graph and config");
         })
+
+        // peqline.addEventListener("update",function(){
+        //     console.log("Update config")
+        // })
+
+        // removeLine.addEventListener('click',function(){ })        
 
         peqline.instance=this;
         this.peqline=peqline;
@@ -124,21 +125,22 @@ class PEQLine {
     }
 
     // Takes telement values and creates JSON config object
-    valuesToJSON() {
-        let sequence = this.peqline.getAttribute('sequence')
-        let type,freq,gain,qfact;
-        this.peqline.childNodes.forEach(element => {
-            if (element.id=="type") type=element.value;
-            if (element.id=="freq") freq=parseInt(element.value.replace(',',''));
-            if (element.id=="gain") gain=parseFloat(element.value);
-            if (element.id=="qfact") qfact=parseFloat(element.value);
+    valuesToJSON() {                
+        let enabled,type,freq,gain,qfact;
+        this.peqline.childNodes.forEach(element => {            
+            if (element.id =="enabled") enabled= element.checked;
+            if (element.id =="type") type=element.value;
+            if (element.id =="freq") freq=parseInt(element.value.replace(',',''));
+            if (element.id =="gain") gain=parseFloat(element.value);
+            if (element.id =="qfact") qfact=parseFloat(element.value);
         });        
         let tmpObj = new Object();        
+        if (!enabled) gain=0;
         
-        let filterName = this.peqline.getAttribute("filterName");
-        if (filterName==undefined) filterName="filter"+sequence;
+        // let filterName = this.peqline.getAttribute("filterName");
+        // if (filterName==undefined) filterName="filter"+sequence;
         
-        tmpObj[filterName]={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}}
+        tmpObj={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}}        
         return tmpObj;
     }
 
@@ -164,9 +166,11 @@ class PEQLine {
         this.peqline.childNodes.forEach(e=>{               
             if (e.id.length>0) {                 
                 let name = e.id;
-                obj[name]=e.value;                
+                let val= e.value.replace("Hz","").replace("dB","").replace(",","");       
+                if (!isNaN(parseFloat(val))) val=parseFloat(val);
+                obj[name]=val;                
             } 
-        })
+        })        
         return obj;
     }
 
@@ -185,16 +189,21 @@ class PEQLine {
         const context = ctx.getContext('2d');             
         context.clearRect(0, 0, ctx.width, ctx.height)        
         
+        
+
         createGrid(ctx); 
         let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
-
-        for (let filter of Object.keys(filterObject)) {            
-            let dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);            
-            //plotArray(ctx,dataMatrix,"#0C0",1);
+        let dataMatrix;
+        for (let filter of Object.keys(filterObject)) {  
+            console.log(filterObject)
+            
+            if (filterObject[filter].parameters==undefined) console.log(filter,filterObject); else dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);            
+            
             for (i=0;i<dataMatrix.length;i++) {
                 totalArray[i][0]=dataMatrix[i][0]
                 totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
             }    
+            //plotArray(ctx,dataMatrix,"#0C0",1);
         }
         plotArray(ctx, totalArray,"#EEE",3)
     }
