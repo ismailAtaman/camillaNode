@@ -35,6 +35,7 @@
                 line.setAttribute("filterName",filterName);
                 line.instance.JSONtoValues(config.filters[filterName]);                
                 line.addEventListener("update",peqlineUpdate);            
+                line.addEventListener("remove",function(e){peqlineRemove(this)});     
                 // console.log(line);
             }
             
@@ -77,6 +78,7 @@
             
             let config = await document.DSP.sendDSPMessage("GetConfigJson");
             config.filters=filters;       
+            config.pipeline= document.DSP.updatePipeline(config);
                  
             await document.DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});                                                                           
         }
@@ -91,6 +93,17 @@
             })
             return filters;
         }
+    
+        function peqlineRemove(peqline) {            
+            if (document.loading) return;
+            const PEQ = document.getElementById('PEQ');
+            PEQ.removeChild(peqline);
+
+            
+
+            peqlineUpdate();
+        }
+    
     </script>
 
 

@@ -204,6 +204,13 @@ class camillaDSP {
         return {"type":"Biquad","parameters":{"type":"Peaking","freq":freq,"gain":gain,"q":q}};                
     }        
     
+    updatePipeline(config) {
+        let pipeline=[];        
+        pipeline.push({"type":"Mixer","name":Object.keys(config.mixers)[0]});
+        pipeline.push({"type":"Filter","channel":0,"names":Object.keys(config.filters)})
+        pipeline.push({"type":"Filter","channel":0,"names":Object.keys(config.filters)})
+        return pipeline;
+    }
 
 
 

@@ -116,7 +116,7 @@ class PEQLine {
         //     console.log("Update config")
         // })
 
-        // removeLine.addEventListener('click',function(){ })        
+        removeLine.addEventListener('click',function(){console.log("Remove");peqline.dispatchEvent(new Event("remove"))});  
 
         peqline.instance=this;
         this.peqline=peqline;
@@ -188,7 +188,7 @@ class PEQLine {
         const ctx = canvas;        
         const context = ctx.getContext('2d');             
         context.clearRect(0, 0, ctx.width, ctx.height)        
-        
+        let color=parseInt("F00",16);
         
 
         createGrid(ctx); 
@@ -203,7 +203,8 @@ class PEQLine {
                 totalArray[i][0]=dataMatrix[i][0]
                 totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
             }    
-            //plotArray(ctx,dataMatrix,"#0C0",1);
+            color = color + 50;
+            plotArray(ctx,dataMatrix,"#"+color.toString(16),1.5);
         }
         plotArray(ctx, totalArray,"#EEE",3)
     }
