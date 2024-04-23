@@ -21,6 +21,8 @@
         let version = document.getElementById('version')
         DSP.sendDSPMessage("GetVersion").then(r=>version.innerText="CamillaDSP Version "+r);
 
+        let status = document.getElementById('status')            
+        DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);    
         
 
         setInterval(async ()=>{

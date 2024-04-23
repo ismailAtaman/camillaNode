@@ -6,7 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 
 :root {
-    --bck-hue: 180;
+    --bck-hue: 140;
     --bck-sat: 30%;
     --bck-light : 20%;
     --bck-color: hsl(var(--bck-hue),var(--bck-sat),var(--bck-light));   
@@ -61,7 +61,7 @@ header {
     width: 100%;
     height: 20px;
     font-size: 13px;
-    color: #666;
+    color: hsla(0,100%,100%,50%);
     text-align: right;
     padding-right: 20px;      
     transform: translate(-15px, -25px);    
@@ -85,7 +85,18 @@ section {
     overflow-y: scroll;
     padding-block: 20px;
     border-top: 1px solid #222;
-    
+}
+
+#sectionMain {
+    width: 100%;
+    height: 100%;
+}
+
+#mainframe {    
+    padding: 10px;
+    width: 100%;        
+    height:100%;
+    overflow-y: scroll;
 }
 
 #sectionMainTitle {        
@@ -125,11 +136,14 @@ section {
     margin-top: 0;
 }
 
-.navigate {        
+.navigate {   
+    height: 20px;     
     font-size: 15px;
     padding:10px;    
     cursor:pointer;    
-    transition: all linear 250ms;     
+    transition: all linear 250ms;    
+    
+    
 }
 
 .navigate:hover {    
@@ -138,24 +152,18 @@ section {
 }
 
 .navigate img {        
-    height: 15px;
-    filter:invert(1);    
+    height: 20px;
+    filter:invert(0.75);    
     transition: all linear 300ms;    
     padding-right: 5px;
+    transform: translateY(4px);
 }
 
 .navigate:hover img {         
     filter:invert(1);    
-    
-    
 }
 
-#mainframe {    
-    padding: 10px;
-    width: 100%;        
-    height:80%;
-    overflow-y: scroll;
-}
+
 
 canvas {    
     /* background:linear-gradient(45deg,var(--bck-color),#222); */
@@ -197,7 +205,7 @@ canvas {
     position: relative;
     align-items: center;
     justify-content: center;
-    width: 70px;
+    width: 60px;
     aspect-ratio: 1;
     margin: 15px;
     margin-top: 35px;
@@ -296,18 +304,6 @@ canvas {
 }
 
 .peqParam {    
-    /* display: flex;
-    position: relative;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    border: none;
-    border-radius: 2px;
-    width: var(--param-width);        
-    font-size: 13px;
-    text-align: center;    
-    left: 50%;
-    transform: translateX(-50%);     */
     display: flex;       
     justify-content: center;
     margin-top: 10px;
@@ -338,12 +334,12 @@ select {
     overflow-y: hidden;
     margin-left: 10px;
     margin-right: 5px;
-    padding-block: 10px;
+    padding-block: 5px;
     font-size: 15px;           
 }
 
 .peqline:first-of-type {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 
@@ -409,5 +405,25 @@ select {
 #qfact {
     width: 4em ;
 }
-/******************************************************************************************************************************/
 
+.button {
+    content: ' ';
+    display: inline-block;    
+    filter: invert(.5);
+    width: 20px; 
+    height: 20px;  
+    padding-left: 20px;  
+    cursor: pointer;
+}
+
+.button:hover {
+    filter: invert(1);
+}
+
+.add {
+    background: no-repeat center url("/img/icon/add.png");
+}
+
+.remove {
+    background: no-repeat center url("/img/icon/remove.png");
+}

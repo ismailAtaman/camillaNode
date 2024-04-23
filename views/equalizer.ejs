@@ -11,9 +11,12 @@
     <%- include('plot.ejs'); %>
     <script type="module">
         import PEQline from '/src/PEQLine.js';
-        import camillaDSP from "/src/camillaDSP.js";                
+        import camillaDSP from "/src/camillaDSP.js";       
+        import EQKnob from '/src/knob.js';
+
         window.PEQline = PEQline;
         window.camillaDSP = camillaDSP;                        
+        window.EQKnob=EQKnob;
     </script>
 
     <script> 
@@ -25,11 +28,50 @@
             document.loading=true;
             const PEQ = document.getElementById('PEQ');
             const ctx = document.getElementById("plotCanvas")
-        
+
             document.DSP = new camillaDSP();            
             let connected =await document.DSP.connect()            
-            
             let config = await document.DSP.sendDSPMessage("GetConfigJson");
+
+            /// Basics Controls Section
+            const basicControls = document.getElementById('basicControls');
+
+            // Create UI elements
+            let vol = new EQKnob("Volume",31);        
+            let balance = new EQKnob("Balance",181);
+            let crossfeed = new EQKnob("Crossfeed",31);
+
+            crossfeed.knob.instance.offAtDefault=true;
+            balance.knob.instance.offAtDefault=true;
+            
+            basicControls.appendChild(vol.knob);        
+            basicControls.appendChild(balance.knob)
+            basicControls.appendChild(crossfeed.knob)
+
+            // Load data from DSP
+            document.DSP.sendDSPMessage("GetVolume").then(r=>{            
+                let volMarker = r/3*10 + 181;
+                vol.setVal(volMarker);            
+            });
+
+            vol.knob.addEventListener("change",function(e){
+                const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
+                document.DSP.sendDSPMessage({"SetVolume":volume})
+            })
+
+            balance.knob.addEventListener("change",function(e){
+                const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
+                document.DSP.setBalance(bal);
+            })
+
+            crossfeed.knob.addEventListener("change",function(e){
+                let crossfeedVal = (this.instance.getVal()-331)/20;
+                // console.log(crossfeedVal)
+                document.DSP.setCrossfeed(crossfeedVal);
+            })
+
+            /// Parametric EQ section
+
 
             for (let filterName of Object.keys(config.filters)) {            
                 let line = addLine(PEQ,filterName);                
@@ -42,7 +84,6 @@
 
             // change loading to false after 100ms to avoud update running multiple times during loading.            
             setInterval(function(){document.loading=false},50);
-
 
             // setInterval(function(){document.DSP.sendDSPMessage("GetConfigJson").then(r=>console.log(r.filters))},5000);
         }
@@ -80,10 +121,12 @@
 
             const ctx = document.getElementById("plotCanvas")
             let filters = generateFiltersObject();
+            console.log(filters)
             PEQline.plot(filters,ctx);  
             
             let config = await document.DSP.sendDSPMessage("GetConfigJson");
             config.filters=filters;       
+            
             config.pipeline= document.DSP.updatePipeline(config);
                  
             await document.DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});                                                                           
@@ -114,6 +157,8 @@
     
     </script>
 
+    <div class="group" id="basicControls" label="Basic Controls">
+    </div>    
 
     <div class="group" id="PEQ" label="Parametric EQ">         
     </div>    

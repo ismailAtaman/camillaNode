@@ -14,8 +14,8 @@ class PEQLine {
         const freq = document.createElement('input')
         const gain = document.createElement('input')
         const qfact = document.createElement('input')
-        const addLineAfter = document.createElement('input')
-        const removeLine = document.createElement('input')
+        const addLineAfter = document.createElement('div')
+        const removeLine = document.createElement('div')
 
         const spanType = document.createElement('span')
         const spanFreq = document.createElement('span')
@@ -30,8 +30,7 @@ class PEQLine {
         freq.type="text";freq.id="freq"; freq.setAttribute('value',1000);
         gain.type="text";gain.id="gain"; gain.setAttribute("value",0)
         qfact.type="text";qfact.id="qfact"; qfact.setAttribute("value",1.41)
-        addLineAfter.type="button";addLineAfter.value="+";
-        removeLine.type="button";removeLine.value="x";        
+        addLineAfter.className='button';removeLine.className='button';addLineAfter.classList.add('add');removeLine.classList.add('remove')        
         spanType.innerText="Type :"; spanFreq.innerText="Frequency :";spanGain.innerText="Gain :",spanQfact.innerText="Q :";
 
         type.appendChild(LS);type.appendChild(PK);type.append(HS);
@@ -107,7 +106,7 @@ class PEQLine {
         gain.addEventListener('focusout',function(){                                    
             let oldValue = this.getAttribute("oldValue");
             if (isNaN(this.value)) this.value=oldValue;                        
-            if (this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
+            if (this.value!=oldValue || this.value==0) this.parentElement.dispatchEvent(new Event("update"));
             this.value=this.value+'dB';                                                
         })
 
@@ -117,8 +116,7 @@ class PEQLine {
             if (val<-14) val=-14;
             if (val>14) val=14;
             val = Math.round(val * 100)/100;
-            this.value= val;
-            // this.oldValue=this.value;
+            this.value= val;            
             this.dispatchEvent(new Event("focusout"))
             e.preventDefault();
         })
