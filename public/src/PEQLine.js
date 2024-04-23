@@ -121,6 +121,8 @@ class PEQLine {
             e.preventDefault();
         })
 
+        gain.addEventListener("dblclick",function(e){this.value=0; this.setAttribute("oldValue",0); this.dispatchEvent(new Event("focusout"))});       
+
         qfact.addEventListener('focus',function(){                     
             this.setAttribute("oldValue",this.value);
         })

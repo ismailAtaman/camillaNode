@@ -61,6 +61,14 @@
             vol.setVal(volMarker);            
         });
 
+        // load crossfeed
+        let crossfeedVal = await DSP.getCrossfeed() * 20 +331;        
+        crossfeed.knob.instance.setVal(crossfeedVal);
+
+        // load balance
+        let bal = await DSP.getBalance() * 10 +181;
+        balance.knob.instance.setVal(bal)
+
         vol.knob.addEventListener("change",function(e){
             const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
             DSP.sendDSPMessage({"SetVolume":volume})
@@ -128,9 +136,6 @@
         upperMids.knob.instance.setVal(config.filters["upperMids"].parameters.gain*10+181);
         treble.knob.instance.setVal(config.filters["treble"].parameters.gain*10+181);
 
-        // load crossfeed
-        let crossfeedVal = await DSP.getCrossfeed() * 20 +331;        
-        crossfeed.knob.instance.setVal(crossfeedVal);
 
 
         plot();

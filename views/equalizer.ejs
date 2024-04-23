@@ -54,6 +54,14 @@
                 vol.setVal(volMarker);            
             });
 
+            // load crossfeed
+            let crossfeedVal = await document.DSP.getCrossfeed() * 20 +331;        
+            crossfeed.knob.instance.setVal(crossfeedVal);
+            
+            // load balance
+            let bal = await document.DSP.getBalance() * 10 +181;
+            balance.knob.instance.setVal(bal)
+
             vol.knob.addEventListener("change",function(e){
                 const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
                 document.DSP.sendDSPMessage({"SetVolume":volume})
@@ -69,6 +77,8 @@
                 // console.log(crossfeedVal)
                 document.DSP.setCrossfeed(crossfeedVal);
             })
+
+
 
             /// Parametric EQ section
 

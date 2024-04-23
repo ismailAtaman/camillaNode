@@ -150,7 +150,11 @@ class camillaDSP {
         config.mixers.recombine.mapping[1].sources[0].gain = bal
 
         await this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)})
+    }
 
+    async getBalance() {
+        let config = await this.sendDSPMessage("GetConfigJson");
+        return config.mixers.recombine.mapping[1].sources[0].gain;
     }
 
     async setTone(subBass, bass, mids, upperMids, treble) {
@@ -192,7 +196,7 @@ class camillaDSP {
 
         // console.log(config.mixers.recombine.mapping)
 
-        this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.error(e));
+        return this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)})
     }
 
     async getCrossfeed() {
