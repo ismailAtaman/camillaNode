@@ -220,7 +220,7 @@ class PEQLine {
         const ctx = canvas;        
         const context = ctx.getContext('2d');             
         context.clearRect(0, 0, ctx.width, ctx.height)        
-        let color=parseInt("F00",16);
+        let color=parseInt("0F0",16);
         
 
         createGrid(ctx); 
@@ -233,7 +233,7 @@ class PEQLine {
                 totalArray[i][0]=dataMatrix[i][0]
                 totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
             }    
-            color = color + 50;
+            color = color + 60;
             plotArray(ctx,dataMatrix,"#"+color.toString(16),1.5);
         }
         plotArray(ctx, totalArray,"#EEE",3)
