@@ -186,7 +186,7 @@ function plotArray(canvas, array, col, lineWidth){
 	ctx.setLineDash([]);
 
 	stepSize = w / array.length;
-	heightScale= 19; //h / (5 * 10);      	
+	heightScale= 15.7; //h / (5 * 10);      	
 	let max=0;
 	let rounded=[];
 	for (i=0;i<array.length;i++) {            		

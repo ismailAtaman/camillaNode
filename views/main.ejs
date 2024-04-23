@@ -26,7 +26,7 @@
         setInterval(async ()=>{
             let status = document.getElementById('status')            
             DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);                        
-        },2000);
+        },5000);
 
     </script>
 
@@ -43,19 +43,28 @@
 
     <main>
         <section id="sectionLeft">
+
             <span class="leftTitle">Navigation</span>
-            <div class="navigate" target="/connections">Connections</div>
-            <div class="navigate" target="/basic">Basic</div>
-            <div class="navigate" target="/equalizer">Equalizer</div>
-            <div class="navigate" target="/advanced">Advanced</div>
-            <div class="navigate" target="/preferences">Preferences</div>            
+            <div class="navigate" target="/connections"><img src="img/icon/connections.png" class="icon"> Connections</div>
+            <div class="navigate" target="/basic"><img src="img/icon/basic.png" class="icon"> Basic</div>
+            <div class="navigate" target="/equalizer"><img src="img/icon/equalizer.png" class="icon"> Equalizer</div>
+            <div class="navigate" target="/advanced"><img src="img/icon/advanced.png" class="icon"> Advanced</div>
+            <div class="navigate" target="/preferences"><img src="img/icon/connections.png" class="icon"> Preferences</div>            
             <br>
-            <div id="savedConfig">
-                <span class="leftTitle">Saved Configurations</span>
-            </div>
+
+            
+            <div class="leftTitle">Tools</div>
+            <div class="navigate" target="/connections"><img src="img/icon/import.png" class="icon">Import</div>
+            <div class="navigate" target="/connections"><img src="img/icon/export.png" class="icon">Export</div>
+            <div class="navigate" target="/connections"><img src="img/icon/connections.png" class="icon">Auto EQ</div>
+            
+            <br>
+            
+            <div class="leftTitle">Saved Configurations</div>
+            
         </section>
 
-        <section id="sectionMain">
+        <section id="sectionMain">            
             <iframe id="mainframe" src="/equalizer" frameborder="0"></iframe>
         </section>
     </main>
