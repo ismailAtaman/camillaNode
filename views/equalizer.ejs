@@ -79,15 +79,13 @@
             })
 
 
-
             /// Parametric EQ section
-
-
             for (let filterName of Object.keys(config.filters)) {            
                 let line = addLine(PEQ,filterName);                
                 line.instance.JSONtoValues(config.filters[filterName]);                
             }
             
+
             sortByFreq(PEQ);
             PEQline.plot(config.filters,ctx);         
 
@@ -110,7 +108,7 @@
         function sortByFreq(parent) {            
             let elementArray=[];
             parent.childNodes.forEach(element => {                
-                if (element.className=="peqline") {
+                if (element.className=="peqline") {                    
                     elementArray.push(element);                        
                 }
                 //parent.removeChild(element)
@@ -169,7 +167,7 @@
 
     <div class="group" id="basicControls" label="Basic Controls">
     </div>    
-
+    <input type="button" onclick="document.DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));">
     <div class="group" id="PEQ" label="Parametric EQ">         
     </div>    
 

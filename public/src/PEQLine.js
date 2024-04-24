@@ -11,6 +11,7 @@ class PEQLine {
         const LS = document.createElement('option')
         const PK = document.createElement('option')
         const HS = document.createElement('option')
+        const PRE = document.createElement('option')
         const freq = document.createElement('input')
         const gain = document.createElement('input')
         const qfact = document.createElement('input')
@@ -22,18 +23,19 @@ class PEQLine {
         const spanGain = document.createElement('span')
         const spanQfact = document.createElement('span')
 
-        peqline.className="peqline";enabled.type="checkbox";peqline.setAttribute("sequence","-1"); enabled.id="enabled";
-        type.id="type";type.value="PK";
+        peqline.className="peqline";enabled.type="checkbox";peqline.setAttribute("sequence","-1"); enabled.id="enabled";        
         LS.value="Lowshelf";LS.innerText="LS";
-        PK.value="Peaking";PK.innerText="PK"
+        PK.value="Peaking";PK.innerText="PK";PK.selected=true;
         HS.value="Highshelf";HS.innerText="HS";
+        PRE.value="Gain";PRE.innerText="Pre";
+        type.id="type";
         freq.type="text";freq.id="freq"; freq.setAttribute('value',1000);
         gain.type="text";gain.id="gain"; gain.setAttribute("value",0)
         qfact.type="text";qfact.id="qfact"; qfact.setAttribute("value",1.41)
-        addLineAfter.className='button';removeLine.className='button';addLineAfter.classList.add('add');removeLine.classList.add('remove')        
+        addLineAfter.className='peqbutton';removeLine.className='peqbutton';addLineAfter.classList.add('add');removeLine.classList.add('remove')        
         spanType.innerText="Type :"; spanFreq.innerText="Frequency :";spanGain.innerText="Gain :",spanQfact.innerText="Q :";
 
-        type.appendChild(LS);type.appendChild(PK);type.append(HS);
+        type.appendChild(PRE);type.appendChild(LS);type.appendChild(PK);type.appendChild(HS);
         peqline.appendChild(enabled);
         peqline.appendChild(spanType); peqline.appendChild(type);
         peqline.appendChild(spanFreq); peqline.appendChild(freq);
@@ -72,7 +74,26 @@ class PEQLine {
 
         type.addEventListener("change", function(e){
             let oldValue = this.getAttribute("oldValue");              
-            if (this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
+            
+            if (this.value=="Gain") {
+                this.parentElement.removeChild(freq);
+                this.parentElement.removeChild(qfact);
+                this.parentElement.removeChild(spanFreq);
+                this.parentElement.removeChild(spanQfact);
+                this.parentElement.oldFilterName = this.parentElement.getAttribute("filterName");
+                this.parentElement.setAttribute("filterName","preamp");
+                
+            } else {
+                if (this.parentElement.getAttribute("filterName")=="preamp") {
+                    this.parentElement.setAttribute("filterName",this.parentElement.oldFilterName);
+                    this.parentElement.insertBefore(qfact,addLineAfter)
+                    this.parentElement.insertBefore(spanQfact,qfact)
+                    this.parentElement.insertBefore(freq,spanGain)
+                    this.parentElement.insertBefore(spanFreq,freq)                
+                }                                
+            }
+            
+            if (oldValue!="" && this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
         })   
 
         freq.addEventListener('focus',function(){                        
@@ -172,7 +193,12 @@ class PEQLine {
         // let filterName = this.peqline.getAttribute("filterName");
         // if (filterName==undefined) filterName="filter"+sequence;
         
-        tmpObj={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}}        
+        
+        if (type=="Gain") {
+             tmpObj={"type":"Gain","parameters":{"gain":gain,"inverted":false,"scale":"dB"}};
+         } else {
+            tmpObj={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}};       
+         }
         return tmpObj;
     }
 
@@ -226,8 +252,10 @@ class PEQLine {
         createGrid(ctx); 
         let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
         let dataMatrix;
+        // console.log(filterObject);
         for (let filter of Object.keys(filterObject)) {  
-            // console.log(filterObject)                        
+            if (filterObject[filter].type=="Gain") continue;
+
             dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
             for (i=0;i<dataMatrix.length;i++) {
                 totalArray[i][0]=dataMatrix[i][0]

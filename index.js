@@ -43,15 +43,22 @@ app.get('/',(req,res)=>{
     res.render("main")
 }) 
 
-app.get('/advanced',(req,res)=>{
-    res.render('advanced');     
-}) 
-
 
 
 app.get('/equalizer',(req,res)=>{
     res.render('equalizer');     
 }) 
+
+app.get('/advanced',(req,res)=>{
+    res.render('advanced');     
+}) 
+
+app.get('/room',(req,res)=>{
+    res.render('room');     
+}) 
+
+
+
 
 app.get('/preferences',(req,res)=>{
     res.render('preferences');     

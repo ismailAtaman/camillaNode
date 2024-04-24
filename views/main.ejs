@@ -32,6 +32,24 @@
 
     </script>
 
+    <script>
+        function showImport() {
+            const mod = document.getElementById("importWindow");
+            mod.showModal();            
+        }
+
+        function showExport() {
+            const mod = document.getElementById("modalWindow");
+            mod.showModal();            
+        }
+
+        function showAutoEQ() {
+            const mod = document.getElementById("modalWindow");
+            mod.showModal();            
+
+        }
+    </script>
+
     <header>
         <div id="header" class="section">
             <div id="title">
@@ -39,26 +57,29 @@
                 <span>CamillaNode</span>
             </div>             
         </div>    
-        <div id="version"></div> 
-        <div id="status"></div>
+        <div id="version" class="smallInfo"></div> 
+        <div class="smallInfo">CamillaNode Version 2.0.1</div> 
+        <div id="status" class="smallInfo"></div>
     </header>
 
     <main>
+        
         <section id="sectionLeft">
 
             <span class="leftTitle">Navigation</span>
-            <div class="navigate" target="/connections"><img src="img/icon/connections.png" class="icon"> Connections</div>
-            <div class="navigate" target="/basic"><img src="img/icon/basic.png" class="icon"> Basic</div>
-            <div class="navigate" target="/equalizer"><img src="img/icon/equalizer.png" class="icon"> Equalizer</div>
-            <div class="navigate" target="/advanced"><img src="img/icon/advanced.png" class="icon"> Advanced</div>
-            <div class="navigate" target="/preferences"><img src="img/icon/connections.png" class="icon"> Preferences</div>            
+            <div class="navigate" target="/connections"><img src="img/icon/connections.png" class="icon">Connections</div>
+            <div class="navigate" target="/basic"><img src="img/icon/basic.png" class="icon">Basic</div>
+            <div class="navigate" target="/equalizer"><img src="img/icon/equalizer.png" class="icon">Equalizer</div>
+            <div class="navigate" target="/advanced"><img src="img/icon/advanced.png" class="icon">Advanced</div>
+            <div class="navigate" target="/room"><img src="img/icon/room.png" class="icon">Room EQ</div>
+            <div class="navigate" target="/preferences"><img src="img/icon/preferences.png" class="icon">Preferences</div>            
             <br>
 
             
             <div class="leftTitle">Tools</div>
-            <div class="navigate" target="/connections"><img src="img/icon/import.png" class="icon">Import</div>
-            <div class="navigate" target="/connections"><img src="img/icon/export.png" class="icon">Export</div>
-            <div class="navigate" target="/connections"><img src="img/icon/connections.png" class="icon">Auto EQ</div>
+            <div class="navigate" onclick="showImport()"  target=""><img src="img/icon/import.png" class="icon">Import</div>
+            <div class="navigate" onclick="showExport()"  target=""><img src="img/icon/export.png" class="icon">Export</div>
+            <div class="navigate" onclick="showAutoEQ()" target=""><img src="img/icon/connections.png" class="icon">Auto EQ</div>
             
             <br>
             
@@ -66,10 +87,24 @@
             
         </section>
 
-        <section id="sectionMain">            
+        <section id="sectionMain">                        
             <iframe id="mainframe" src="/equalizer" frameborder="0"></iframe>
         </section>
+        
     </main>
 
+    
+    <dialog id="modalWindow">
+        <button onclick="document.getElementById('modalWindow').close();">Close</button>
+    </dialog>
+
+
+    <dialog id="importWindow">        
+        <p>Import EQ settings from a text file. Please paste the text to import below.</p>
+        <div class="navigate" onclick="importFromText()"><img src="img/icon/import.png" class="icon">Import</div>   
+        <div class="navigate" onclick="this.parentElement.close()"><img src="img/icon/remove.png" class="icon">Close</div>   
+        <div id="importText" contenteditable="true"></div>
+        
+    </dialog>
 </body>
 </html>

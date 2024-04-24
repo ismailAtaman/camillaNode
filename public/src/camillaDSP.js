@@ -212,9 +212,10 @@ class camillaDSP {
         let pipeline=[];        
         pipeline.push({"type":"Mixer","name":Object.keys(config.mixers)[0]});
         pipeline.push({"type":"Filter","channel":0,"names":Object.keys(config.filters)})
-        pipeline.push({"type":"Filter","channel":0,"names":Object.keys(config.filters)})
+        pipeline.push({"type":"Filter","channel":1,"names":Object.keys(config.filters)})
         return pipeline;
     }
+
 
 
 

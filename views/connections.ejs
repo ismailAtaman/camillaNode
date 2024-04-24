@@ -28,19 +28,30 @@
             const port = document.getElementById('port').value;    
             const DSP = new camillaDSP();                
 
+            let state = document.getElementById("state");
+
             let connected = await DSP.connect(server,port)
             if (connected) {
                 window.localStorage.setItem("server",server);
                 window.localStorage.setItem("port",port);            
+            } else {                            
+                state.innerText="Can not connect to DSP. Make sure you got the corrent name or IP address and port, and the websocket server is enabled on external interface.";
+                state.style.color="#C66";
+                return -1;
             }
 
             let config =  await DSP.sendDSPMessage("GetConfigJson");
             config = camillaDSP.getDefaultConfig(config);
-            if (config.pipeline[0].name!="recombine") config = camillaDSP.getDefaultConfig(config,true)
+            if (config.pipeline[0].name!="recombine") config = camillaDSP.getDefaultConfig(config,true);
+            
+            state.innerText="Connected.";
+            state.style.color="#6C6";
 
-            DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.log(e));
-            let downLoadconfig = await DSP.sendDSPMessage("GetConfigJson");
-            //console.log(downLoadconfig)
+            let int=setInterval(function(int){                            
+                state.innerText='';                
+                window.clearInterval(int);
+            },5000);
+            
         }          
 
 
@@ -48,10 +59,10 @@
     <div>
         <div><span>IP Address</span><input id="server" type="text" value="opizero2.local"></div>
         <div><span>Port</span><input id="port" type="text" value="1234"></div>
-        <button onclick="connect()">Connect</button>        
+        <div style="display: flex; justify-content: right; width: 277px"><button onclick="connect()">Connect</button>        </div>
     </div>
     <br>
-    <div id="state"></div>
+    <div id="state" style="margin-left: 30px"></div>
 
 
 
