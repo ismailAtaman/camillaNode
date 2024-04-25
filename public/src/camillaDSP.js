@@ -1,8 +1,8 @@
 
 
 class camillaDSP {
-    ws = new Object();    
-    ws_spectrum = new Object();
+    ws;    
+    ws_spectrum;
     server;
     port;
     spectrumPort;
@@ -16,26 +16,41 @@ class camillaDSP {
         if (server==undefined) {
             server = window.localStorage.getItem("server");
             port = window.localStorage.getItem("port");
+            spectrumPort= window.localStorage.getItem("spectrumPort");
         }
 
-        return await this.connectToDsp(server,port).then((r)=>{ 
+        let connect = await this.connectToDSP(server,port).then((r)=>{ 
             this.ws = r[1];                                    
             this.server=server;
-            this.port=port;
-            return true;
+            this.port=port;           
+            console.log("Connected to DSP. Trying spectrum now..",this.ws) 
+            return true;            
         }).catch((e)=>{
             console.error("Connection error");
             console.error(e);            
             return false;
         });        
+
+        if (connect) {
+            connect = await this.connectToDSP(server,spectrumPort).then(p=>{                
+                this.ws_spectrum=p[1];
+                this.spectrumPort=spectrumPort;
+                console.log("Connected to spectrum.",this.ws_spectrum) 
+                return true;
+            }).catch(f=>{
+                console.error("Error connecting to spectrum error");
+                console.error(f);                
+                return false;
+            })            
+        }
+        return connect;
     }
 
-    async connectToDsp(server,port) {
+    connectToDSP(server,port) {        
         if (server==undefined) {
-            let serverConfig = getDefaultServerConfig();
-            server=serverConfig.serverIp;
-            port=serverConfig.port;        
-        }    
+            console.error("No server string specified")
+            return false;
+        }        
         let WS = new WebSocket("ws://"+server+":"+port);
         return new Promise((resolve,reject)=>{        
             WS.addEventListener('open',function(){                            
@@ -47,6 +62,9 @@ class camillaDSP {
             })
         })
     }
+
+
+
 
     static handleDSPMessage(m) {        
         const res = JSON.parse(m.data);                  
@@ -99,6 +117,7 @@ class camillaDSP {
         }
     
     }
+
     
     async sendDSPMessage(message) {        
         return new Promise((resolve,reject)=>{
@@ -114,6 +133,23 @@ class camillaDSP {
             });
 
             this.ws.send(JSON.stringify(message));             
+        })     
+    }   
+
+    async sendSpectrumMessage(message) {        
+        return new Promise((resolve,reject)=>{            
+            let eventListener = this.ws_spectrum.addEventListener('message',function(m){
+                const res = JSON.parse(m.data);
+                const responseCommand = Object.keys(res)[0];
+                if (message!=responseCommand) return;
+    
+                let handleResult = camillaDSP.handleDSPMessage(m);
+                if (handleResult[0]) resolve(handleResult[1]); else reject(handleResult[1]);
+
+                this.removeEventListener('message',eventListener);
+            });
+
+            this.ws_spectrum.send(JSON.stringify(message));             
         })     
     }   
 
@@ -225,7 +261,9 @@ class camillaDSP {
         return pipeline;
     }
 
-
+    async getSpectrumData() {
+        return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
+    }
 
 
 }

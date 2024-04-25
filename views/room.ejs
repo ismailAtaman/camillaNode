@@ -13,19 +13,20 @@
 <style>
     #spectrum {
         display: grid;        
-        grid-template-columns: repeat(30,auto);        
+        grid-template-columns: repeat(60,auto);        
         height: 300px;
-        width: 320px;
+        width: 620px;
         align-items:end;
-        border:1px solid #333;
+        
     }
 
     .levelBar {        
         display: inline-block;        
-        width: 10px;
+        width: 20px;
         height: 200px;
         margin-inline: 1px;
-        background: linear-gradient(90deg,green,#333);                
+        /* background: linear-gradient(90deg,hsl(120, 100%, 25%),hsl(120, 100%, 15%));                 */
+        background-color: hsl(200, 40%, 35%) ;
     }
 
 </style>
@@ -33,7 +34,7 @@
     <div id="sectionMainTitle"><img src="img/icon/room.png" class="icon">Room EQ</div>
 
     <br>
-    <input type="button" value="Mixer Multi" onclick="mixerMulti()">
+    <input type="button" value="Mixer Multi" onclick="">
     <input type="button" value="Check Levels" onclick="checkLevels()">
 
     <div id="spectrum">
@@ -67,6 +68,7 @@
         <div class="levelBar"></div>
         <div class="levelBar"></div>
         <div class="levelBar"></div>
+
     </div>
 
     <script>
@@ -129,23 +131,25 @@
             
         }
 
-        function checkLevels(){            
-            setInterval(function(){
+        async function checkLevels(){          
+            await DSP.connect();
+            
+            setInterval(async function(){
                 const spec = document.getElementById("spectrum");
-                DSP.sendDSPMessage("GetPlaybackSignalPeak").then(r=>{
-                    let i=0, height, hue;
-                    spec.childNodes.forEach(e=>{
-                        if (e.tagName=="DIV") {                            
-                            height = Math.round(-r[i]*2);  
-                            hue = -r[i]*2;
-                            e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
-                            i=i+2;
-                        }
-                    })
-                    
-                
-                }).catch(e=>console.log(e))},10);
+                let r = await DSP.getSpectrumData();                
+                let i=0, height, hue;
+                spec.childNodes.forEach(e=>{
+                    if (e.tagName=="DIV") {                         
+                        height = 200 + (1.5*Math.round(r[i]));  
+                        if (height<0) height=0;
+                        if (height>200) height=0;                        
+                        hue = -height;
+                        e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
+                        i=i+2;
+                    }                     
+                })               
 
+            },10)
         }
     </script>
 

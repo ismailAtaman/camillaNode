@@ -26,31 +26,39 @@
         async function connect() {
             const server = document.getElementById('server').value;        
             const port = document.getElementById('port').value;    
+            const spectrumPort = document.getElementById('spectrumPort').value;    
+
             const DSP = new camillaDSP();                
 
             let state = document.getElementById("state");
-
-            let connected = await DSP.connect(server,port)
+            let connected = await DSP.connect(server,port,spectrumPort)
+            console.log("Connection : ",connected)
 
             if (connected) {
                 window.localStorage.setItem("server",server);
                 window.localStorage.setItem("port",port);           
-                console.log("Connected") 
+                window.localStorage.setItem("spectrumPort",spectrumPort);           
+                console.log("Connected.") 
             } else {                            
                 state.innerText="Can not connect to DSP. Make sure you got the corrent name or IP address and port, and the websocket server is enabled on external interface.";
                 state.style.color="#C66";
                 return -1;
             }
 
-            let config =  await DSP.sendDSPMessage("GetConfigJson");
-            config = camillaDSP.getDefaultConfig(config);
+            let config =  await DSP.sendDSPMessage("GetConfigJson");            
             if (config.pipeline[0].name!="recombine") config = camillaDSP.getDefaultConfig(config,true);
-            await DSP.sendDSPMessage({"SetConfigJson":JSON.stringify(config)});
-
-            config =  await DSP.sendDSPMessage("GetConfigJson");
             
-            state.innerText="Connected.";
-            state.style.color="#6C6";
+            conencted = DSP.sendDSPMessage({"SetConfigJson":JSON.stringify(config)});            
+            if (connected) {
+                state.innerText="Connected.";
+                state.style.color="#6C6";
+            } else {
+                state.innerText="Error uploading configuration.";
+                state.style.color="#EC6";
+            }            
+            
+            // state.innerText="Connected.";
+            // state.style.color="#6C6";
 
             let int=setInterval(function(int){                            
                 state.innerText='';                
@@ -62,7 +70,7 @@
 
     </script>
     <style>
-        span {
+        span, #state {
             text-align: left;
         }
     </style>
@@ -74,7 +82,7 @@
         <div style="display: flex; justify-content: right; width: 277px"><button onclick="connect()">Connect</button>        </div>
     </div>
     <br>
-    <div id="state" style="margin-left: 30px"></div>
+    <div id="state"></div>
 
 
 
