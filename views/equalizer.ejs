@@ -164,10 +164,12 @@
         }
     
     </script>
-
+    <input type="button" onclick="document.DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));" value="Show Config">
     <div class="group" id="basicControls" label="Basic Controls">
+
+        
     </div>    
-    <input type="button" onclick="document.DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));">
+    
     <div class="group" id="PEQ" label="Parametric EQ">         
     </div>    
 

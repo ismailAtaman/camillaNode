@@ -31,9 +31,11 @@
             let state = document.getElementById("state");
 
             let connected = await DSP.connect(server,port)
+
             if (connected) {
                 window.localStorage.setItem("server",server);
-                window.localStorage.setItem("port",port);            
+                window.localStorage.setItem("port",port);           
+                console.log("Connected") 
             } else {                            
                 state.innerText="Can not connect to DSP. Make sure you got the corrent name or IP address and port, and the websocket server is enabled on external interface.";
                 state.style.color="#C66";
@@ -43,6 +45,9 @@
             let config =  await DSP.sendDSPMessage("GetConfigJson");
             config = camillaDSP.getDefaultConfig(config);
             if (config.pipeline[0].name!="recombine") config = camillaDSP.getDefaultConfig(config,true);
+            await DSP.sendDSPMessage({"SetConfigJson":JSON.stringify(config)});
+
+            config =  await DSP.sendDSPMessage("GetConfigJson");
             
             state.innerText="Connected.";
             state.style.color="#6C6";
@@ -56,9 +61,16 @@
 
 
     </script>
+    <style>
+        span {
+            text-align: left;
+        }
+    </style>
     <div>
+        
         <div><span>IP Address</span><input id="server" type="text" value="opizero2.local"></div>
-        <div><span>Port</span><input id="port" type="text" value="1234"></div>
+        <div><span>Audio Port</span><input id="port" type="text" value="1234"></div>
+        <div><span>Spectrum Port</span><input id="spectrumPort" type="text" value="4321"></div>
         <div style="display: flex; justify-content: right; width: 277px"><button onclick="connect()">Connect</button>        </div>
     </div>
     <br>

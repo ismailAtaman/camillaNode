@@ -27,7 +27,7 @@ class PEQLine {
         LS.value="Lowshelf";LS.innerText="LS";
         PK.value="Peaking";PK.innerText="PK";PK.selected=true;
         HS.value="Highshelf";HS.innerText="HS";
-        PRE.value="Gain";PRE.innerText="Pre";
+        // PRE.value="Gain";PRE.innerText="Pre";
         type.id="type";
         freq.type="text";freq.id="freq"; freq.setAttribute('value',1000);
         gain.type="text";gain.id="gain"; gain.setAttribute("value",0)
@@ -35,7 +35,8 @@ class PEQLine {
         addLineAfter.className='peqbutton';removeLine.className='peqbutton';addLineAfter.classList.add('add');removeLine.classList.add('remove')        
         spanType.innerText="Type :"; spanFreq.innerText="Frequency :";spanGain.innerText="Gain :",spanQfact.innerText="Q :";
 
-        type.appendChild(PRE);type.appendChild(LS);type.appendChild(PK);type.appendChild(HS);
+        // type.appendChild(PRE);
+        type.appendChild(LS);type.appendChild(PK);type.appendChild(HS);
         peqline.appendChild(enabled);
         peqline.appendChild(spanType); peqline.appendChild(type);
         peqline.appendChild(spanFreq); peqline.appendChild(freq);
@@ -75,25 +76,25 @@ class PEQLine {
         type.addEventListener("change", function(e){
             let oldValue = this.getAttribute("oldValue");              
             
-            if (this.value=="Gain") {
-                this.parentElement.removeChild(freq);
-                this.parentElement.removeChild(qfact);
-                this.parentElement.removeChild(spanFreq);
-                this.parentElement.removeChild(spanQfact);
-                this.parentElement.oldFilterName = this.parentElement.getAttribute("filterName");
-                this.parentElement.setAttribute("filterName","preamp");
+            // if (this.value=="Gain") {
+            //     this.parentElement.removeChild(freq);
+            //     this.parentElement.removeChild(qfact);
+            //     this.parentElement.removeChild(spanFreq);
+            //     this.parentElement.removeChild(spanQfact);
+            //     this.parentElement.oldFilterName = this.parentElement.getAttribute("filterName");
+            //     this.parentElement.setAttribute("filterName","preamp");
                 
-            } else {
-                if (this.parentElement.getAttribute("filterName")=="preamp") {
-                    this.parentElement.setAttribute("filterName",this.parentElement.oldFilterName);
-                    this.parentElement.insertBefore(qfact,addLineAfter)
-                    this.parentElement.insertBefore(spanQfact,qfact)
-                    this.parentElement.insertBefore(freq,spanGain)
-                    this.parentElement.insertBefore(spanFreq,freq)                
-                }                                
-            }
+            // } else {
+            //     if (this.parentElement.getAttribute("filterName")=="preamp") {
+            //         this.parentElement.setAttribute("filterName",this.parentElement.oldFilterName);
+            //         this.parentElement.insertBefore(qfact,addLineAfter)
+            //         this.parentElement.insertBefore(spanQfact,qfact)
+            //         this.parentElement.insertBefore(freq,spanGain)
+            //         this.parentElement.insertBefore(spanFreq,freq)                
+            //     }                                
+            // }
             
-            if (oldValue!="" && this.value!=oldValue) this.parentElement.dispatchEvent(new Event("update"));
+            this.parentElement.dispatchEvent(new Event("update"));
         })   
 
         freq.addEventListener('focus',function(){                        
@@ -252,17 +253,17 @@ class PEQLine {
         createGrid(ctx); 
         let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
         let dataMatrix;
-        // console.log(filterObject);
+        
         for (let filter of Object.keys(filterObject)) {  
-            if (filterObject[filter].type=="Gain") continue;
-
-            dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
-            for (i=0;i<dataMatrix.length;i++) {
-                totalArray[i][0]=dataMatrix[i][0]
-                totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
-            }    
-            color = color + 60;
-            plotArray(ctx,dataMatrix,"#"+color.toString(16),1.5);
+            // if (filterObject[filter].type=="Gain") continue;
+                dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
+                for (i=0;i<dataMatrix.length;i++) {
+                    totalArray[i][0]=dataMatrix[i][0]
+                    totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
+                }    
+                color = color + 60;
+                plotArray(ctx,dataMatrix,"#"+color.toString(16),1.5);
+            
         }
         plotArray(ctx, totalArray,"#EEE",3)
     }

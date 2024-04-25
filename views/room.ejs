@@ -5,9 +5,150 @@
     <meta name="viewport" content="width=100%, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
 </head>
+
+<script type="module">
+    import camillaDSP from "/src/camillaDSP.js"
+    window.DSP = new camillaDSP();
+</script>
+<style>
+    #spectrum {
+        display: grid;        
+        grid-template-columns: repeat(30,auto);        
+        height: 300px;
+        width: 320px;
+        align-items:end;
+        border:1px solid #333;
+    }
+
+    .levelBar {        
+        display: inline-block;        
+        width: 10px;
+        height: 200px;
+        margin-inline: 1px;
+        background: linear-gradient(90deg,green,#333);                
+    }
+
+</style>
 <body>
     <div id="sectionMainTitle"><img src="img/icon/room.png" class="icon">Room EQ</div>
-    
+
+    <br>
+    <input type="button" value="Mixer Multi" onclick="mixerMulti()">
+    <input type="button" value="Check Levels" onclick="checkLevels()">
+
+    <div id="spectrum">
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+        <div class="levelBar"></div>
+    </div>
+
+    <script>
+        async function mixerMulti() {
+            await DSP.connect()
+            let config = await DSP.sendDSPMessage("GetConfigJson");
+            let oldConfig = config;
+            let mixers = new Object();
+            let filters= new Object();
+            
+            mixers["multi"] = {"channels":{"in":2,"out":6}, 
+                "mapping":[
+                        {"dest":0,"sources":[{"channel":0}]},
+                        {"dest":1,"sources":[{"channel":1}]},
+                        {"dest":2,"sources":[{"channel":0}]},
+                        {"dest":3,"sources":[{"channel":1}]},
+                        {"dest":4,"sources":[{"channel":0}]},
+                        {"dest":5,"sources":[{"channel":1}]},                            
+                    ]                                                   
+            }            
+
+            // mixers["merge"] = {"channels":{"in":6,"out":2}, 
+            //     "mapping":[
+            //         {"dest":0,"sources":[{"channel":0}]},
+            //         {"dest":1,"sources":[{"channel":1}]},                    
+            //         ]                                                   
+            // }            
+
+            filters["band0"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":100,"q":1.41}}
+            filters["band1"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":500,"q":1.41}}
+            filters["band2"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":1000,"q":1.41}}
+            filters["band3"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":2000,"q":1.41}}
+            filters["band4"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":3000,"q":1.41}}
+            filters["band5"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":4000,"q":1.41}}
+            console.log(filters,config.filters);
+            let pipeline=[];        
+
+            pipeline.push({"type":"Mixer","name":"multi"});
+            pipeline.push({"type":"Filter","channel":0,"names":["band0"]})
+            pipeline.push({"type":"Filter","channel":1,"names":["band1"]})
+            pipeline.push({"type":"Filter","channel":2,"names":["band2"]})
+            pipeline.push({"type":"Filter","channel":3,"names":["band3"]})            
+            pipeline.push({"type":"Filter","channel":4,"names":["band3"]})            
+            pipeline.push({"type":"Filter","channel":5,"names":["band3"]})            
+            // pipeline.push({"type":"Mixer","name":"merge"});
+
+            config.mixers=mixers;
+            config.filters=filters;
+            console.log(config,oldConfig);            
+            // let pipeline = DSP.updatePipeline(config);
+            config.pipeline=pipeline;
+
+
+            DSP.sendDSPMessage({"SetConfigJson":JSON.stringify(config)}).then(r=>{
+                console.log(r);
+            }).catch(e=>{
+                console.error(e);
+            })
+            
+            
+        }
+
+        function checkLevels(){            
+            setInterval(function(){
+                const spec = document.getElementById("spectrum");
+                DSP.sendDSPMessage("GetPlaybackSignalPeak").then(r=>{
+                    let i=0, height, hue;
+                    spec.childNodes.forEach(e=>{
+                        if (e.tagName=="DIV") {                            
+                            height = Math.round(-r[i]*2);  
+                            hue = -r[i]*2;
+                            e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
+                            i=i+2;
+                        }
+                    })
+                    
+                
+                }).catch(e=>console.log(e))},10);
+
+        }
+    </script>
+
 </body>
 </html>
 
