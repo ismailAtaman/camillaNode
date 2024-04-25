@@ -95,7 +95,11 @@ class camillaDSP {
                 break;
             case "GetPlaybackSignalRms":
                 if (result=='Ok') return [true,value]; else return[false,value];           
-                break;                
+                break; 
+            case "GetPlaybackSignalPeakSinceLast":
+                if (result=='Ok') return [true,value]; else return[false,value];           
+                break; 
+                              
             case "SetUpdateInterval":
                 if (result=='Ok') return [true,value]; else return[false,value];           
                 break;                
@@ -262,7 +266,7 @@ class camillaDSP {
     }
 
     async getSpectrumData() {
-        return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
+        return await this.sendSpectrumMessage("GetPlaybackSignalPeakSinceLast");
     }
 
 

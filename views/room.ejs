@@ -20,13 +20,28 @@
         
     }
 
-    .levelBar {        
+    .levelbar {        
         display: inline-block;        
+        position: relative;
         width: 20px;
         height: 200px;
         margin-inline: 1px;
-        /* background: linear-gradient(90deg,hsl(120, 100%, 25%),hsl(120, 100%, 15%));                 */
-        background-color: hsl(200, 40%, 35%) ;
+        font-size: 12px;
+        /* background: linear-gradient(90deg,hsl(200, 100%, 25%),hsl(200, 100%, 15%));                 */
+        background-color: hsl(200, 40%, 35%) ;        
+        border-radius: 6px 6px 0 0;
+    }
+
+    .levelbar::after{
+        content: attr(freq);
+        position: absolute;
+        bottom: 0;
+        left:50%;
+        color:#888;
+        background-color: none;
+        font-size: 10px;
+        transform: translateX(-50%);
+
     }
 
 </style>
@@ -38,100 +53,28 @@
     <input type="button" value="Check Levels" onclick="checkLevels()">
 
     <div id="spectrum">
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-        <div class="levelBar"></div>
-
     </div>
 
     <script>
-        async function mixerMulti() {
-            await DSP.connect()
-            let config = await DSP.sendDSPMessage("GetConfigJson");
-            let oldConfig = config;
-            let mixers = new Object();
-            let filters= new Object();
-            
-            mixers["multi"] = {"channels":{"in":2,"out":6}, 
-                "mapping":[
-                        {"dest":0,"sources":[{"channel":0}]},
-                        {"dest":1,"sources":[{"channel":1}]},
-                        {"dest":2,"sources":[{"channel":0}]},
-                        {"dest":3,"sources":[{"channel":1}]},
-                        {"dest":4,"sources":[{"channel":0}]},
-                        {"dest":5,"sources":[{"channel":1}]},                            
-                    ]                                                   
-            }            
-
-            // mixers["merge"] = {"channels":{"in":6,"out":2}, 
-            //     "mapping":[
-            //         {"dest":0,"sources":[{"channel":0}]},
-            //         {"dest":1,"sources":[{"channel":1}]},                    
-            //         ]                                                   
-            // }            
-
-            filters["band0"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":100,"q":1.41}}
-            filters["band1"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":500,"q":1.41}}
-            filters["band2"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":1000,"q":1.41}}
-            filters["band3"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":2000,"q":1.41}}
-            filters["band4"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":3000,"q":1.41}}
-            filters["band5"] = {"type":"Biquad","parameters":{"type":"Bandpass","freq":4000,"q":1.41}}
-            console.log(filters,config.filters);
-            let pipeline=[];        
-
-            pipeline.push({"type":"Mixer","name":"multi"});
-            pipeline.push({"type":"Filter","channel":0,"names":["band0"]})
-            pipeline.push({"type":"Filter","channel":1,"names":["band1"]})
-            pipeline.push({"type":"Filter","channel":2,"names":["band2"]})
-            pipeline.push({"type":"Filter","channel":3,"names":["band3"]})            
-            pipeline.push({"type":"Filter","channel":4,"names":["band3"]})            
-            pipeline.push({"type":"Filter","channel":5,"names":["band3"]})            
-            // pipeline.push({"type":"Mixer","name":"merge"});
-
-            config.mixers=mixers;
-            config.filters=filters;
-            console.log(config,oldConfig);            
-            // let pipeline = DSP.updatePipeline(config);
-            config.pipeline=pipeline;
-
-
-            DSP.sendDSPMessage({"SetConfigJson":JSON.stringify(config)}).then(r=>{
-                console.log(r);
-            }).catch(e=>{
-                console.error(e);
-            })
-            
-            
-        }
-
+        const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
+        '315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
+        '3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
+    
         async function checkLevels(){          
+
+            // Create bars
+            const spec = document.getElementById("spectrum");   
+            const barCount=freq.length-1;
+            let bar;
+            spec.innerHTML='';
+            for (i=0;i<=barCount;i++){
+                bar = document.createElement("div");
+                bar.className='levelbar';
+                // bar.classList.add(bar % 2==0)?'left':'right';
+                bar.setAttribute('freq',freq[i]);
+                spec.appendChild(bar);
+            }
+
             await DSP.connect();
             
             setInterval(async function(){
@@ -140,16 +83,17 @@
                 let i=0, height, hue;
                 spec.childNodes.forEach(e=>{
                     if (e.tagName=="DIV") {                         
-                        height = 200 + (1.5*Math.round(r[i]));  
+                        height = 200 + (2*Math.round(r[i]));  
                         if (height<0) height=0;
                         if (height>200) height=0;                        
                         hue = -height;
                         e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
                         i=i+2;
                     }                     
-                })               
+                })       
+                        
 
-            },10)
+            },100)
         }
     </script>
 
