@@ -23,7 +23,7 @@ class camillaDSP {
             this.ws = r[1];                                    
             this.server=server;
             this.port=port;           
-            console.log("Connected to DSP. Trying spectrum now..",this.ws) 
+            console.log("Connected to DSP. Trying spectrum now..") 
             return true;            
         }).catch((e)=>{
             console.error("Connection error");
@@ -35,7 +35,7 @@ class camillaDSP {
             connect = await this.connectToDSP(server,spectrumPort).then(p=>{                
                 this.ws_spectrum=p[1];
                 this.spectrumPort=spectrumPort;
-                console.log("Connected to spectrum.",this.ws_spectrum) 
+                console.log("Connected to spectrum.") 
                 return true;
             }).catch(f=>{
                 console.error("Error connecting to spectrum error");

@@ -29,8 +29,6 @@
     margin: 0px;
     border: 0px;
     padding: 0px;
-
-
 }
 
 body {    
@@ -526,30 +524,44 @@ input[type="checkbox"]:checked::before {
 #spectrum {
     display: grid;        
     grid-template-columns: repeat(60,auto);        
-    height: 160px;    
+    height: 250px;    
     align-items:end;
 }
 
 .levelbar {        
-    display: inline-block;        
+    display: flex;        
+    flex-direction: column;
+    flex-wrap: wrap-reverse;
+    align-items: center;
+    justify-items: baseline;
     position: relative;
-    width: 30px;
-    height: 200px;
+    width: 31px;
+    height: 238px;
     margin-inline: 1px;
     font-size: 12px;
-    /* background: linear-gradient(90deg,hsl(200, 100%, 25%),hsl(200, 100%, 15%));                 */
-    background-color: hsl(200, 40%, 35%) ;        
-    border-radius: 6px 6px 0 0;        
+    background-color: hsl(160, 20%, 15%) ;        
+    border-radius: 4px;        
+    transform: rotate(180deg);
 }
 
 .levelbar::after{
     content: attr(freq);
     position: absolute;
-    bottom: 0;
-    left:50%;
-    color:#AAA;
+    bottom: 0;    
+    color:#444;
     background-color: none;
     font-size: 13px;
     transform: translateX(-50%);
+    transform: rotate(180deg);
+}
 
+.levelbox {
+    width: 100%;
+    height: 5px;
+    margin: 0;
+    background-color: gold;
+    opacity: 0;
+    margin-block: 2px;
+    border-radius: 4px;
+    transition: all 100ms;
 }

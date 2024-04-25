@@ -10,47 +10,18 @@
     import camillaDSP from "/src/camillaDSP.js"
     window.DSP = new camillaDSP();
 </script>
+
 <style>
-    #spectrum {
-        display: grid;        
-        grid-template-columns: repeat(60,auto);        
-        height: 300px;
-        width: 620px;
-        align-items:end;
-        
-    }
-
-    .levelbar {        
-        display: inline-block;        
-        position: relative;
-        width: 20px;
-        height: 200px;
-        margin-inline: 1px;
-        font-size: 12px;
-        /* background: linear-gradient(90deg,hsl(200, 100%, 25%),hsl(200, 100%, 15%));                 */
-        background-color: hsl(200, 40%, 35%) ;        
-        border-radius: 6px 6px 0 0;        
-    }
-
-    .levelbar::after{
-        content: attr(freq);
-        position: absolute;
-        bottom: 0;
-        left:50%;
-        color:#888;
-        background-color: none;
-        font-size: 10px;
-        transform: translateX(-50%);
-
-    }
 
 </style>
+
 <body>
     <div id="sectionMainTitle"><img src="img/icon/room.png" class="icon">Room EQ</div>
 
     <br>
     <input type="button" value="Mixer Multi" onclick="">
     <input type="button" value="Check Levels" onclick="checkLevels()">
+    <br><br><br>
 
     <div id="spectrum">
     </div>
@@ -64,14 +35,25 @@
 
             // Create bars
             const spec = document.getElementById("spectrum");   
+            
+
             const barCount=freq.length-1;
-            let bar;
+            let bar,box;
             spec.innerHTML='';
             for (i=0;i<=barCount;i++){
                 bar = document.createElement("div");
                 bar.className='levelbar';
                 // bar.classList.add(bar % 2==0)?'left':'right';
                 bar.setAttribute('freq',freq[i]);
+                hue=180;
+                for (j=1;j<40;j++) {
+                    box = document.createElement('div');
+                    box.className='levelbox';                    
+                    box.style="background-color: hsl("+hue+", 30%, 50%);"        
+                    hue=hue-10;
+                    bar.appendChild(box);
+                }
+
                 spec.appendChild(bar);
             }
 
@@ -80,14 +62,23 @@
             setInterval(async function(){
                 const spec = document.getElementById("spectrum");
                 let r = await DSP.getSpectrumData();                
-                let i=0, height, hue;
+                
+                let i=0, height, hue, boxCount, count;
                 spec.childNodes.forEach(e=>{
                     if (e.tagName=="DIV") {                         
                         height = 200 + (2*Math.round(r[i]));  
                         if (height<0) height=0;
-                        if (height>200) height=0;                        
+                        if (height>200) height=0;     
+                        boxCount= Math.round(height/8)-1;
                         hue = -height;
-                        e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
+                        // e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
+                        count=0;
+                        e.childNodes.forEach(e=>{
+                            if (e.tagName=="DIV") {
+                                if (count>boxCount) e.style.opacity=0; else e.style.opacity=1;
+                                count++
+                            }
+                        })
                         i=i+2;
                     }                     
                 })       
@@ -98,5 +89,6 @@
     </script>
 
 </body>
+
 </html>
 
