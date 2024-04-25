@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="sectionMainTitle"><img src="img/icon/equalizer.png" class="icon">Equalizer</div>
-    <%- include('plot.ejs'); %>
+    
     <script type="module">
         import PEQline from '/src/PEQLine.js';
         import camillaDSP from "/src/camillaDSP.js";       
@@ -94,6 +94,8 @@
             setInterval(function(){document.loading=false},50);
 
             // setInterval(function(){document.DSP.sendDSPMessage("GetConfigJson").then(r=>console.log(r.filters))},5000);
+
+            initSpectrum();
         }
 
         function addLine(parent,filterName,insertBefore) {
@@ -162,12 +164,55 @@
             const PEQ = document.getElementById('PEQ');
             addLine(PEQ,"NewFilter"+PEQ.children.length+1,peqline)
         }
+
+        const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
+        '315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
+        '3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
+    
+        async function initSpectrum(){          
+
+            // Create bars
+            const spec = document.getElementById("spectrum");   
+            const maxHeight= spec.getBoundingClientRect().height-10;
+            const barCount=freq.length-1;
+            let bar;
+            spec.innerHTML='';
+            for (i=0;i<=barCount;i++){
+                bar = document.createElement("div");
+                bar.className='levelbar';
+                // bar.classList.add(bar % 2==0)?'left':'right';
+                bar.setAttribute('freq',freq[i]);
+                spec.appendChild(bar);
+            }
+            
+            setInterval(async function(){
+                const spec = document.getElementById("spectrum");
+                let r = await document.DSP.getSpectrumData();                
+                let i=0, height, hue;
+                spec.childNodes.forEach(e=>{
+                    if (e.tagName=="DIV") {                         
+                        height = maxHeight + (2*Math.round(r[i]));  
+                        if (height<0) height=0;
+                        if (height>maxHeight) height=maxHeight;                        
+                        hue = -height/maxHeight*180;
+                        e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
+                        i=i+2;
+                    }                     
+                })       
+                        
+
+            },100)
+        }
     
     </script>
-    <input type="button" onclick="document.DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));" value="Show Config">
-    <div class="group" id="basicControls" label="Basic Controls">
+    <!-- <input type="button" onclick="document.DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));" value="Show Config"> -->
 
-        
+    <div id="spectrum" class="group">
+    </div>
+
+    <%- include('plot.ejs'); %>
+
+    <div class="group" id="basicControls" label="Basic Controls">        
     </div>    
     
     <div class="group" id="PEQ" label="Parametric EQ">         

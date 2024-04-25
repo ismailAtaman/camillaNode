@@ -266,7 +266,7 @@ class camillaDSP {
     }
 
     async getSpectrumData() {
-        return await this.sendSpectrumMessage("GetPlaybackSignalPeakSinceLast");
+        return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
     }
 
 
