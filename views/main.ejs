@@ -17,6 +17,7 @@
         // Connect to camillaDSP
         const DSP = new camillaDSP();
         let connected =await DSP.connect()
+        window.DSP=DSP;
 
         let version = document.getElementById('version')
         DSP.sendDSPMessage("GetVersion").then(r=>version.innerText="CamillaDSP Version "+r);
@@ -48,6 +49,13 @@
             mod.showModal();            
 
         }
+
+        function importClick() {
+            importFilters(document.getElementById('importText').innerText,window.DSP);
+            document.getElementById("importWindow").close();
+            document.getElementById("mainframe").src='/equalizer';            
+        }
+
     </script>
 
     <header>
@@ -83,7 +91,11 @@
             
             <br>
             
-            <div class="leftTitle">Saved Configurations</div>
+            <div class="leftTitle">Configurations</div>
+            <!-- <div style="margin-top:10px"><span>Current</span><input style="margin-left:10px" type="text" value="untitled"></div> -->
+            <div class="navigate" onclick="" target=""><img src="img/icon/save.png" class="icon">Save</div>
+            <div class="navigate" onclick="" target=""><img src="img/icon/open.png" class="icon">Open</div>
+            <div class="navigate" onclick="" target=""><img src="img/icon/delete.png" class="icon">Delete</div>
             
         </section>
 
@@ -101,10 +113,15 @@
 
     <dialog id="importWindow">        
         <p>Import EQ settings from a text file. Please paste the text to import below.</p>
-        <div class="navigate" onclick="importFromText()"><img src="img/icon/import.png" class="icon">Import</div>   
-        <div class="navigate" onclick="this.parentElement.close()"><img src="img/icon/remove.png" class="icon">Close</div>   
+        <div class="navigate" onclick="importClick()" target=""><img src="img/icon/import.png" class="icon">Import</div>   
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
         <div id="importText" contenteditable="true"></div>
         
     </dialog>
 </body>
 </html>
+
+
+<!-- 
+Revolve
+NTF0424S4H8VWRU8  -->

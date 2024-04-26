@@ -7,6 +7,8 @@ class camillaDSP {
     port;
     spectrumPort;
     config;
+    connected=false;
+    spectrum_connected=false;
 
     constructor() { 
         return this;        
@@ -24,10 +26,11 @@ class camillaDSP {
             this.server=server;
             this.port=port;           
             console.log("Connected to DSP. Trying spectrum now..") 
+            this.connected=true;
             return true;            
         }).catch((e)=>{
             console.error("Connection error");
-            console.error(e);            
+            console.error(e);                        
             return false;
         });        
 
@@ -36,6 +39,7 @@ class camillaDSP {
                 this.ws_spectrum=p[1];
                 this.spectrumPort=spectrumPort;
                 console.log("Connected to spectrum.") 
+                this.spectrum_connected=true;
                 return true;
             }).catch(f=>{
                 console.error("Error connecting to spectrum error");
@@ -269,6 +273,42 @@ class camillaDSP {
         return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
     }
 
+
+    async updateFilters(filters) {
+        if (this.config==undefined) this.config = await this.sendDSPMessage("GetConfigJson");
+        let name, obj, ret;
+        filters.forEach(e => {
+            name = Object.keys(e)[0];
+            obj = this.filterToJSON(e[name]);
+            this.config.filters[name] = obj;            
+        });
+
+        this.config.pipeline= this.updatePipeline(this.config);
+
+        this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).catch(e=>console.error("upload error",e));        
+
+    }
+
+    filterToJSON(filter) {                        
+        // Filter Format 
+        // filter[name] = {
+        //     "enabled"   : enabled,
+        //     "type"      : filterType,
+        //     "freq"      : parseInt(freq),
+        //     "gain"      : parseFloat(gain),
+        //     "q"         : parseFloat(qfact)
+        // }
+
+        let obj = new Object();                
+        if (!filter.enabled) gain=0;                  
+        if (filter.type=="Gain") {
+             obj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
+         } else {
+            obj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
+         }
+         console.log("json",obj)    
+        return obj;
+    }
 
 }
 

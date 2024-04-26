@@ -398,7 +398,7 @@ select {
     text-align: center;
 }
 
-.peqline input:hover, input:focus {
+.peqline input:hover, input:focus, select:hover {
     background-color: hsl(var(--bck-hue), 50%, 70%)
 }
 

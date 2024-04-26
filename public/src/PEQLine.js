@@ -95,6 +95,7 @@ class PEQLine {
             // }
             
             this.parentElement.dispatchEvent(new Event("update"));
+            
         })   
 
         freq.addEventListener('focus',function(){                        
@@ -203,14 +204,27 @@ class PEQLine {
         return tmpObj;
     }
 
+    static filterToJSON(filter) {                
+        
+        let tmpObj = new Object();        
+        if (!enabled) gain=0;        
+        
+        if (filter.type=="Gain") {
+             tmpObj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
+         } else {
+            tmpObj={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}};       
+         }
+        return tmpObj;
+    }
+    
+
     // Takes a JSON config filter object and updates values from it 
     JSONtoValues(filterObject) {
         // console.log(filterObject);
 
         let parameters=filterObject[Object.keys(filterObject)[0]].parameters;        
         if (parameters==undefined) parameters=filterObject["parameters"];
-        //console.log(parameters);
-        
+        //console.log(parameters);        
 
         this.peqline.childNodes.forEach(element => {            
             if (element.id=="type")  {  element.value =parameters.type; }
