@@ -11,9 +11,11 @@
         import EQKnob from '/src/knob.js';
         import camillaDSP from "/src/camillaDSP.js";
         import PEQLine from "/src/PEQLine.js";
+        import plot from '/src/eqplot.js';
 
         window.EQKnob = EQKnob;
         window.PEQLine=PEQLine;
+        window.plot=plot;
 
         const DSP = new camillaDSP();
         let connected =await DSP.connect()

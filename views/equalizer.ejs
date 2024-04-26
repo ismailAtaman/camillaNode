@@ -13,10 +13,12 @@
         import PEQline from '/src/PEQLine.js';
         import camillaDSP from "/src/camillaDSP.js";       
         import EQKnob from '/src/knob.js';
+        import plot from '/src/eqplot.js';
 
         window.PEQline = PEQline;
         window.camillaDSP = camillaDSP;                        
         window.EQKnob=EQKnob;
+        window.plot=plot;
     </script>
 
     <script> 
@@ -87,7 +89,7 @@
             
 
             sortByFreq(PEQ);
-            PEQline.plot(config.filters,ctx);         
+            plot(config.filters,ctx);         
 
 
             // change loading to false after 100ms to avoud update running multiple times during loading.            

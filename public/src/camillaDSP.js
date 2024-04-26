@@ -210,19 +210,17 @@ class camillaDSP {
         const midsFilter = camillaDSP.createPeakFilterJSON(1000,mids,1.41);
         const upperMidsFilter = camillaDSP.createPeakFilterJSON(3000,upperMids,1.41);
         const trebleFilter = camillaDSP.createPeakFilterJSON(8000,treble,1.41);
-
-        config.filters={};
+        
         config.filters["subBass"]=subBassFilter;
         config.filters["bass"]=bassFilter;
         config.filters["mids"]=midsFilter;
         config.filters["upperMids"]=upperMidsFilter;
         config.filters["treble"]=trebleFilter;
         
-        config.pipeline=[{"type":"Mixer","name":"recombine"}];
-        config.pipeline.push({"type":"Filter","channel":0,"names":["subBass","bass","mids","upperMids","treble"]})
-        config.pipeline.push({"type":"Filter","channel":1,"names":["subBass","bass","mids","upperMids","treble"]})
+        config.pipeline=this.updatePipeline(config);        
         
-        return this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>console.log(r)).catch(e=>console.error(e));
+        this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});
+        return config;
     }
 
     async setCrossfeed(crossfeedVal) {
@@ -245,8 +243,7 @@ class camillaDSP {
     }
 
     async getCrossfeed() {
-        let config = await this.sendDSPMessage("GetConfigJson");
-        console.log(config)
+        let config = await this.sendDSPMessage("GetConfigJson");        
         if (config.mixers.recombine.mapping[0].sources[1].mute == true) return -16.5; else return config.mixers.recombine.mapping[0].sources[1].gain;
     }
     

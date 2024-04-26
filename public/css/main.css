@@ -496,7 +496,7 @@ input[type="checkbox"]:checked::before {
 }
 
 .remove {
-    background: no-repeat center url("/img/icon/remove.png");
+    background: no-repeat center url("/img/icon/remove.png");    
 }
 
 

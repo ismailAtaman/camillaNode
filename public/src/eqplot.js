@@ -1,10 +1,12 @@
-const QUADLEN = 1024;
+export default plot;
 
-function calculateFilterDataMatrix(type, freq, gain, qfact) {
-	
+const QUADLEN = 1024;
+const colorArray=[""]
+
+function calculateFilterDataMatrix(type, freq, gain, qfact) {	
 	let sampleRate=48000;
 	var a0,a1,a2,b1,b2,norm;
-	var ymin, ymax, minVal, maxVal;
+	var minVal, maxVal;
 	
 	var V = Math.pow(10, Math.abs(gain) / 20);
 	var K = Math.tan(Math.PI * freq /sampleRate);
@@ -185,11 +187,11 @@ function plotArray(canvas, array, col, lineWidth){
 	ctx.lineWidth = lineWidth;
 	ctx.setLineDash([]);
 
-	stepSize = w / array.length;
-	heightScale= 15.7; //h / (5 * 10);      	
+	let stepSize = w / array.length;
+	const heightScale= 15.7; //h / (5 * 10);      	
 	let max=0;
 	let rounded=[];
-	for (i=0;i<array.length;i++) {            		
+	for (let i=0;i<array.length;i++) {            		
 		x=30 + i * stepSize;		
 		if (x<60) continue;
 		rounded[0]=Math.round(array[i][1],2);
@@ -198,8 +200,7 @@ function plotArray(canvas, array, col, lineWidth){
 		ctx.lineTo(x,y);				
 	}        
 	ctx.stroke();               
-	
-	
+	return {"color":col,"lineWidth":lineWidth};	
 }
 
 function createGrid(canvas) {
@@ -219,17 +220,18 @@ function createGrid(canvas) {
 	
 
 	ctx.beginPath();
-	for (i=1;i<verticalLineCount;i+=2) {    		
+	for (let i=1;i<verticalLineCount;i+=2) {    		
 		ctx.moveTo(60,verticalStepSize * i);
 		ctx.lineTo(w-10,verticalStepSize * i) 
-		level = (i + verticalLineCount/2 - verticalLineCount)*-1;
+		let level = (i + verticalLineCount/2 - verticalLineCount)*-1;
 		ctx.fillText(level+"dB", 10 ,verticalStepSize * i)		
 	}   
 	ctx.stroke();     	
 			
 	ctx.beginPath();
+	let xPos;
 	const freqList = [[30,28],[40, 71],[50, 104],[60, 131],[70, 154],[80, 174],[90, 191],[100, 207],[200, 309],[300, 369],[400, 412],[500, 445],[600, 472],[700, 495],[800, 515],[900, 532],[1000, 548],[2000, 650],[3000, 711],[4000, 753],[5000, 786],[6000, 814],[7000, 837],[8000, 857],[9000, 874],[10000, 890],[11000, 904],[12000, 918],[13000, 930],[14000, 941],[15000, 951],[16000, 961],[17000, 971],[18000, 979],[19000, 988],[20000, 996]]
-	for (i=0;i<freqList.length;i++) {		
+	for (let i=0;i<freqList.length;i++) {		
 	
 		xPos= 35+freqList[i][1];
 		switch(freqList[i][0]) {
@@ -261,3 +263,28 @@ function createGrid(canvas) {
 	
 }
 
+function plot(filterObject,canvas) {
+	const ctx = canvas;        
+	const context = ctx.getContext('2d');             
+	context.clearRect(0, 0, ctx.width, ctx.height)        	
+
+	createGrid(ctx); 
+	let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
+	let dataMatrix;
+	let color = parseInt("88e015",16);	
+	
+	for (let filter of Object.keys(filterObject)) {  
+		if (filterObject[filter].type=="Gain") continue;
+		dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
+		for (let i=0;i<dataMatrix.length;i++) {
+			totalArray[i][0]=dataMatrix[i][0]
+			totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
+		}
+		color = color+15;
+		plotArray(ctx,dataMatrix,"#"+color.toString(16),0.3);
+		
+		// plotArray(ctx,dataMatrix,"#88e015",1);
+		
+	}
+	let t= plotArray(ctx, totalArray,"#FFF",3);	
+}

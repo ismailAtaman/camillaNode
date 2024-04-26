@@ -91,11 +91,11 @@ async function basicOnLoad() {
     upperMids.knob.instance.setVal(config.filters["upperMids"].parameters.gain*10+181);
     treble.knob.instance.setVal(config.filters["treble"].parameters.gain*10+181);
     
-    PEQLine.plot(config.filters,canvas);
+    plot(config.filters,canvas);
 
 }
 
-function setTone() {
+async function setTone() {
     const knobs = document.getElementsByClassName('knob');
     let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;            
 
@@ -114,5 +114,7 @@ function setTone() {
     trebleVal = (parseInt(trebleVal)-181)/10
     
     // console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
-    // DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);   
+    let config = await DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
+    const canvas = document.getElementById('plotCanvas');        
+    plot(config.filters,canvas);  
 }

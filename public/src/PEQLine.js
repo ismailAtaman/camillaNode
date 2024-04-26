@@ -255,34 +255,7 @@ class PEQLine {
         tmpPEQLine.setAttribute("sequence",sequence);        
         if (insertBefore==undefined) parent.appendChild(tmpPEQLine); else if(insertBefore.nextSibling) parent.insertBefore(tmpPEQLine,insertBefore.nextSibling); else parent.appendChild(tmpPEQLine)
         return tmpPEQLine;
-    }
-
-    static plot(filterObject,canvas) {
-        const ctx = canvas;        
-        const context = ctx.getContext('2d');             
-        context.clearRect(0, 0, ctx.width, ctx.height)        
-        let color=parseInt("0F0",16);
-        
-
-        createGrid(ctx); 
-        let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
-        let dataMatrix;
-        
-        for (let filter of Object.keys(filterObject)) {  
-            // if (filterObject[filter].type=="Gain") continue;
-                dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
-                for (i=0;i<dataMatrix.length;i++) {
-                    totalArray[i][0]=dataMatrix[i][0]
-                    totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
-                }    
-                color = color + 60;
-                plotArray(ctx,dataMatrix,"#"+color.toString(16),1.5);
-            
-        }
-        plotArray(ctx, totalArray,"#EEE",3)
-    }
-
-    
+    }    
 
 }
 
