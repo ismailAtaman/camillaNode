@@ -82,13 +82,18 @@
 
 
             /// Parametric EQ section
-            for (let filterName of Object.keys(config.filters)) {            
-                let line = addLine(PEQ,filterName);                
-                line.instance.JSONtoValues(config.filters[filterName]);                
+            let line;
+            for (let filterName of Object.keys(config.filters)) {                  
+                if (filterName=="Gain") {
+                    line = addLine(PEQ,filterName,PEQ.childNodes[0]);                    
+                } else {
+                    line = addLine(PEQ,filterName);                    
+                }
+                // line.instance.update();
+                line.instance.JSONtoValues(config.filters[filterName]);                    
             }
             
-
-            sortByFreq(PEQ);
+            // sortByFreq(PEQ);
             plot(config.filters,ctx);         
 
 
@@ -124,23 +129,22 @@
 
             elementArray.sort(compareLines);            
             for (let element of elementArray) {
+                console(element.instance.getParams.type);
                 parent.appendChild(element);
             }
         }
 
         async function peqlineUpdate() {                        
             if (document.loading) return;
-
             const ctx = document.getElementById("plotCanvas")
             let filters = generateFiltersObject();
             console.log(filters)
-            PEQline.plot(filters,ctx);  
-            
+
+            plot(filters,ctx);              
             let config = await document.DSP.sendDSPMessage("GetConfigJson");
-            config.filters=filters;       
+            // config.filters=filters;       
             
-            config.pipeline= document.DSP.updatePipeline(config);
-                 
+            config.pipeline= document.DSP.updatePipeline(config);                 
             await document.DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});                                                                           
         }
 

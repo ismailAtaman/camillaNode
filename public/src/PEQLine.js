@@ -27,7 +27,7 @@ class PEQLine {
         LS.value="Lowshelf";LS.innerText="LS";
         PK.value="Peaking";PK.innerText="PK";PK.selected=true;
         HS.value="Highshelf";HS.innerText="HS";
-        // PRE.value="Gain";PRE.innerText="Pre";
+        PRE.value="Gain";PRE.innerText="PRE";        
         type.id="type";
         freq.type="text";freq.id="freq"; freq.setAttribute('value',1000);
         gain.type="text";gain.id="gain"; gain.setAttribute("value",0)
@@ -35,7 +35,7 @@ class PEQLine {
         addLineAfter.className='peqbutton';removeLine.className='peqbutton';addLineAfter.classList.add('add');removeLine.classList.add('remove')        
         spanType.innerText="Type :"; spanFreq.innerText="Frequency :";spanGain.innerText="Gain :",spanQfact.innerText="Q :";
 
-        // type.appendChild(PRE);
+        type.appendChild(PRE);
         type.appendChild(LS);type.appendChild(PK);type.appendChild(HS);
         peqline.appendChild(enabled);
         peqline.appendChild(spanType); peqline.appendChild(type);
@@ -76,23 +76,23 @@ class PEQLine {
         type.addEventListener("change", function(e){
             let oldValue = this.getAttribute("oldValue");              
             
-            // if (this.value=="Gain") {
-            //     this.parentElement.removeChild(freq);
-            //     this.parentElement.removeChild(qfact);
-            //     this.parentElement.removeChild(spanFreq);
-            //     this.parentElement.removeChild(spanQfact);
-            //     this.parentElement.oldFilterName = this.parentElement.getAttribute("filterName");
-            //     this.parentElement.setAttribute("filterName","preamp");
+            if (this.value=="Gain") {
+                this.parentElement.removeChild(freq);
+                this.parentElement.removeChild(qfact);
+                this.parentElement.removeChild(spanFreq);
+                this.parentElement.removeChild(spanQfact);
+                this.parentElement.oldFilterName = this.parentElement.getAttribute("filterName");
+                this.parentElement.setAttribute("filterName","preamp");
                 
-            // } else {
-            //     if (this.parentElement.getAttribute("filterName")=="preamp") {
-            //         this.parentElement.setAttribute("filterName",this.parentElement.oldFilterName);
-            //         this.parentElement.insertBefore(qfact,addLineAfter)
-            //         this.parentElement.insertBefore(spanQfact,qfact)
-            //         this.parentElement.insertBefore(freq,spanGain)
-            //         this.parentElement.insertBefore(spanFreq,freq)                
-            //     }                                
-            // }
+            } else {
+                if (this.parentElement.getAttribute("filterName")=="preamp") {
+                    this.parentElement.setAttribute("filterName",this.parentElement.oldFilterName);
+                    this.parentElement.insertBefore(qfact,addLineAfter)
+                    this.parentElement.insertBefore(spanQfact,qfact)
+                    this.parentElement.insertBefore(freq,spanGain)
+                    this.parentElement.insertBefore(spanFreq,freq)                
+                }                                
+            }
             
             this.parentElement.dispatchEvent(new Event("update"));
             
@@ -179,6 +179,13 @@ class PEQLine {
         return peqline;
     }
 
+    update() {
+        let event = new Event("change");
+        this.peqline.childNodes.forEach(element=>{            
+            element.dispatchEvent(event)
+        })
+    }
+
     // Takes telement values and creates JSON config object
     valuesToJSON() {                
         let enabled,type,freq,gain,qfact;
@@ -220,18 +227,23 @@ class PEQLine {
 
     // Takes a JSON config filter object and updates values from it 
     JSONtoValues(filterObject) {
-        // console.log(filterObject);
+        //  console.log(filterObject);
 
-        let parameters=filterObject[Object.keys(filterObject)[0]].parameters;        
-        if (parameters==undefined) parameters=filterObject["parameters"];
-        //console.log(parameters);        
+        let parameters=filterObject[Object.keys(filterObject)[0]].parameters;    
+        if (parameters==undefined) parameters=filterObject["parameters"];        
 
-        this.peqline.childNodes.forEach(element => {            
-            if (element.id=="type")  {  element.value =parameters.type; }
-            if (element.id=="freq")  { element.value = parameters.freq; element.oldValue=parameters.freq; }
-            if (element.id=="gain")  { element.value = parameters.gain; element.oldValue=parameters.gain }
-            if (element.id=="qfact") { element.value = parameters.q; element.oldValue=parameters.q }
-        });
+
+
+        if (filterObject.type=="Gain") {
+            this.peqline.children["type"].value="PRE";             
+            this.peqline.children["gain"].value = parameters.gain;
+            console.log(this.peqline.children["type"].value);
+        } else {                        
+            this.peqline.children["type"].value=parameters.type;
+            this.peqline.children["freq"].value= parameters.freq;        
+            this.peqline.children["gain"].value = parameters.gain;
+            this.peqline.children["qfact"].value = parameters.q;
+        }
     }
 
     getParams() {

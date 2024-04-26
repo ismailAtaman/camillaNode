@@ -402,7 +402,7 @@ select {
     background-color: hsl(var(--bck-hue), 50%, 70%)
 }
 
-.peqline input[type="text"] {
+.peqline input[type="text"] {    
     margin-right: 10px;
     appearance: none;    
     border: none;
@@ -446,7 +446,7 @@ input[type="checkbox"]:checked::before {
     appearance: none;
     border: none;
     border-radius: 3px;
-    margin-right: 5px;
+    margin-right: 15px;
 }
 .peqline span {
     width: 4.5rem;
@@ -556,7 +556,7 @@ input[type="checkbox"]:checked::before {
     content: attr(freq);
     position: absolute;
     bottom: 0;    
-    color:#444;
+    color:#666;
     background-color: none;
     font-size: 13px;
     transform: translateX(-50%);
