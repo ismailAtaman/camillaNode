@@ -501,23 +501,31 @@ input[type="checkbox"]:checked::before {
 
 
 /************************************************* DIALOGUES *********************************************************************/
-#importWindow {
+#importWindow {        
     color: white;            
     width: 40vw;
     height: fit-content;
     transform: translate(-50%, -50%); 
 }
 
-#importText {    
-    padding: 10px;
+#importWindow .navigate {
+    height: 15px;
+}
+
+#importText {        
     font-family: 'Courier New', Courier, monospace;       
     background-color: hsl(var(--bck-hue), var(--bck-sat),10%);
     border-radius: 5px;    
     margin: 15px;
     color:white;
     min-height: 300px;
+    width: 35vw;
+    padding: 5px;    
 }
 
+#importText:focus {
+    appearance: none;
+}
 
 /***************************************************** SPECTRUM *******************************************************************/
 

@@ -1002,7 +1002,7 @@ class EQSlider {
 
     static convertConfigToText() {
         let preampGain = document.getElementById('preampGainVal').value;
-        let configText=`Preamp: ${preampGain} dB\n`
+        let configText=`Preamp: ${preampGain}\n`
         let sliders = document.getElementsByClassName('slider-container');
         for (let filterNo=0;filterNo<sliders.length;filterNo++) {
             let filterTypeText = sliders[filterNo].children['filterType'].value;            

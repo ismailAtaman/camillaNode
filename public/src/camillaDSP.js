@@ -67,9 +67,6 @@ class camillaDSP {
         })
     }
 
-
-
-
     static handleDSPMessage(m) {        
         const res = JSON.parse(m.data);                  
     
@@ -125,7 +122,6 @@ class camillaDSP {
         }
     
     }
-
     
     async sendDSPMessage(message) {        
         return new Promise((resolve,reject)=>{
@@ -272,7 +268,6 @@ class camillaDSP {
     async getSpectrumData() {
         return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
     }
-
 
     async updateFilters(filters) {
         if (this.config==undefined) this.config = await this.sendDSPMessage("GetConfigJson");

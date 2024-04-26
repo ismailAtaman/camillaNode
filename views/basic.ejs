@@ -3,186 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
-    <link rel="stylesheet" href="css/main.css">
-    <script src="src/main.js" defer></script>
-    <script type="module" src="src/knob.js"></script>
     <title>basic</title>
 
+    <link rel="stylesheet" href="css/main.css">    
+    <script src="src/main.js"></script>    
     <script type="module" >
         import EQKnob from '/src/knob.js';
         import camillaDSP from "/src/camillaDSP.js";
-        
-        const basicControls = document.getElementById('basicControls');
-        const canvas = document.getElementById('plotCanvas');
-        // console.log("Width",canvas.getBoundingClientRect().width)
+        import PEQLine from "/src/PEQLine.js";
 
+        window.EQKnob = EQKnob;
+        window.PEQLine=PEQLine;
 
-        // Connect to camillaDSP
         const DSP = new camillaDSP();
         let connected =await DSP.connect()
+        window.DSP=DSP;        
 
-        if (!connected) throw new Error("Can not connect to DSP!"); else console.log("Connected");
-            
+        document.addEventListener("DOMContentLoaded",basicOnLoad());
 
-        // Create UI elements
-        let vol = new EQKnob("Volume",31);        
-        let balance = new EQKnob("Balance",181);
-        let crossfeed = new EQKnob("Crossfeed",31);
-
-        crossfeed.knob.instance.offAtDefault=true;
-        balance.knob.instance.offAtDefault=true;
-        
-        basicControls.appendChild(vol.knob);        
-        basicControls.appendChild(balance.knob)
-        basicControls.appendChild(crossfeed.knob)
-
-        let subBass = new EQKnob("Sub-bass",181);
-        let bass = new EQKnob("Bass",181);
-        let mids = new EQKnob("Mids",181);
-        let upperMids = new EQKnob("Upper Mids",181);
-        let treble = new EQKnob("Treble",181);
-
-        subBass.knob.instance.offAtDefault=true;
-        bass.knob.instance.offAtDefault=true;
-        mids.knob.instance.offAtDefault=true;
-        upperMids.knob.instance.offAtDefault=true;
-        treble.knob.instance.offAtDefault=true;
-
-        const toneControls = document.getElementById('toneControls');
-        toneControls.appendChild(subBass.knob);
-        toneControls.appendChild(bass.knob);
-        toneControls.appendChild(mids.knob);
-        toneControls.appendChild(upperMids.knob);
-        toneControls.appendChild(treble.knob);
-
-        // Load data from DSP
-        DSP.sendDSPMessage("GetVolume").then(r=>{            
-            let volMarker = r/3*10 + 181;
-            vol.setVal(volMarker);            
-        });
-
-        // load crossfeed
-        let crossfeedVal = await DSP.getCrossfeed() * 20 +331;        
-        crossfeed.knob.instance.setVal(crossfeedVal);
-
-        // load balance
-        let bal = await DSP.getBalance() * 10 +181;
-        balance.knob.instance.setVal(bal)
-
-        vol.knob.addEventListener("change",function(e){
-            const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
-            DSP.sendDSPMessage({"SetVolume":volume})
-        })
-
-        balance.knob.addEventListener("change",function(e){
-            const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
-            DSP.setBalance(bal);
-        })
-
-        crossfeed.knob.addEventListener("change",function(e){
-            let crossfeedVal = (this.instance.getVal()-331)/20;
-            // console.log(crossfeedVal)
-            DSP.setCrossfeed(crossfeedVal);
-        })
-
-
-        function setTone() {
-            const knobs = document.getElementsByClassName('knob');
-            let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;            
-
-            for (let knob of knobs) {
-                if (knob.getAttribute("label")=="Sub-bass") subBassVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Bass") bassVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Mids") midsVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Upper Mids") upperMidsVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Treble") trebleVal= knob.instance.getVal();
-            }
-
-            subBassVal = (parseInt(subBassVal)-181)/10
-            bassVal = (parseInt(bassVal)-181)/10
-            midsVal = (parseInt(midsVal)-181)/10
-            upperMidsVal = (parseInt(upperMidsVal)-181)/10
-            trebleVal = (parseInt(trebleVal)-181)/10
-            
-            // console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
-            DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
-
-            /// Plot the curve 
-            plot()            
-        }
-
-        subBass.knob.addEventListener("change",setTone);
-        bass.knob.addEventListener("change",setTone);
-        mids.knob.addEventListener("change",setTone);
-        upperMids.knob.addEventListener("change",setTone);
-        treble.knob.addEventListener("change",setTone);
-
-        // Load filters
-        let config = await DSP.sendDSPMessage("GetConfigJson");
-        // console.log(config.pipeline)
-        if (config.filters["subBass"]==undefined) {
-            let r = await DSP.setTone(0,0,0,0,0);
-            console.log(r)
-            let config = await DSP.sendDSPMessage("GetConfigJson");
-            // console.log(config.filters)
-        }
-
-
-        console.log(config.filters);
-        
-        subBass.knob.instance.setVal(config.filters["subBass"].parameters.gain*10+181);
-        bass.knob.instance.setVal(config.filters["bass"].parameters.gain*10+181);
-        mids.knob.instance.setVal(config.filters["mids"].parameters.gain*10+181);
-        upperMids.knob.instance.setVal(config.filters["upperMids"].parameters.gain*10+181);
-        treble.knob.instance.setVal(config.filters["treble"].parameters.gain*10+181);
-
-
-
-        plot();
-
-        function plot() {            
-            const ctx = document.getElementById("plotCanvas");
-            const knobs = document.getElementsByClassName('knob');
-            
-            const context = ctx.getContext('2d');             
-            context.clearRect(0, 0, ctx.width, ctx.height)
-
-            
-            let subBassVal, bassVal, midsVal,upperMidsVal,trebleVal;
-            for (let knob of knobs) {
-                if (knob.getAttribute("label")=="Sub-bass") subBassVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Bass") bassVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Mids") midsVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Upper Mids") upperMidsVal= knob.instance.getVal();
-                if (knob.getAttribute("label")=="Treble") trebleVal= knob.instance.getVal();
-            }
-            
-            subBassVal = (parseInt(subBassVal)-181)/10
-            bassVal = (parseInt(bassVal)-181)/10
-            midsVal = (parseInt(midsVal)-181)/10
-            upperMidsVal = (parseInt(upperMidsVal)-181)/10
-            trebleVal = (parseInt(trebleVal)-181)/10
-
-            createGrid(ctx); 
-            let totalArray = [];
-
-            let f1 = calculateFilterDataMatrix("Peaking", 70, subBassVal, 1.41);              
-            let f2 = calculateFilterDataMatrix("Peaking", 200, bassVal, 1.41);    
-            let f3 = calculateFilterDataMatrix("Peaking", 1000, midsVal, 1.41);    
-            let f4 = calculateFilterDataMatrix("Peaking", 3000, upperMidsVal, 1.41);    
-            let f5 = calculateFilterDataMatrix("Peaking", 8000, trebleVal, 1.41);    
-            for (i=0;i<f1.length;i++) {
-                 totalArray.push([f1[i][0], f1[i][1]+f2[i][1]+f3[i][1]+f4[i][1]+f5[i][1]]);        
-            }
-
-            plotArray(ctx, f1,"#D20",2)
-            plotArray(ctx, f2,"#CC0",2)
-            plotArray(ctx, f3,"#0C2",2)
-            plotArray(ctx, f4,"#057",2)
-            plotArray(ctx, f5,"#02E",2)            
-            plotArray(ctx, totalArray,"#EEE",3)
-        }        
-    </script>
+    </script>    
+    <script src="src/basic.js"></script>    
 </head>
 <body>    
     <div id="sectionMainTitle"><img src="img/icon/basic.png" class="icon">Basic</div>
@@ -195,4 +35,6 @@
 
     </div>
 </body>
+
+
 </html>
