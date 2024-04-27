@@ -1,5 +1,3 @@
-export default plot;
-
 const QUADLEN = 1024;
 const colorArray=[""]
 
@@ -288,3 +286,6 @@ function plot(filterObject,canvas) {
 	}
 	let t= plotArray(ctx, totalArray,"#FFF",3);	
 }
+
+
+export default plot;

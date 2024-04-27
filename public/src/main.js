@@ -1,20 +1,47 @@
 
 
-document.addEventListener('DOMContentLoaded',mainBodyOnLoad);
 
-
-function mainBodyOnLoad() {
-    const mainframe = document.getElementById('mainframe');    
+function mainBodyOnLoad() {    
+    if (document.title !='CamillaNode') return;
+    window.mainframe = document.getElementById('mainframe');    
 
     // Find all navigate items and add event handler to change them to links to their target attribute        
     const navigates = document.getElementsByClassName("navigate");    
     for (i=0;i<navigates.length;i++) {        
         navigates[i].addEventListener('click',function (){ 
             let target =this.getAttribute('target')
-            if (target.length>0) mainframe.src=target;             
+            if (target.length>0) window.mainframe.src=target;             
         })
     }    
+
+    // Hide indicators.
+    let indicators = document.getElementById("indicators")
+    if (indicators!=null) indicators.style = 'display:none'
+
+    // Connect to camillaDSP
+    conectToDSP();
+    
+
 }
+
+async function conectToDSP() {
+    const DSP = new camillaDSP();
+    await DSP.connect();
+
+    let version = document.getElementById('version')
+    DSP.sendDSPMessage("GetVersion").then(r=>version.innerText="CamillaDSP Version "+r);
+
+    let status = document.getElementById('status')            
+    DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);    
+
+
+    setInterval(async ()=>{
+        let status = document.getElementById('status')            
+        DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);                        
+    },5000);
+    window.DSP= DSP;        
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +147,60 @@ function getActivePage() {
     return window.document.frame.src.split("/")[3];            
 }
 
+async function connect(camillaDSP) {
+    const server = document.getElementById('server').value;        
+    const port = document.getElementById('port').value;    
+    const spectrumPort = document.getElementById('spectrumPort').value;    
+
+    const DSP = new camillaDSP();                
+
+    let state = document.getElementById("state");
+    let connected = await DSP.connect(server,port,spectrumPort)    
+
+    if (connected) {
+        window.localStorage.setItem("server",server);
+        window.localStorage.setItem("port",port);           
+        window.localStorage.setItem("spectrumPort",spectrumPort);           
+        console.log("Connected.") 
+    } else {                            
+        state.innerText="Can not connect to DSP. Make sure you got the corrent name or IP address and port, and the websocket server is enabled on external interface.";
+        state.style.color="#C66";
+        return -1;
+    }
+
+    
+    let config =  await DSP.sendDSPMessage("GetConfigJson");                     
+    if (config.pipeline==null || config.mixers==null || config.filter==null) config = camillaDSP.getDefaultConfig(config,true);
+                
+    conencted = DSP.sendDSPMessage({"SetConfigJson":JSON.stringify(config)});            
+    if (connected) {
+        state.innerText="Connected.";
+        state.style.color="#6C6";
+    } else {
+        state.innerText="Error uploading configuration.";
+        state.style.color="#EC6";
+    }            
+    
+    // state.innerText="Connected.";
+    // state.style.color="#6C6";
+
+    // Update indcators 
+    let samplingRate=document.getElementById("samplingRate") 
+    let clippingIndicator=document.getElementById("clippingIndicator")
+    let limiter=document.getElementById("limiter")
+    let balance=document.getElementById("balance")
+    let crossfeed=document.getElementById("crossfeed")
+    let filters=document.getElementById("filters")
+    let spectrum=document.getElementById("spectrum")
+    let DSPstate=document.getElementById("DSPState")
+    let DSPversion=document.getElementById("DSPVersion")
+    let nodeVersion=document.getElementById("nodeVersion")
+
+    let int=setInterval(function(int){                            
+        state.innerText='';                
+        window.clearInterval(int);
+    },5000);            
+}          
 
 /*
 

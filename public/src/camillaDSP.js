@@ -28,7 +28,7 @@ class camillaDSP {
             this.server=server;
             this.port=port;           
             console.log("Connected to DSP. Trying spectrum now..") 
-            this.connected=true;
+            this.connected=true;        
             return true;            
         }).catch((e)=>{
             console.error("Connection error");
@@ -58,10 +58,10 @@ class camillaDSP {
 
     async initAfterConnection() {
         // Download and initialize configuration        
-        let config = await this.sendDSPMessage("GetConfigJson");        
-        config = camillaDSP.getDefaultConfig(config,true);    
-        config.pipeline = this.updatePipeline(config);   
-        return this.uploadConfig(config);
+        this.config = await this.sendDSPMessage("GetConfigJson");        
+        this.config = camillaDSP.getDefaultConfig(this.config,true);    
+        this.config.pipeline = this.updatePipeline(this.config);   
+        return this.uploadConfig(this.config);
     }
 
     connectToDSP(server,port) {        

@@ -44,6 +44,7 @@ body {
 
 header {
     display: block ;
+    position: relative;
     font-size: x-large;
     height: 80px;
     align-items: center;
@@ -378,6 +379,27 @@ select {
     appearance: none;
 }
 
+#indicators {
+    display: flex;
+    position: absolute;
+    left: 250px;
+    bottom: 0px;
+    line-height: 1.5;    
+    font-size: 13px;
+}
+
+#indicators > div {    
+    color:#9A9;
+    width: 100px;
+    text-align: center;
+    border-right: 1px solid #666;
+    cursor:hand;
+}
+
+#indicators div:last-of-type {
+    border-right: none;
+}
+
 /********************************************** PEQLINE *************************************************************************/
 .peqline {
     display: flex;
@@ -500,6 +522,8 @@ input[type="checkbox"]:checked::before {
 .remove {
     background: no-repeat center url("/img/icon/remove.png");    
 }
+
+
 
 
 /************************************************* DIALOGUES *********************************************************************/

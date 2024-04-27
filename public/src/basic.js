@@ -1,8 +1,11 @@
 
+let DSP;
+
 async function basicOnLoad() {       
     
     const basicControls = document.getElementById('basicControls');
-    const canvas = document.getElementById('plotCanvas');                
+    const canvas = document.getElementById('plotCanvas');    
+    DSP = window.parent.DSP;            
 
     // Create UI elements
     let vol = new EQKnob("Volume",31);        

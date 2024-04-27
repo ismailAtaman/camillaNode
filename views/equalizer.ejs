@@ -22,21 +22,16 @@
     </script>
 
     <script> 
-        document.loading=false;
-        document.DSP = {};
+        document.loading=false;        
         document.addEventListener("DOMContentLoaded",equalizerOnLoad);
-        
+        const DSP = window.parent.DSP;
+
         async function equalizerOnLoad() {            
             document.loading=true;
-            const PEQ = document.getElementById('PEQ');
-            const ctx = document.getElementById("plotCanvas")
-
-            document.DSP = new camillaDSP();            
-            let connected =await document.DSP.connect()            
-            document.config = await document.DSP.sendDSPMessage("GetConfigJson");
-            let config= document.config;
-            // console.log(config)
-
+            const PEQ = document.getElementById('PEQ');            
+            const ctx = document.getElementById("plotCanvas");
+            let config= DSP.config;
+            
             /// Basics Controls Section
             const basicControls = document.getElementById('basicControls');
 
@@ -53,33 +48,33 @@
             basicControls.appendChild(crossfeed.knob)
 
             // Load data from DSP
-            document.DSP.sendDSPMessage("GetVolume").then(r=>{            
+            DSP.sendDSPMessage("GetVolume").then(r=>{            
                 let volMarker = r/3*10 + 181;
                 vol.setVal(volMarker);            
             });
 
             // load crossfeed
-            let crossfeedVal = await document.DSP.getCrossfeed() * 20 +331;        
+            let crossfeedVal = await DSP.getCrossfeed() * 20 +331;        
             crossfeed.knob.instance.setVal(crossfeedVal);
             
             // load balance
-            let bal = await document.DSP.getBalance() * 10 +181;
+            let bal = await DSP.getBalance() * 10 +181;
             balance.knob.instance.setVal(bal)
 
             vol.knob.addEventListener("change",function(e){
                 const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
-                document.DSP.sendDSPMessage({"SetVolume":volume})
+                DSP.sendDSPMessage({"SetVolume":volume})
             })
 
             balance.knob.addEventListener("change",function(e){
                 const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
-                document.DSP.setBalance(bal);
+                DSP.setBalance(bal);
             })
 
             crossfeed.knob.addEventListener("change",function(e){
                 let crossfeedVal = (this.instance.getVal()-331)/20;
                 // console.log(crossfeedVal)
-                document.DSP.setCrossfeed(crossfeedVal);
+                DSP.setCrossfeed(crossfeedVal);
             })
 
 
@@ -101,9 +96,7 @@
             }
 
             // change loading to false after 100ms to avoud update running multiple times during loading.            
-            setInterval(function(){document.loading=false},50);
-
-            // setInterval(function(){document.DSP.sendDSPMessage("GetConfigJson").then(r=>console.log(r.filters))},5000);
+            setInterval(function(){document.loading=false},50);            
 
             initSpectrum();
         }
@@ -206,7 +199,7 @@
             
             setInterval(async function(){
                 const spec = document.getElementById("spectrum");
-                let r = await document.DSP.getSpectrumData();                
+                let r = await DSP.getSpectrumData();                
                 
                 let i=0, height, hue, boxCount, count;
                 spec.childNodes.forEach(e=>{
@@ -233,7 +226,7 @@
         }
     
     </script>
-    <input type="button" onclick="document.DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));" value="Show Config">
+    <input type="button" onclick="DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));" value="Show Config">
 
     <div id="spectrum" class="group">
     </div>

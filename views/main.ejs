@@ -10,29 +10,10 @@
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
 </head>
 <body id="mainBody">
-
     <script type="module">
         import camillaDSP from "/src/camillaDSP.js";
-        
-        // Connect to camillaDSP
-        const DSP = new camillaDSP();
-        let connected =await DSP.connect()
-        window.DSP=DSP;
-
-        let version = document.getElementById('version')
-        DSP.sendDSPMessage("GetVersion").then(r=>version.innerText="CamillaDSP Version "+r);
-
-        let status = document.getElementById('status')            
-        DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);    
-        
-
-        setInterval(async ()=>{
-            let status = document.getElementById('status')            
-            DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);                        
-        },5000);
-
-        document.frame = document.getElementById("mainframe");
-
+        window.camillaDSP= camillaDSP;
+        document.addEventListener('DOMContentLoaded',mainBodyOnLoad);
     </script>
 
     <script>
@@ -182,6 +163,18 @@
                 <span>CamillaNode</span>
             </div>             
         </div>    
+        <div id="indicators">
+            <div id="samplingRate">48,000</div>
+            <div id="clippingIndicator">No Clipping</div>
+            <div id="limiter">Limiter Off</div>
+            <div id="balance">0 Center</div>
+            <div id="crossfeed">0dB</div>
+            <div id="filters">12 filters</div>
+            <div id="spectrum">Spectrum Active</div>
+            <div id="DSPstate">Running</div>
+            <div id="DSPversion">2.0.3</div>
+            <div id="nodeVersion">2.0.1</div>            
+        </div>
         <div id="version" class="smallInfo"></div> 
         <div class="smallInfo">CamillaNode Version 2.0.1</div> 
         <div id="status" class="smallInfo"></div>
