@@ -83,15 +83,10 @@ class camillaDSP {
 
     static handleDSPMessage(m) {        
         const res = JSON.parse(m.data);                           
-         
-    
+           
         const responseCommand = Object.keys(res)[0];
         const result = res[responseCommand].result;
-        const value =  res[responseCommand].value;
-    
-        // console.log("Command : "+responseCommand)
-        // console.log("Result : "+result)
-        // console.log("Value : "+value)    
+        const value =  res[responseCommand].value;        
     
         switch (responseCommand) {
             case 'GetVersion':
@@ -101,7 +96,7 @@ class camillaDSP {
                 if (result=='Ok') return [true,JSON.parse(value)]; else return[false,value];          
                 break;                    
             case 'SetConfigJson':                
-                if (result=='Ok') return [true,value]; else return[false,value];          
+                if (result=='Ok') return [true,true]; else return[false,value];          
                 break;
             case 'GetState':
                 if (result=='Ok') return [true,value]; else return[false,value];          
@@ -151,6 +146,7 @@ class camillaDSP {
                 if (handleResult[0]) resolve(handleResult[1]); else reject(handleResult[1]);                
                 // this.removeEventListener('message',eventListener);                
             });            
+
             this.ws.send(JSON.stringify(message));             
         })     
     }   
@@ -325,6 +321,17 @@ class camillaDSP {
          }
          console.log("json",obj)    
         return obj;
+    }
+
+    async updateConfig(config) {
+        return new Promise((resolve,reject)=>{
+            this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>{
+                this.sendDSPMessage("GetConfigJson").then(currentConfig=>{                   
+                    resolve([true,"Config upload successful."]); //else reject([false,"Config validation failed!"])
+                }).catch(e=>{reject([false,"Config validation failed."])})        
+            }).catch(e=>reject([false,"Config upload failed."]));            
+        })
+        
     }
 
 }

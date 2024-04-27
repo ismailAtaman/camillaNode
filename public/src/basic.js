@@ -10,6 +10,7 @@ async function basicLoad() {
     let vol = new EQKnob("Volume",31);        
     let balance = new EQKnob("Balance",181);
     let crossfeed = new EQKnob("Crossfeed",31);
+ 
 
     crossfeed.knob.instance.offAtDefault=true;
     balance.knob.instance.offAtDefault=true;
@@ -37,20 +38,16 @@ async function basicLoad() {
     toneControls.appendChild(upperMids.knob);
     toneControls.appendChild(treble.knob);
 
-    // Load data from DSP
-    DSP.sendDSPMessage("GetVolume").then(r=>{            
-        let volMarker = r/3*10 + 181;
-        vol.setVal(volMarker);            
-    });
+    window.vol=vol;
+    window.balance=balance;
+    window.crossfeed=crossfeed;
+    window.subBass=subBass;
+    window.bass=bass;
+    window.mids=mids;
+    window.upperMids=upperMids;
+    window.treble=treble;
 
-    // load crossfeed
-    let crossfeedVal = await DSP.getCrossfeed() * 20 + 331;        
-    crossfeed.knob.instance.setVal(crossfeedVal);
-
-    // load balance
-    let bal = await DSP.getBalance() * 10 +181;
-    balance.knob.instance.setVal(bal)
-    
+    loadData();        
 
     // Event Listeners
     vol.knob.addEventListener("change",function(e){
@@ -74,6 +71,25 @@ async function basicLoad() {
     mids.knob.addEventListener("change",setTone);
     upperMids.knob.addEventListener("change",setTone);
     treble.knob.addEventListener("change",setTone);
+}
+
+async function loadData() {
+    const ctx = document.getElementById('plotCanvas');    
+    DSP = window.parent.DSP;            
+
+    // Load data from DSP
+    DSP.sendDSPMessage("GetVolume").then(r=>{            
+        let volMarker = r/3*10 + 181;
+        vol.setVal(volMarker);            
+    });
+
+    // load crossfeed
+    let crossfeedVal = await DSP.getCrossfeed() * 20 + 331;        
+    crossfeed.knob.instance.setVal(crossfeedVal);
+
+    // load balance
+    let bal = await DSP.getBalance() * 10 +181;
+    balance.knob.instance.setVal(bal)
 
     // Load filters
     let config = await DSP.sendDSPMessage("GetConfigJson");            

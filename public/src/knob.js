@@ -79,7 +79,6 @@ class EQKnob {
         })
 
         this.knob.instance = this;
-
         return this;
     }
 

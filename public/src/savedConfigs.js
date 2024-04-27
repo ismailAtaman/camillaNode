@@ -15,15 +15,14 @@ class savedConfigs {
         if (this.configs==undefined) this.loadConfigs();
 
         if (type==undefined) {
-            let r =  this.configs.filter(e=>e.name==name);
-
-            if (r.length==0) return [false,r.length];
-            if (r.length>1) return [false,r.length]
-            return [true, this.configs.indexOf(r)];
+            let filteredList =  this.configs.filter(e=>e.name==name);
+            if (filteredList.length==0) return {"success":false,"elementCount":0};
+            if (filteredList.length>1) return {"success":false,"elementCount":filteredList.length};
+            return {"success":true,"elementIndex":this.configs.indexOf(filteredList)};
         } else {
             let r =  this.configs.filter(e=>e.name==name && e.type==type);
-            if (r.length==0) return [false,r.length];
-            return [true,r];
+            if (r.length==0) return {"success":false,"elementCount":r.length};
+            return {"success":true,"elementIndex":this.configs.indexOf(filteredList)};
         }
     }
 

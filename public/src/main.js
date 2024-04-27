@@ -5,6 +5,11 @@ function mainBodyOnLoad() {
     if (document.title !='CamillaNode') return;
     window.mainframe = document.getElementById('mainframe');    
 
+    window.mainframe.addEventListener("load",function() {
+        updateActions(this.getAttribute('src').replace("/",""));
+        
+    })
+
     // Find all navigate items and add event handler to change them to links to their target attribute        
     const navigates = document.getElementsByClassName("navigate");    
     for (i=0;i<navigates.length;i++) {        
@@ -30,18 +35,24 @@ function mainBodyOnLoad() {
         mut.forEach(m=>{
             if (m.attributeName=="src") {
                 const page = m.target.getAttribute('src').replace("/","");
-                const eqTools = document.getElementById("eqTools");
-                eqTools.childNodes.forEach(e=>{if (e.tagName=='DIV') e.style.display='none'});
-                
-                if (page=="basic") eqTools.children["basicTools"].style.display='flex';
-                if (page=="equalizer") eqTools.children["equalizerTools"].style.display='flex';
-                if (page=="advanced") eqTools.children["advancedTools"].style.display='flex';
-                
+                updateActions(page);                
             }            
         })
     })
 
     observer.observe(window.mainframe,{attributes:true});
+
+
+}
+
+function updateActions(page) {
+    const eqTools = document.getElementById("eqTools");
+    eqTools.childNodes.forEach(e=>{if (e.tagName=='DIV') e.style.display='none'});
+    
+    if (page=="basic") eqTools.children["basicTools"].style.display='flex';
+    if (page=="equalizer") eqTools.children["equalizerTools"].style.display='flex';
+    if (page=="advanced") eqTools.children["advancedTools"].style.display='flex';
+
 }
 
 async function conectToDSP() {
@@ -172,7 +183,7 @@ async function connect(camillaDSP) {
     const port = document.getElementById('port').value;    
     const spectrumPort = document.getElementById('spectrumPort').value;    
 
-    const DSP = new camillaDSP();                
+    let DSP = new camillaDSP();                
 
     let state = document.getElementById("state");
     let connected = await DSP.connect(server,port,spectrumPort)    
@@ -182,6 +193,7 @@ async function connect(camillaDSP) {
         window.localStorage.setItem("port",port);           
         window.localStorage.setItem("spectrumPort",spectrumPort);           
         console.log("Connected.") 
+        window.parent.DSP=DSP;
     } else {                            
         state.innerText="Can not connect to DSP. Make sure you got the corrent name or IP address and port, and the websocket server is enabled on external interface.";
         state.style.color="#C66";

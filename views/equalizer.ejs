@@ -23,13 +23,24 @@
 
     <script> 
         document.loading=false;        
-        document.addEventListener("DOMContentLoaded",equalizerOnLoad);
-        const DSP = window.parent.DSP;
+        
+        // Run equalizerOnLoad function after DSP is connected.
+        let interval;
+        interval = setInterval(function(){            
+            // console.log(window.parent.DSP);
+            if (window.parent.DSP!=undefined) {                
+                equalizerOnLoad();
+                clearInterval(interval);
+            }
+        },50);
+        
 
         async function equalizerOnLoad() {            
             document.loading=true;
             const PEQ = document.getElementById('PEQ');            
             
+            DSP=window.parent.DSP;
+
             let config= DSP.config;
             
             /// Basics Controls Section
@@ -87,8 +98,10 @@
             initSpectrum();
         }
 
-        function loadFiltersFromConfig() {
+        function loadFiltersFromConfig() {            
+            PEQ.innerHTML='';
             let config= DSP.config;
+            // console.log(config);
             const ctx = document.getElementById("plotCanvas");            
             let line;
             if (config.filters!=null) {
@@ -99,7 +112,8 @@
                         line = addLine(PEQ,filterName);                    
                     }
                     // line.instance.update();
-                    line.instance.JSONtoValues(config.filters[filterName]);                    
+                    line.instance.JSONtoValues(config.filters[filterName]);                  
+                    // console.log("Line added",line)  
                 }
             
                 // sortByFreq(PEQ);
@@ -155,7 +169,7 @@
             
             config.pipeline= DSP.updatePipeline(config);                 
             await DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});
-            
+            console.log("peqlineupdate")            
         }
 
         function generateFiltersObject() {

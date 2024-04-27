@@ -55,8 +55,11 @@
             const activePage = getActivePage();
 
             let configsAray = configsObject.loadConfigs(activePage);                       
-
+            console.log(configsAray);
             loadConfigs(activePage,configList);
+            document.getElementById("configName").addEventListener('keyup',function(e){                
+                if (e.key=="Enter") saveConfigurationClick();
+            })
             mod.showModal();            
         }
 
@@ -70,19 +73,29 @@
                 return;
             }
 
+            const frameDocument = window.mainframe.contentWindow.document;
+
             let data,DSPConfig;
             switch (activePage) {
-                case "connections":
-                    const frameDocument = window.mainframe.contentWindow.document;
-                    server = frameDocument.getElementById("server").value;
-                    port = frameDocument.getElementById("port").value;
-                    spectrumPort=frameDocument.getElementById("spectrumPort").value;
-
+                case "connections":                    
+                    let server = frameDocument.getElementById("server").value;
+                    let port = frameDocument.getElementById("port").value;
+                    let spectrumPort=frameDocument.getElementById("spectrumPort").value;
                     data={"server":server,"port":port,"spectrumPort":spectrumPort}
                     break;
                 case "basic":
                     DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
-                    data={"filters":DSPConfig.filters,"mixers":DSPConfig.mixers,"pipeline":DSPConfig.pipeline}
+
+                    let vol = await DSP.sendDSPMessage("GetVolume");
+                    let balance = await DSP.getBalance();
+                    let crossfeed = await DSP.getCrossfeed();
+                    let filters={}
+                    filters.subBass= DSPConfig.filters.subBass;
+                    filters.bass= DSPConfig.filters.bass;
+                    filters.mids= DSPConfig.filters.mids;
+                    filters.upperMids= DSPConfig.filters.upperMids;
+                    filters.treble= DSPConfig.filters.treble;                    
+                    data={"volume":vol,"balance":balance,"crossfeed":crossfeed,"filters":filters,"mixers":DSPConfig.mixers}                    
                     break;
                 case "equalizer":
                     DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
@@ -115,13 +128,14 @@
             }
         }
 
-        async function openConfigurationClick() {            
+        async function openConfigurationClick() {         
+            console.log("Open config")   
             const activePage = getActivePage();
             const configName = document.getElementById("configName");
             const configId = configName.getAttribute("configId");
             let config = configsObject.getConfigById(configId);
             let data = config.data;
-
+            console.log(activePage,data)
 
             switch (activePage) {
                 case "connections":          
@@ -130,17 +144,30 @@
                     frameDocument.getElementById("port").value=data.port;
                     frameDocument.getElementById("spectrumPort").value=data.spectrumPort;
                     break;
-                case "basic":
-                    
-                    
+                case "basic":                    
+                    console.log("Processing basic")
+                    await DSP.sendDSPMessage({"SetVolume":data.volume})                    
+                    await DSP.setBalance(data.balance);
+                    await DSP.setCrossfeed(data.crossfeed);
+
+                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
+                    DSPConfig.filters= data.filters
+                    DSPConfig.mixers=data.mixers;
+                    DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);
+                    DSPConfig.title="loading from config"
+                    let ret=await DSP.updateConfig(DSPConfig);
+                    console.log(ret);
+                    await window.mainframe.contentWindow.loadData.apply();
                     break;
+
                 case "equalizer":                    
                     DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
                     DSPConfig.filters=data.filters;
                     DSPConfig.mixers=data.mixers;
                     DSPConfig.pipeline=data.pipeline;                                        
-                    await DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(DSPConfig)});
-                    await window.mainframe.contentWindow.loadFiltersFromConfig.apply();
+                    let r=await DSP.updateConfig(DSPConfig);
+                    console.log("EQ Config loaded",r);
+                    window.mainframe.contentWindow.loadFiltersFromConfig.apply();
                     break;
                 case "advanced":
                     break;
@@ -173,7 +200,7 @@
     
         function loadConfigs(activePage,configList) {
             let configsArray = configsObject.loadConfigs(activePage);                        
-            console.log(configsArray);
+            // console.log(configsArray);
             configList.innerHTML='';
             document.getElementById("configName").value='';
             let configItemElement;
@@ -193,7 +220,7 @@
                     const configName= document.getElementById("configName");
                     configName.value=this.innerText;
                     configName.setAttribute("configId",this.getAttribute("configId"));
-                    openClick();
+                    openConfigurationClick();
                 })
                 configList.appendChild(configItemElement);
             })
@@ -273,7 +300,7 @@
         </section>
 
         <section id="sectionMain">                        
-            <iframe id="mainframe" src="/connections" frameborder="0"></iframe>
+            <iframe id="mainframe" src="/equalizer" frameborder="0"></iframe>
         </section>
         
     </main>
