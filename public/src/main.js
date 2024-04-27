@@ -116,6 +116,11 @@ function parseAutoEQText(text) {
     return filterArray;
 }
 
+function getActivePage() {
+    return window.document.frame.src.split("/")[3];            
+}
+
+
 /*
 
 Preamp: -6dB dB

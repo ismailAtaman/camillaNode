@@ -74,6 +74,7 @@ async function basicOnLoad() {
 
     // Load filters
     let config = await DSP.sendDSPMessage("GetConfigJson");            
+    if (config.filters==undefined) config.filters={};
     
     if (config.filters["subBass"]==undefined) {
         console.log("Basic load filters",config.filters);

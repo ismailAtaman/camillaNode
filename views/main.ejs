@@ -31,6 +31,8 @@
             DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);                        
         },5000);
 
+        document.frame = document.getElementById("mainframe");
+
     </script>
 
     <script>
@@ -56,6 +58,121 @@
             document.getElementById("mainframe").src='/equalizer';            
         }
 
+        function showSave() {
+            const activePage = getActivePage();
+            console.log(activePage)
+
+            let savedConfigs = window.localStorage.getItem("savedConfigs"); 
+            if (savedConfigs==null) savedConfigs=[]; else savedConfigs=JSON.parse(savedConfigs);
+            let configs = savedConfigs.filter(e=>e.type==activePage)
+            console.log(configs)
+
+            const configList = document.getElementById("configList");
+            configList.innerHTML='';
+            for (let i=0;i<configs.length;i++) {
+                let config = document.createElement("div");
+                config.className="config";
+                config.innerText=configs[i].name;
+                configList.appendChild(config);
+            }            
+            document.getElementById("saveWindow").showModal();
+        }
+
+        function showOpen() {
+            const activePage = getActivePage();
+            console.log(activePage)
+
+            let savedConfigs = window.localStorage.getItem("savedConfigs"); 
+            if (savedConfigs==null) savedConfigs=[]; else savedConfigs=JSON.parse(savedConfigs);
+            let configs = savedConfigs.filter(e=>e.type==activePage)
+            console.log(configs)
+
+            const configList = document.getElementById("openConfigList");
+            configList.innerHTML='';
+            for (let i=0;i<configs.length;i++) {
+                let config = document.createElement("div");
+                config.className="config";
+                config.innerText=configs[i].name;
+                config.addEventListener("click",function(){document.getElementById("selectedConfig").value=this.innerText})
+                configList.appendChild(config);
+                
+            }            
+            document.getElementById("openWindow").showModal();
+        }
+
+        async function saveClick() {
+            const activePage = getActivePage();
+            const configName = document.getElementById("configName").value;
+            const date = new Date();
+
+
+            let savedConfigs = window.localStorage.getItem("savedConfigs"); 
+            if (savedConfigs==null) savedConfigs=[]; else savedConfigs=JSON.parse(savedConfigs);
+            let data,DSPConfig;
+
+            switch (activePage) {
+                case "connections":
+                    data={"server":document.getElementById("server").value,"port":document.getElementById("port").value,"spectrumPort":document.getElementById("spectrumPort").value}
+                    break;
+                case "basic":
+                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
+                    data={"filters":DSPConfig.filters,"mixers":DSPConfig.mixers,"pipeline":DSPConfig.pipeline}
+                    break;
+                case "equalizer":
+                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
+                    data={"filters":DSPConfig.filters,"mixers":DSPConfig.mixers,"pipeline":DSPConfig.pipeline}
+                    break;
+                case "advanced":
+                    break;
+                case "room":
+                    break;
+                case "preferences":
+                    break;
+
+            }
+
+
+            let tmpConfig={"type":activePage,"name":configName,"createdDate":date,"data":data}
+            savedConfigs.s
+
+            savedConfigs.push(tmpConfig);
+            console.log(tmpConfig)
+            window.localStorage.setItem("savedConfigs",JSON.stringify(savedConfigs));
+        }
+
+        async function openClick() {
+            const name = document.getElementById("selectedConfig").value;
+            let savedConfigs = window.localStorage.getItem("savedConfigs"); 
+            if (savedConfigs==null) savedConfigs=[]; else savedConfigs=JSON.parse(savedConfigs);
+            let tConfig = savedConfigs.find(e=>e.name==name)
+            console.log(tConfig);
+            const activePage = getActivePage();
+
+            switch (activePage) {
+                case "connections":            
+                    break;
+                case "basic":
+                    
+                    
+                    break;
+                case "equalizer":
+                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
+                    DSPConfig.filters=tConfig.data.filters;
+                    DSPConfig.filters=tConfig.data.mixers;
+                    DSPConfig.filters=tConfig.data.pipeline;
+                    console.log("DSP Config",DSPConfig);
+                    await DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(DSPConfig)});
+                    
+                    break;
+                case "advanced":
+                    break;
+                case "room":
+                    break;
+                case "preferences":
+                    break;
+
+            }
+        }
     </script>
 
     <header>
@@ -100,8 +217,8 @@
             
             <div class="leftTitle">Configurations</div>
             <!-- <div style="margin-top:10px"><span>Current</span><input style="margin-left:10px" type="text" value="untitled"></div> -->
-            <div class="navigate" onclick="" target=""><img src="img/icon/save.png" class="icon">Save</div>
-            <div class="navigate" onclick="" target=""><img src="img/icon/open.png" class="icon">Open</div>
+            <div class="navigate" onclick="showSave()" target=""><img src="img/icon/save.png" class="icon">Save</div>
+            <div class="navigate" onclick="showOpen()" target=""><img src="img/icon/open.png" class="icon">Open</div>
             <div class="navigate" onclick="" target=""><img src="img/icon/delete.png" class="icon">Delete</div>
             
         </section>
@@ -114,17 +231,40 @@
 
     
     <dialog id="modalWindow">
-        <button onclick="document.getElementById('modalWindow').close();">Close</button>
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
     </dialog>
 
 
     <dialog id="importWindow">        
-        <p>Import EQ settings from a text file. Please paste the text to import below.</p>
+        <p>Import EQ settings from a text file. Please paste the text to import below.</p>          
+        <div id="importText" contenteditable="true"></div>        
         <div class="navigate" onclick="importClick()" target=""><img src="img/icon/import.png" class="icon">Import</div>   
-        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
-        <div id="importText" contenteditable="true"></div>
-        
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div> 
     </dialog>
+
+
+    <dialog id="saveWindow">        
+        <span>Save As : </span><input type="text" name="" id="configName"><br>
+        <div id="configList">            
+        </div>
+
+        <div class="navigate" onclick="saveClick()" target=""><img src="img/icon/save.png" class="icon">Save</div>               
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
+    </dialog>
+
+
+    
+    <dialog id="openWindow" class="dialogueWindow">        
+        <p>Select configuration to load. Cancel to close without loading.</p>
+        <div id="openConfigList">            
+        </div>
+
+        <div class="navigate" onclick="openClick()" target=""><img src="img/icon/open.png" class="icon">Open</div>               
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
+        <input type="text" id="selectedConfig" value="">
+    </dialog>
+
+
 </body>
 </html>
 

@@ -33,7 +33,9 @@
 
             document.DSP = new camillaDSP();            
             let connected =await document.DSP.connect()            
-            let config = await document.DSP.sendDSPMessage("GetConfigJson");
+            document.config = await document.DSP.sendDSPMessage("GetConfigJson");
+            let config= document.config;
+            // console.log(config)
 
             /// Basics Controls Section
             const basicControls = document.getElementById('basicControls');
@@ -83,19 +85,20 @@
 
             /// Parametric EQ section
             let line;
-            for (let filterName of Object.keys(config.filters)) {                  
-                if (filterName=="Gain") {
-                    line = addLine(PEQ,filterName,PEQ.childNodes[0]);                    
-                } else {
-                    line = addLine(PEQ,filterName);                    
+            if (config.filters!=null) {
+                for (let filterName of Object.keys(config.filters)) {                  
+                    if (filterName=="Gain") {
+                        line = addLine(PEQ,filterName,PEQ.childNodes[0]);                    
+                    } else {
+                        line = addLine(PEQ,filterName);                    
+                    }
+                    // line.instance.update();
+                    line.instance.JSONtoValues(config.filters[filterName]);                    
                 }
-                // line.instance.update();
-                line.instance.JSONtoValues(config.filters[filterName]);                    
-            }
             
-            // sortByFreq(PEQ);
-            plot(config.filters,ctx);         
-
+                // sortByFreq(PEQ);
+                plot(config.filters,ctx);         
+            }
 
             // change loading to false after 100ms to avoud update running multiple times during loading.            
             setInterval(function(){document.loading=false},50);
@@ -163,6 +166,7 @@
             if (document.loading) return;
             const PEQ = document.getElementById('PEQ');
             PEQ.removeChild(peqline);
+            peqline=null;
             peqlineUpdate();
         }
 

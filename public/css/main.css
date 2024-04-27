@@ -172,7 +172,7 @@ dialog {
     border-radius: 10px;
     border: none;
     overflow: auto;
-    color: white;
+    color: white;    
 }
 
 dialog::backdrop {
@@ -183,9 +183,11 @@ dialog .navigate {
     background-color: hsl(var(--bck-hue), 75%, 10%);     
     display: inline-flex;
     justify-content: center;
-    width: fit-content;
-    height: 30px;
+    max-width: fit-content;
+    min-width: 100px;
+    height: 20px;
     border-radius: 10px;
+    margin-top: 20px;
 }
 
 .button {
@@ -508,9 +510,6 @@ input[type="checkbox"]:checked::before {
     transform: translate(-50%, -50%); 
 }
 
-#importWindow .navigate {
-    height: 15px;
-}
 
 #importText {        
     font-family: 'Courier New', Courier, monospace;       
@@ -525,6 +524,64 @@ input[type="checkbox"]:checked::before {
 
 #importText:focus {
     appearance: none;
+}
+
+.dialogueWindow {   
+    /* display: block;
+    background-color: black; */
+    width: 350px;
+    height: 500px;
+    overflow: hidden;
+    transform: translate(-50%,-50%);
+}
+
+#saveWindow {   
+    /* display: block;
+    background-color: black; */
+    width: 350px;
+    height: 500px;
+    overflow: hidden;
+    transform: translate(-50%,-50%);
+}
+
+#saveWindow div {
+    margin-block: 20px;
+}
+
+#saveWindow input {
+    margin-top: 20px;
+    margin-left: 10px;
+    width: 250px;
+}
+
+#configList {
+    display: flex;        
+    flex-direction: column;    
+    border-radius: 5px;    
+    width: 100%;
+    height: 350px;
+    align-items:flex-start;    
+    align-self: flex-start;
+}
+
+.config {
+    font-size: 15px;    
+    cursor: pointer;    
+    user-select: none;
+    border-radius: 5px;    
+    padding: 0px;
+    margin: 0px;
+}
+
+.config:hover {
+    color: #222;   
+    background-color: hsl(var(--bck-hue), var(--bck-sat), 80%);    
+    transition: all 350ms;    
+}
+
+.config::before {
+    content: url('/img/headphone.png');
+    margin-right: 5px;
 }
 
 /***************************************************** SPECTRUM *******************************************************************/

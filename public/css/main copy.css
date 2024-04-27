@@ -211,7 +211,7 @@ canvas {
 }
 
 .config {
-    font-size: var(--default-font-size);
+    font-size: 14px;
     cursor: pointer;
     padding: 0.2rem;
     user-select: none;
@@ -225,7 +225,7 @@ canvas {
 }
 
 .config::before {
-    content: url('./headphone16.png');
+    content: url('img/icon//headphone.png');
     margin-right: 5px;
 }
 
