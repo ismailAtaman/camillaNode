@@ -42,12 +42,13 @@ async function basicOnLoad() {
     });
 
     // load crossfeed
-    let crossfeedVal = await DSP.getCrossfeed() * 20 +331;        
+    let crossfeedVal = await DSP.getCrossfeed() * 20 + 331;        
     crossfeed.knob.instance.setVal(crossfeedVal);
 
     // load balance
     let bal = await DSP.getBalance() * 10 +181;
     balance.knob.instance.setVal(bal)
+    
 
     // Event Listeners
     vol.knob.addEventListener("change",function(e){
@@ -76,14 +77,9 @@ async function basicOnLoad() {
     let config = await DSP.sendDSPMessage("GetConfigJson");            
     if (config.filters==undefined) config.filters={};
     
-    if (config.filters["subBass"]==undefined) {
-        console.log("Basic load filters",config.filters);
-        if (config.filter!={}) {
-            
-        }
-        // let r = await DSP.setTone(0,0,0,0,0);
-        // console.log(r)
-        // let config = await DSP.sendDSPMessage("GetConfigJson");             
+    if (config.filters["subBass"]==undefined) {        
+        await DSP.setTone(0,0,0,0,0);        
+        config = await DSP.sendDSPMessage("GetConfigJson");             
     }            
     
     subBass.knob.instance.setVal(config.filters["subBass"].parameters.gain*10+181);

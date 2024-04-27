@@ -1,6 +1,6 @@
 
 
-const debugLevel = 'high';
+const debugLevel = 'low';
 
 class camillaDSP {
     ws;    
@@ -245,14 +245,14 @@ class camillaDSP {
         
         config.pipeline=this.updatePipeline(config);        
         
-        this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});
+        await this.uploadConfig(config);
         return config;
     }
 
     async setCrossfeed(crossfeedVal) {
         let config = await this.sendDSPMessage("GetConfigJson");
 
-        if (crossfeedVal<=-16.5) {
+        if (crossfeedVal<=-15) {
             config.mixers.recombine.mapping[0].sources[1].mute = true;   
             config.mixers.recombine.mapping[1].sources[1].mute = true;
         } else {
@@ -270,7 +270,7 @@ class camillaDSP {
 
     async getCrossfeed() {
         let config = await this.sendDSPMessage("GetConfigJson");        
-        if (config.mixers.recombine.mapping[0].sources[1].mute == true) return -16.5; else return config.mixers.recombine.mapping[0].sources[1].gain;
+        if (config.mixers.recombine.mapping[0].sources[1].mute == true) return -15; else return config.mixers.recombine.mapping[0].sources[1].gain;
     }
     
     static createPeakFilterJSON(freq,gain,q) {         
