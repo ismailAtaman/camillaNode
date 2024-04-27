@@ -21,21 +21,34 @@
     </script>
 
     <script>
+        // Import Functions
         function showImport() {
             const mod = document.getElementById("importWindow");
             mod.showModal();            
         }
+
+        function importClick() {
+            importFilters(document.getElementById('importText').innerText,window.DSP);
+            document.getElementById("importWindow").close();
+            document.getElementById("mainframe").src='/equalizer';            
+        }
+
+        // Export Functions
 
         function showExport() {
             const mod = document.getElementById("modalWindow");
             mod.showModal();            
         }
 
+
+        // AutoEQ Functions
         function showAutoEQ() {
             const mod = document.getElementById("modalWindow");
             mod.showModal();            
         }
 
+
+        // Configuration functions
         function showManageConfigs() {
             const mod = document.getElementById("manageConfigs");
             const configList = document.getElementById("configList")
@@ -47,41 +60,17 @@
             mod.showModal();            
         }
 
-        function loadConfigs(activePage,configList) {
-            let configsArray = configsObject.loadConfigs(activePage);                        
-            console.log(configsArray);
-            configList.innerHTML='';
-            document.getElementById("configName").value='';
-            let configItemElement;
-            configsArray.forEach(e=>{
-                configItemElement=document.createElement('div');
-                configItemElement.className='config';
-                configItemElement.innerText=e.name;
-                configItemElement.setAttribute('alt',e.createdDate)
-                configItemElement.setAttribute('configId',e.id)
-                configItemElement.addEventListener('click',function(e){
-                    const configName= document.getElementById("configName");
-                    configName.value=this.innerText;
-                    configName.setAttribute("configId",this.getAttribute("configId"));
-                });
-
-                configItemElement.addEventListener('dblclick',function(e){
-                    const configName= document.getElementById("configName");
-                    configName.value=this.innerText;
-                    configName.setAttribute("configId",this.getAttribute("configId"));
-                    openClick();
-                })
-                configList.appendChild(configItemElement);
-            })
-        }
-
-        async function saveClick() {
+        async function saveConfigurationClick() {
             const activePage = getActivePage();
             const configName = document.getElementById("configName");
             const date = new Date();
-            
-            let data,DSPConfig;
 
+            if (configName.value.length<3) {
+                alert("Configuration name should be at least 3 characters long.");
+                return;
+            }
+
+            let data,DSPConfig;
             switch (activePage) {
                 case "connections":
                     const frameDocument = window.mainframe.contentWindow.document;
@@ -126,55 +115,7 @@
             }
         }
 
-        function importClick() {
-            importFilters(document.getElementById('importText').innerText,window.DSP);
-            document.getElementById("importWindow").close();
-            document.getElementById("mainframe").src='/equalizer';            
-        }
-
-        function showSave() {
-            const activePage = getActivePage();
-            console.log(activePage)
-
-            let savedConfigs = window.localStorage.getItem("savedConfigs"); 
-            if (savedConfigs==null) savedConfigs=[]; else savedConfigs=JSON.parse(savedConfigs);
-            let configs = savedConfigs.filter(e=>e.type==activePage)
-            console.log(configs)
-
-            const configList = document.getElementById("configList");
-            configList.innerHTML='';
-            for (let i=0;i<configs.length;i++) {
-                let config = document.createElement("div");
-                config.className="config";
-                config.innerText=configs[i].name;
-                configList.appendChild(config);
-            }            
-            document.getElementById("saveWindow").showModal();
-        }
-
-        function showOpen() {
-            const activePage = getActivePage();
-            console.log(activePage)
-
-            let savedConfigs = window.localStorage.getItem("savedConfigs"); 
-            if (savedConfigs==null) savedConfigs=[]; else savedConfigs=JSON.parse(savedConfigs);
-            let configs = savedConfigs.filter(e=>e.type==activePage)
-            console.log(configs)
-
-            const configList = document.getElementById("openConfigList");
-            configList.innerHTML='';
-            for (let i=0;i<configs.length;i++) {
-                let config = document.createElement("div");
-                config.className="config";
-                config.innerText=configs[i].name;
-                config.addEventListener("click",function(){document.getElementById("selectedConfig").value=this.innerText})
-                configList.appendChild(config);
-                
-            }            
-            document.getElementById("openWindow").showModal();
-        }
-
-        async function openClick() {            
+        async function openConfigurationClick() {            
             const activePage = getActivePage();
             const configName = document.getElementById("configName");
             const configId = configName.getAttribute("configId");
@@ -212,6 +153,52 @@
 
             document.getElementById("manageConfigs").close();
         }
+    
+        function deleteConfigurationClick() {            
+            
+            const configName = document.getElementById("configName");
+            const configId = configName.getAttribute("configId");
+            if (confirm("Are you sure you want to delete configuration?\n\n"+configName.value+"\n")==false) return
+
+            let deleted = configsObject.delete(configId);
+            if (deleted) {
+                const activePage = getActivePage();
+                const configList = document.getElementById("configList");
+                loadConfigs(activePage,configList);
+            } else {
+                alert("Error deleting configuration!")
+            }
+
+        }
+    
+        function loadConfigs(activePage,configList) {
+            let configsArray = configsObject.loadConfigs(activePage);                        
+            console.log(configsArray);
+            configList.innerHTML='';
+            document.getElementById("configName").value='';
+            let configItemElement;
+            configsArray.forEach(e=>{
+                configItemElement=document.createElement('div');
+                configItemElement.className='config';
+                configItemElement.innerText=e.name;
+                configItemElement.setAttribute('alt',e.createdDate)
+                configItemElement.setAttribute('configId',e.id)
+                configItemElement.addEventListener('click',function(e){
+                    const configName= document.getElementById("configName");
+                    configName.value=this.innerText;
+                    configName.setAttribute("configId",this.getAttribute("configId"));
+                });
+
+                configItemElement.addEventListener('dblclick',function(e){
+                    const configName= document.getElementById("configName");
+                    configName.value=this.innerText;
+                    configName.setAttribute("configId",this.getAttribute("configId"));
+                    openClick();
+                })
+                configList.appendChild(configItemElement);
+            })
+        }
+
     </script>
 
     <header>
@@ -309,9 +296,9 @@
         <span>Name : </span><input type="text" name="" id="configName"><br>        
         <div id="configList">                        
         </div>
-        <div class="navigate" onclick="openClick()" target=""><img src="img/icon/open.png" class="icon">Open</div>               
-        <div class="navigate" onclick="saveClick()" target=""><img src="img/icon/save.png" class="icon">Save</div>               
-        <div class="navigate" onclick="deleteClick()" target=""><img src="img/icon/delete.png" class="icon">Delete</div>               
+        <div class="navigate" onclick="openConfigurationClick()" target=""><img src="img/icon/open.png" class="icon">Open</div>               
+        <div class="navigate" onclick="saveConfigurationClick()" target=""><img src="img/icon/save.png" class="icon">Save</div>               
+        <div class="navigate" onclick="deleteConfigurationClick()" target=""><img src="img/icon/delete.png" class="icon">Delete</div>               
         <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
     </dialog>
 

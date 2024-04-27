@@ -50,16 +50,17 @@ class savedConfigs {
     add(config) {
         // This is the *private* version with no checks. Use saveConfig to save instead
         if (this.configs==undefined) this.loadConfigs();
-        config.id = this.getNextId();
+        config.id = parseInt(new Date().getTime());
         this.configs.push(config);
         window.localStorage.setItem("savedConfigs",JSON.stringify(this.configs));        
     }   
     
     delete(id) {
-        if (this.configs==undefined) this.loadConfigs();                
-        let r = this.configs.find(e=>e.id=id);
-        let index = this.configs.indexOf(r);
-        this.configs.splice(index);         
+        if (this.configs==undefined) this.loadConfigs();    
+        let element = this.configs.filter((e)=>e.id==id)[0];                
+        let index = this.configs.indexOf(element);
+        if (index==-1) return false; 
+        this.configs.splice(index,1);         
         window.localStorage.setItem("savedConfigs",JSON.stringify(this.configs));        
         return true;
     }
@@ -68,7 +69,7 @@ class savedConfigs {
         if (this.configs==undefined) this.loadConfigs();
         let tmpConfigs=this.configs; 
         tmpConfigs.sort((a,b)=>{return b.id - a.id});        
-        return tmpConfigs[0]==undefined?0:tmpConfigs[0].id+1;        
+        return tmpConfigs[0]==undefined?0:parseInt(tmpConfigs[0].id)+1;        
     }
 
 }
