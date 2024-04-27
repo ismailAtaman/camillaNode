@@ -20,8 +20,28 @@ function mainBodyOnLoad() {
 
     // Connect to camillaDSP
     conectToDSP();
-    
 
+    // Track which page we are on to update tools accordingly
+    const eqTools = document.getElementById("eqTools");
+    eqTools.childNodes.forEach(e=>{if (e.tagName=='DIV') e.style.display='none'});
+    eqTools.style.display='flex';
+
+    const observer = new MutationObserver(mut=>{        
+        mut.forEach(m=>{
+            if (m.attributeName=="src") {
+                const page = m.target.getAttribute('src').replace("/","");
+                const eqTools = document.getElementById("eqTools");
+                eqTools.childNodes.forEach(e=>{if (e.tagName=='DIV') e.style.display='none'});
+                
+                if (page=="basic") eqTools.children["basicTools"].style.display='flex';
+                if (page=="equalizer") eqTools.children["equalizerTools"].style.display='flex';
+                if (page=="advanced") eqTools.children["advancedTools"].style.display='flex';
+                
+            }            
+        })
+    })
+
+    observer.observe(window.mainframe,{attributes:true});
 }
 
 async function conectToDSP() {
@@ -144,7 +164,7 @@ function parseAutoEQText(text) {
 }
 
 function getActivePage() {
-    return window.document.frame.src.split("/")[3];            
+    return window.mainframe.src.split("/")[3];            
 }
 
 async function connect(camillaDSP) {

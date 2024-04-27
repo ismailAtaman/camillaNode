@@ -101,7 +101,6 @@ class camillaDSP {
                 if (result=='Ok') return [true,JSON.parse(value)]; else return[false,value];          
                 break;                    
             case 'SetConfigJson':                
-
                 if (result=='Ok') return [true,value]; else return[false,value];          
                 break;
             case 'GetState':
@@ -141,7 +140,7 @@ class camillaDSP {
     
     async sendDSPMessage(message) {        
         return new Promise((resolve,reject)=>{            
-            this.ws.addEventListener('message',function(m,eventListener){                           
+            this.ws.addEventListener('message',function(m){                           
                 const res = JSON.parse(m.data);
                 const responseCommand = Object.keys(res)[0];
                 if (typeof message == 'object') message=Object.keys(message)[0];

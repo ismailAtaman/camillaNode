@@ -29,7 +29,7 @@
         async function equalizerOnLoad() {            
             document.loading=true;
             const PEQ = document.getElementById('PEQ');            
-            const ctx = document.getElementById("plotCanvas");
+            
             let config= DSP.config;
             
             /// Basics Controls Section
@@ -79,6 +79,17 @@
 
 
             /// Parametric EQ section
+            loadFiltersFromConfig()
+
+            // change loading to false after 100ms to avoud update running multiple times during loading.            
+            setInterval(function(){document.loading=false},50);            
+
+            initSpectrum();
+        }
+
+        function loadFiltersFromConfig() {
+            let config= DSP.config;
+            const ctx = document.getElementById("plotCanvas");            
             let line;
             if (config.filters!=null) {
                 for (let filterName of Object.keys(config.filters)) {                  
@@ -94,11 +105,6 @@
                 // sortByFreq(PEQ);
                 plot(config.filters,ctx);         
             }
-
-            // change loading to false after 100ms to avoud update running multiple times during loading.            
-            setInterval(function(){document.loading=false},50);            
-
-            initSpectrum();
         }
 
         function addLine(parent,filterName,insertBefore) {
@@ -110,7 +116,15 @@
             return line;   
         }
 
-        function sortByFreq(parent) {            
+        function sortAll() {
+            const PEQs=document.getElementsByClassName("PEQ");                        
+            for (let PEQ of PEQs) {
+                sortByFreq(PEQ);
+            }
+        }
+
+        function sortByFreq(parent) {    
+
             let elementArray=[];
             parent.childNodes.forEach(element => {                
                 if (element.className=="peqline") {                    
@@ -124,24 +138,24 @@
             }
 
             elementArray.sort(compareLines);            
-            for (let element of elementArray) {
-                console(element.instance.getParams.type);
+            for (let element of elementArray) {                
                 parent.appendChild(element);
-            }
+            }            
         }
 
         async function peqlineUpdate() {                        
             if (document.loading) return;
             const ctx = document.getElementById("plotCanvas")
             let filters = generateFiltersObject();
-            console.log(filters)
+            // console.log(filters)
 
             plot(filters,ctx);              
-            let config = await document.DSP.sendDSPMessage("GetConfigJson");
-            // config.filters=filters;       
+            let config = await DSP.sendDSPMessage("GetConfigJson");
+            config.filters=filters;       
             
-            config.pipeline= document.DSP.updatePipeline(config);                 
-            await document.DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});                                                                           
+            config.pipeline= DSP.updatePipeline(config);                 
+            await DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});
+            
         }
 
         function generateFiltersObject() {
@@ -166,6 +180,12 @@
         function peqlineAdd(peqline) {
             const PEQ = document.getElementById('PEQ');
             addLine(PEQ,"NewFilter"+PEQ.children.length+1,peqline)
+        }
+
+        async function clearPEQ() {
+            document.getElementById('PEQ').innerHTML='';
+            await peqlineUpdate();
+            console.log("PEQ Cleared.");
         }
 
         const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
@@ -236,7 +256,7 @@
     <div class="group" id="basicControls" label="Basic Controls">        
     </div>    
     
-    <div class="group" id="PEQ" label="Parametric EQ">         
+    <div class="group PEQ" id="PEQ" label="Parametric EQ">         
     </div>    
 
     

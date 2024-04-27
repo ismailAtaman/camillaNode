@@ -1,10 +1,9 @@
 
-let DSP;
 
-async function basicOnLoad() {       
+async function basicLoad() {       
     
     const basicControls = document.getElementById('basicControls');
-    const canvas = document.getElementById('plotCanvas');    
+    const ctx = document.getElementById('plotCanvas');    
     DSP = window.parent.DSP;            
 
     // Create UI elements
@@ -91,8 +90,7 @@ async function basicOnLoad() {
     upperMids.knob.instance.setVal(config.filters["upperMids"].parameters.gain*10+181);
     treble.knob.instance.setVal(config.filters["treble"].parameters.gain*10+181);
     
-    plot(config.filters,canvas);
-
+    plot(config.filters,ctx);
 }
 
 async function setTone() {

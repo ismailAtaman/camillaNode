@@ -17,13 +17,14 @@
         window.PEQLine=PEQLine;
         window.plot=plot;
 
-        document.addEventListener("DOMContentLoaded",basicOnLoad());
+        document.addEventListener("DOMContentLoaded",basicLoad);
 
     </script>    
     <script src="src/basic.js"></script>    
 </head>
 <body>    
     <div id="sectionMainTitle"><img src="img/icon/basic.png" class="icon">Basic</div>
+
     <%- include('plot.ejs'); %>
 
     <div class="group" id="basicControls" label="Basic Controls">
