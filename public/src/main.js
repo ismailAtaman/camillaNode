@@ -21,7 +21,7 @@ function mainBodyOnLoad() {
 
     // Hide indicators.
     let indicators = document.getElementById("indicators")
-    if (indicators!=null) indicators.style = 'display:none'
+    // if (indicators!=null) indicators.style = 'display:none'
 
     // Connect to camillaDSP
     conectToDSP();
@@ -42,7 +42,7 @@ function mainBodyOnLoad() {
 
     observer.observe(window.mainframe,{attributes:true});
 
-
+    
 }
 
 function updateActions(page) {
@@ -71,6 +71,71 @@ async function conectToDSP() {
         DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);                        
     },5000);
     window.DSP= DSP;        
+    initIndicators();
+}
+
+async function initIndicators() {
+    console.log("updating indicators")
+
+    // Update indcators 
+    let samplingRateInd=document.getElementById("samplingRateInd"); 
+    let uzilizationInd=document.getElementById("uzilizationInd");     
+    let clippingInd=document.getElementById("clippingInd");
+    let limiterInd=document.getElementById("limiterInd");
+    let balanceInd=document.getElementById("balanceInd");
+    let crossfeedInd=document.getElementById("crossfeedInd");
+    let filtersInd=document.getElementById("filtersInd");
+    let spectrumInd=document.getElementById("spectrumIndicatorInd");
+    let DSPstateInd=document.getElementById("DSPStateInd");
+    let DSPversionInd=document.getElementById("DSPVersionInd");
+    let nodeVersionInd=document.getElementById("nodeVersionInd");
+
+    let rate=await window.DSP.sendDSPMessage("GetCaptureRate");
+    let bal = await DSP.getBalance();
+    let crs = await DSP.getCrossfeed();
+    let cfg = await DSP.sendDSPMessage("GetConfigJson")
+    let clp = await window.DSP.sendDSPMessage("GetClippedSamples");
+    let dUtl= await window.DSP.sendDSPMessage("GetProcessingLoad");
+    let sUtl= await window.DSP.sendSpectrumMessage("GetProcessingLoad");
+    let utl = sUtl+dUtl;
+
+    samplingRateInd.innerText=  new Intl.NumberFormat('en-US').format(rate);
+    uzilizationInd.innerText=Math.round(utl*10)/10+"%";
+    if (clp>0) { clippingInd.innerText = "CLIPPED"; clippingInd.style.color="red"; } else {clippingInd.innerText = "No clipping"; clippingInd.style.color="#9A9";}
+    if (bal==0) balanceInd.innerText="0 Centre";
+    if (bal>0) balanceInd.innerText=bal+" Right";
+    if (bal<0) balanceInd.innerText=bal+" Left";
+    
+    if (crs==-15) crossfeedInd.innerText="x-feed off"; else crossfeedInd.innerText="x-feed : "+crs+"dB"
+    filtersInd.innerText=Object.keys(cfg.filters).length-1+" filters";
+    
+    
+
+    setInterval(async function(){
+        DSP.sendDSPMessage("ResetClippedSamples");
+    },10000);
+
+    setInterval(async function(){                            
+        let bal = await DSP.getBalance();
+        let cfg = await DSP.sendDSPMessage("GetConfigJson")
+        let crs = await DSP.getCrossfeed();
+
+        if (bal==0) balanceInd.innerText="0 Centre";
+        if (bal>0) balanceInd.innerText=bal+" Right";
+        if (bal<0) balanceInd.innerText=bal+" Left";
+        filtersInd.innerText=Object.keys(cfg.filters).length-1+" filters";
+        if (crs==-15) crossfeedInd.innerText="x-feed off"; else crossfeedInd.innerText="x-feed : "+crs+"dB"
+    },2000);  
+
+    setInterval(async function(){                            
+        let rate=await window.DSP.sendDSPMessage("GetCaptureRate");
+        let clp = await window.DSP.sendDSPMessage("GetClippedSamples");
+        
+        samplingRateInd.innerText=  new Intl.NumberFormat('en-US').format(rate);
+        uzilizationInd.innerText=Math.round(await window.DSP.sendSpectrumMessage("GetProcessingLoad")*10)/10+"%";
+        if (clp>0) { clippingInd.innerText = "CLIPPED"; clippingInd.style.color="red"; } else {clippingInd.innerText = "No clipping"; clippingInd.style.color="#9A9";}
+        
+    },1000);    
 }
 
 
@@ -215,22 +280,7 @@ async function connect(camillaDSP) {
     // state.innerText="Connected.";
     // state.style.color="#6C6";
 
-    // Update indcators 
-    let samplingRate=document.getElementById("samplingRate") 
-    let clippingIndicator=document.getElementById("clippingIndicator")
-    let limiter=document.getElementById("limiter")
-    let balance=document.getElementById("balance")
-    let crossfeed=document.getElementById("crossfeed")
-    let filters=document.getElementById("filters")
-    let spectrum=document.getElementById("spectrum")
-    let DSPstate=document.getElementById("DSPState")
-    let DSPversion=document.getElementById("DSPVersion")
-    let nodeVersion=document.getElementById("nodeVersion")
-
-    let int=setInterval(function(int){                            
-        state.innerText='';                
-        window.clearInterval(int);
-    },5000);            
+        
 }          
 
 function downloadFile(filename, text) {

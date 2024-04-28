@@ -388,16 +388,30 @@ select {
     font-size: 13px;
 }
 
-#indicators > div {    
-    color:#9A9;
+.indicator {      
+    color: #ffffff75;    
     width: 100px;
+    height: 20px;
     text-align: center;
     border-right: 1px solid #666;
-    cursor:hand;
+    cursor:hand;    
+    
 }
 
 #indicators div:last-of-type {
     border-right: none;
+}
+
+.indicator-off {
+    color: #424942; 
+}
+
+.indicator-on {
+    color: white
+}
+
+.indicator-alarm {
+    color: #dd490e;
 }
 
 /********************************************** PEQLINE *************************************************************************/
