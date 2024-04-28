@@ -661,3 +661,8 @@ input[type="checkbox"]:checked::before {
 .tools .navigate {
     width: 300px;
 }
+
+#preamp {
+    margin-left: 10px;
+    width: 40px;
+}

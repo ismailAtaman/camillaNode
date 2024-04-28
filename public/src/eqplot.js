@@ -285,6 +285,8 @@ function plot(filterObject,canvas) {
 		
 	}
 	let t= plotArray(ctx, totalArray,"#FFF",3);	
+	return Math.round(Math.max(...totalArray[1]));
+
 }
 
 

@@ -7,6 +7,7 @@
     <title>Document</title>
 </head>
 <body>
+
     <div id="sectionMainTitle"><img src="img/icon/equalizer.png" class="icon">Equalizer</div>
     
     <script type="module">
@@ -50,13 +51,21 @@
             let vol = new EQKnob("Volume",31);        
             let balance = new EQKnob("Balance",181);
             let crossfeed = new EQKnob("Crossfeed",31);
+            let preamp = new EQKnob("Pre-amp",181);
 
             crossfeed.knob.instance.offAtDefault=true;
             balance.knob.instance.offAtDefault=true;
+            preamp.knob.instance.offAtDefault=true;
             
             basicControls.appendChild(vol.knob);        
             basicControls.appendChild(balance.knob)
             basicControls.appendChild(crossfeed.knob)
+            basicControls.appendChild(preamp.knob)
+
+            window.vol=vol;
+            window.balance=balance;
+            window.crossfeed=crossfeed;
+            window.preamp=preamp;
 
             // Load data from DSP
             DSP.sendDSPMessage("GetVolume").then(r=>{            
@@ -88,6 +97,12 @@
                 DSP.setCrossfeed(crossfeedVal);
             })
 
+            preamp.knob.addEventListener("change",function(e){
+                const preampGain = (this.instance.getVal() -181)/10*1; // 1db change per every tick       
+                console.log(preampGain);
+                setPreamp(preampGain);                 
+            })
+
 
             /// Parametric EQ section
             loadFiltersFromConfig()
@@ -98,6 +113,16 @@
             initSpectrum();
         }
 
+        async function setPreamp(gain) {
+            let config = await DSP.sendDSPMessage("GetConfigJson");
+            if (config.filters.Gain == undefined) {
+                config.filters.Gain = {"type":"Gain","parameters":{"gain":0,"inverted":false,"scale":"dB"}}
+            }  
+            config.filters.Gain.parameters.gain=gain;                
+            config.pipeline=DSP.updatePipeline(config);
+            await DSP.updateConfig(config);
+        }
+
         function loadFiltersFromConfig() {            
             PEQ.innerHTML='';
             let config= DSP.config;
@@ -105,19 +130,25 @@
             const ctx = document.getElementById("plotCanvas");            
             let line;
             if (config.filters!=null) {
-                for (let filterName of Object.keys(config.filters)) {                  
-                    if (filterName=="Gain") {
-                        line = addLine(PEQ,filterName,PEQ.childNodes[0]);                    
+                for (let filterName of Object.keys(config.filters)) {                               
+                    console.log(config.filters[filterName].type)
+                    if (config.filters[filterName].type=="Gain") {                        
+                        let preampGain = config.filters.Gain.parameters.gain; 
+                        preamp.knob.instance.setVal(preampGain* 10 +181);                        
+                        setPreamp(preampGain);
+                        console.log("Gain",preampGain,preampGain*10+181)
                     } else {
                         line = addLine(PEQ,filterName);                    
+                        line.instance.JSONtoValues(config.filters[filterName]);                  
                     }
                     // line.instance.update();
-                    line.instance.JSONtoValues(config.filters[filterName]);                  
+                    
                     // console.log("Line added",line)  
                 }
             
                 // sortByFreq(PEQ);
-                plot(config.filters,ctx);         
+                let max = plot(config.filters,ctx);         
+                console.log("Max Level ",max)
             }
         }
 
@@ -266,12 +297,11 @@
     </div>
 
     <%- include('plot.ejs'); %>
-
-    <div class="group" id="basicControls" label="Basic Controls">        
-    </div>    
     
-    <div class="group PEQ" id="PEQ" label="Parametric EQ">         
-    </div>    
+
+    <div class="group" id="basicControls" label="Basic Controls">                
+    </div> 
+    <div class="group PEQ" id="PEQ" label="Parametric EQ"></div>    
 
     
 </body>

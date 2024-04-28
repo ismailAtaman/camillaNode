@@ -319,7 +319,7 @@ class camillaDSP {
          } else {
             obj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
          }
-         console.log("json",obj)    
+         //console.log("json",obj)    
         return obj;
     }
 

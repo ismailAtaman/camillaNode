@@ -170,7 +170,7 @@ function parseAutoEQText(text) {
         filterArray.push(filter);        
         i++;
     }
-    // console.log("parse",filterArray)    
+    console.log("parse",filterArray)    
     return filterArray;
 }
 

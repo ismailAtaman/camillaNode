@@ -234,10 +234,8 @@ class PEQLine {
 
 
 
-        if (filterObject.type=="Gain") {
-            this.peqline.children["type"].value="PRE";             
-            this.peqline.children["gain"].value = parameters.gain;
-            console.log(this.peqline.children["type"].value);
+        if (filterObject.type=="Gain") {            
+            this.peqline.children["gain"].value = parameters.gain;            
         } else {                        
             this.peqline.children["type"].value=parameters.type;
             this.peqline.children["freq"].value= parameters.freq;        
