@@ -324,10 +324,20 @@ class camillaDSP {
     }
 
     async updateConfig(config) {
+        await this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});
+        this.config = await this.sendDSPMessage("GetConfigJson");        
+        return true;
+
+        let currentConfig= await this.sendDSPMessage("GetConfigJson");
+        configsEqual(currentConfig,config);
+        return true;
+
         return new Promise((resolve,reject)=>{
             this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>{
-                this.sendDSPMessage("GetConfigJson").then(currentConfig=>{                   
-                    resolve([true,"Config upload successful."]); //else reject([false,"Config validation failed!"])
+                this.sendDSPMessage("GetConfigJson").then(currentConfig=>{    
+                    configsEqual(currentConfig,config);
+                    resolve(true);
+                    //resolve([true,"Config upload successful."]); //else reject([false,"Config validation failed!"])
                 }).catch(e=>{reject([false,"Config validation failed."])})        
             }).catch(e=>reject([false,"Config upload failed."]));            
         })
@@ -335,5 +345,36 @@ class camillaDSP {
     }
 
 }
+
+
+function configsEqual(configA, configB) {
+    console.log("Equal logs");
+    let equal = checkObjectsForEquality(configA,configB);
+    console.log("Configs are equal :", equal)
+
+}
+
+function checkObjectsForEquality(objA, objB) {    
+    let ret;
+    for (let key of Object.keys(objA).sort((a,b)=>{return a-b})) {
+        console.log("===>KEY : ",key, " of type ", typeof(objA[key]))
+        if (typeof(objA[key])!='object') {            
+            if (objB[key]==undefined ) { console.log("Miss  =>", key," does not exist in second object.",objA[key]); return false };
+            if (objB[key]!=objA[key]) { console.log("Miss  =>",key," does not match between objects. A : ",objA[key]," B :",objB[key]);return false } ;            
+            if (objB[key]==objA[key]) { console.log("Match =>",key," is '",objA[key],"' in both objects.") } ;            
+        } else {      
+            if (Array.isArray(objA[key])) {
+                console.log(">>>>>>>>>>>>>>>>>>>>>>Array");
+                return true;
+            }            
+            if (objA[key]==null && objB[key]==null) continue;
+            if (objB[key]==undefined && objA[key]!=null) { console.log(key," does not exist in second object.",objA[key]); return false };
+            ret = checkObjectsForEquality(objA[key],objB[key]);                        
+            if (ret==false) return false;
+        }    
+    }    
+    return true;
+}
+
 
 export default camillaDSP;

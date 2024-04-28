@@ -204,7 +204,7 @@ async function connect(camillaDSP) {
     let config =  await DSP.sendDSPMessage("GetConfigJson");                     
     if (config.pipeline==null || config.mixers==null || config.filter==null) config = camillaDSP.getDefaultConfig(config,true);
                 
-    conencted = DSP.sendDSPMessage({"SetConfigJson":JSON.stringify(config)});            
+    conencted = DSP.updateConfig(config);            
     if (connected) {
         state.innerText="Connected.";
         state.style.color="#6C6";

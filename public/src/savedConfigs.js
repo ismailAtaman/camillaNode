@@ -36,14 +36,14 @@ class savedConfigs {
         
         if (this.configs==undefined) this.loadConfigs();
         
-        let r = this.getConfig(config.name,config.type);
+        let getConfig = this.getConfig(config.name,config.type);
         
-        if (r[0] && overwrite) { this.add(config); return [true,config]; }
-        if (r[0] && !overwrite) { return [false,"exists"];}        
-        if (r[0] && r[1]>1) { return[false,"multiple"] }
+        if ( getConfig.success && overwrite) { this.add(config); return [true,config]; }
+        if ( getConfig.success && !overwrite) { return [false,"exists"];}        
+        if ( getConfig.success && getConfig.elementCount>1) { return[false,"multiple"] }
 
-        if (r[1]==0) { this.add(config); return [true,config]; }        
-        return r;
+        if (getConfig.elementCount==0) { this.add(config); return [true,config]; }        
+        return getConfig;
     }
 
     add(config) {

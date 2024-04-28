@@ -68,12 +68,14 @@
             const configName = document.getElementById("configName");
             const date = new Date();
 
+            console.log("saveConfigurationClick running..")
+
             if (configName.value.length<3) {
                 alert("Configuration name should be at least 3 characters long.");
                 return;
             }
 
-            const frameDocument = window.mainframe.contentWindow.document;
+            const frameDocument = window.mainframe.contentWindow.document;            
 
             let data,DSPConfig;
             switch (activePage) {
@@ -107,12 +109,13 @@
                     break;
                 case "preferences":
                     break;
-
             }
+
+
             let tmpConfig={"type":activePage,"name":configName.value,"createdDate":date,"data":data}
-            //console.log(tmpConfig);
+            console.log(tmpConfig);
             let saved = configsObject.saveConfig(tmpConfig);                        
-            // console.log(saved)
+            console.log(saved)
             if (saved[0]) {
                 loadConfigs(activePage,document.getElementById("configList"))
                 configName.value="";                
@@ -144,31 +147,36 @@
                     frameDocument.getElementById("port").value=data.port;
                     frameDocument.getElementById("spectrumPort").value=data.spectrumPort;
                     break;
-                case "basic":                    
-                    console.log("Processing basic")
+
+                case "basic":                                        
                     await DSP.sendDSPMessage({"SetVolume":data.volume})                    
                     await DSP.setBalance(data.balance);
                     await DSP.setCrossfeed(data.crossfeed);
 
-                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
-                    DSPConfig.filters= data.filters
+                    
+
+                    DSPConfig = DSP.config;
+                    DSPConfig.filters.subBass= data.filters.subBass;
+                    DSPConfig.filters.bass= data.filters.bass;
+                    DSPConfig.filters.mids= data.filters.midsass;
+                    DSPConfig.filters.upperMids= data.filters.upperMids;
+                    DSPConfig.filters.treble= data.filters.treble;                    
                     DSPConfig.mixers=data.mixers;
                     DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);
                     DSPConfig.title="loading from config"
-                    let ret=await DSP.updateConfig(DSPConfig);
-                    console.log(ret);
-                    await window.mainframe.contentWindow.loadData.apply();
+                    await DSP.updateConfig(DSPConfig);                    
+                    await window.mainframe.contentWindow.loadData.apply();                    
                     break;
 
-                case "equalizer":                    
-                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
+                case "equalizer":                
+                    DSPConfig = DSP.config;
                     DSPConfig.filters=data.filters;
                     DSPConfig.mixers=data.mixers;
-                    DSPConfig.pipeline=data.pipeline;                                        
-                    let r=await DSP.updateConfig(DSPConfig);
-                    console.log("EQ Config loaded",r);
+                    DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);                                        
+                    await DSP.updateConfig(DSPConfig);                    
                     window.mainframe.contentWindow.loadFiltersFromConfig.apply();
                     break;
+
                 case "advanced":
                     break;
                 case "room":

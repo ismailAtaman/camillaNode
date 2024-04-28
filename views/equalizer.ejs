@@ -168,7 +168,7 @@
             config.filters=filters;       
             
             config.pipeline= DSP.updatePipeline(config);                 
-            await DSP.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});
+            await DSP.updateConfig(config);
             console.log("peqlineupdate")            
         }
 
