@@ -20,9 +20,13 @@ class savedConfigs {
             if (filteredList.length>1) return {"success":false,"elementCount":filteredList.length};
             return {"success":true,"elementIndex":this.configs.indexOf(filteredList)};
         } else {
-            let r =  this.configs.filter(e=>e.name==name && e.type==type);
-            if (r.length==0) return {"success":false,"elementCount":r.length};
-            return {"success":true,"elementIndex":this.configs.indexOf(filteredList)};
+            let filteredList =  this.configs.filter(e=>e.name==name && e.type==type);
+
+            if (filteredList.length==0) return {"success":false,"elementCount":filteredList.length};
+            console.log("FilterList ID:",filteredList[0].id);
+            return {"success":true,"elementId":filteredList[0].id};
+
+
         }
     }
 
@@ -38,7 +42,7 @@ class savedConfigs {
         
         let getConfig = this.getConfig(config.name,config.type);
         
-        if ( getConfig.success && overwrite) { this.add(config); return [true,config]; }
+        if ( getConfig.success && overwrite) { this.delete(getConfig.elementId); this.add(config); return [true,config]; }
         if ( getConfig.success && !overwrite) { return [false,"exists"];}        
         if ( getConfig.success && getConfig.elementCount>1) { return[false,"multiple"] }
 
@@ -62,13 +66,6 @@ class savedConfigs {
         this.configs.splice(index,1);         
         window.localStorage.setItem("savedConfigs",JSON.stringify(this.configs));        
         return true;
-    }
-
-    getNextId() {
-        if (this.configs==undefined) this.loadConfigs();
-        let tmpConfigs=this.configs; 
-        tmpConfigs.sort((a,b)=>{return b.id - a.id});        
-        return tmpConfigs[0]==undefined?0:parseInt(tmpConfigs[0].id)+1;        
     }
 
 }

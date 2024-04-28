@@ -344,8 +344,30 @@ class camillaDSP {
         
     }
 
+   async convertConfigToText() {        
+        this.config = await this.sendDSPMessage("GetConfigJson");                
+        let configText=[], lastLine=1;        
+
+        for (let filter of Object.keys(this.config.filters)) {
+            console.log(this.config.filters[filter].type)
+            if (this.config.filters[filter].type=="Gain") {
+                configText[0]="Preamp "+this.config.filters[filter].parameters.gain+" dB\n";
+            } else {
+                let gainText= this.config.filters[filter].parameters.gain;
+                let qText = this.config.filters[filter].parameters.q;
+                let freqText = this.config.filters[filter].parameters.freq;
+                let onOffText = this.config.filters[filter].parameters.gain==0?"Off":"On";
+                let typeText = this.config.filters[filter].parameters.type=="Peaking"?"PK":this.config.filters[filter].parameters.type=="Lowshelf"?"LSC":"HSC";
+                configText[lastLine]="Filter "+lastLine+" "+onOffText+" "+typeText+" Fc "+freqText+" Hz Gain "+gainText+" dB Q "+qText+"\n";
+                lastLine++;
+            }            
+        }
+        return configText.toString().replaceAll(',','');
+    }
 }
 
+
+/****************************************************************************************************************** */
 
 function configsEqual(configA, configB) {
     console.log("Equal logs");

@@ -87,7 +87,6 @@
                     break;
                 case "basic":
                     DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
-
                     let vol = await DSP.sendDSPMessage("GetVolume");
                     let balance = await DSP.getBalance();
                     let crossfeed = await DSP.getCrossfeed();
@@ -101,7 +100,7 @@
                     break;
                 case "equalizer":
                     DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
-                    data={"filters":DSPConfig.filters,"mixers":DSPConfig.mixers,"pipeline":DSPConfig.pipeline}
+                    data={"title":DSPConfig.title,"filters":DSPConfig.filters,"mixers":DSPConfig.mixers,"pipeline":DSPConfig.pipeline}
                     break;
                 case "advanced":
                     break;
@@ -132,13 +131,13 @@
         }
 
         async function openConfigurationClick() {         
-            console.log("Open config")   
+            
             const activePage = getActivePage();
             const configName = document.getElementById("configName");
             const configId = configName.getAttribute("configId");
             let config = configsObject.getConfigById(configId);
             let data = config.data;
-            console.log(activePage,data)
+            console.log("Open config",activePage,data)
 
             switch (activePage) {
                 case "connections":          
@@ -152,9 +151,6 @@
                     await DSP.sendDSPMessage({"SetVolume":data.volume})                    
                     await DSP.setBalance(data.balance);
                     await DSP.setCrossfeed(data.crossfeed);
-
-                    
-
                     DSPConfig = DSP.config;
                     DSPConfig.filters.subBass= data.filters.subBass;
                     DSPConfig.filters.bass= data.filters.bass;
@@ -169,12 +165,13 @@
                     break;
 
                 case "equalizer":                
-                    DSPConfig = DSP.config;
+                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");                    
                     DSPConfig.filters=data.filters;
                     DSPConfig.mixers=data.mixers;
-                    DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);                                        
-                    await DSP.updateConfig(DSPConfig);                    
-                    window.mainframe.contentWindow.loadFiltersFromConfig.apply();
+                    DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);         
+                    DSPConfig.title=configName.value;                     
+                    await DSP.updateConfig(DSPConfig);                                        
+                    window.mainframe.contentWindow.loadFiltersFromConfig.apply();                    
                     break;
 
                 case "advanced":
@@ -208,7 +205,7 @@
     
         function loadConfigs(activePage,configList) {
             let configsArray = configsObject.loadConfigs(activePage);                        
-            // console.log(configsArray);
+            console.log(configsArray);
             configList.innerHTML='';
             document.getElementById("configName").value='';
             let configItemElement;
@@ -232,6 +229,13 @@
                 })
                 configList.appendChild(configItemElement);
             })
+        }
+
+        async function exportConfig() {
+            let configText = await DSP.convertConfigToText();
+            console.log(configText);
+            downloadFile("CamillaNode PEQ Export",configText);
+            // window.mainframe.contentWindow._configName
         }
 
     </script>
@@ -277,7 +281,7 @@
             <div class="leftTitle">Tools</div>
             
             <div class="navigate" onclick="showImport()"  target=""><img src="img/icon/import.png" class="icon">Import</div>
-            <div class="navigate" onclick="showExport()"  target=""><img src="img/icon/export.png" class="icon">Export</div>
+            <div class="navigate" onclick="exportConfig()"  target=""><img src="img/icon/export.png" class="icon">Export</div>
             <div class="navigate" onclick="showAutoEQ()" target=""><img src="img/icon/connections.png" class="icon">Auto EQ</div>
         
        

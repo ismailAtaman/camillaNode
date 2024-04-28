@@ -663,6 +663,13 @@ input[type="checkbox"]:checked::before {
 }
 
 #preamp {
-    margin-left: 10px;
+    margin-left: 10px;    
     width: 40px;
+}
+
+#preferences {
+    display: grid;
+    grid-template-columns: min(20vh,250px) auto;
+    gap: 15px;
+
 }

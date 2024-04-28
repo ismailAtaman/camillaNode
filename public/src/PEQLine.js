@@ -211,17 +211,11 @@ class PEQLine {
         return tmpObj;
     }
 
-    static filterToJSON(filter) {                
-        
+    static filterToJSON(filter) {                        
         let tmpObj = new Object();        
-        if (!enabled) gain=0;        
-        
-        if (filter.type=="Gain") {
-             tmpObj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
-         } else {
-            tmpObj={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}};       
-         }
-        return tmpObj;
+        if (!enabled) gain=0;                
+        if (filter.type=="Biquad") return tmpObj={"type":"Biquad","parameters":{"type":type,"freq":freq,"gain":gain,"q":qfact}};               
+        console.error("Non biquad filter received.", filter)
     }
     
 
@@ -232,10 +226,8 @@ class PEQLine {
         let parameters=filterObject[Object.keys(filterObject)[0]].parameters;    
         if (parameters==undefined) parameters=filterObject["parameters"];        
 
-
-
         if (filterObject.type=="Gain") {            
-            this.peqline.children["gain"].value = parameters.gain;            
+            // this.peqline.children["gain"].value = parameters.gain;            
         } else {                        
             this.peqline.children["type"].value=parameters.type;
             this.peqline.children["freq"].value= parameters.freq;        

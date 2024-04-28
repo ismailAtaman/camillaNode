@@ -99,7 +99,7 @@
 
             preamp.knob.addEventListener("change",function(e){
                 const preampGain = (this.instance.getVal() -181)/10*1; // 1db change per every tick       
-                console.log(preampGain);
+                // console.log(preampGain);
                 setPreamp(preampGain);                 
             })
 
@@ -124,14 +124,15 @@
         }
 
         function loadFiltersFromConfig() {            
+            
             PEQ.innerHTML='';
             let config= DSP.config;
-            // console.log(config);
+            
             const ctx = document.getElementById("plotCanvas");            
             let line;
             if (config.filters!=null) {
                 for (let filterName of Object.keys(config.filters)) {                               
-                    console.log(config.filters[filterName].type)
+                    console.log("LoadingFromConfig",config.filters[filterName].type=="Gain")
                     if (config.filters[filterName].type=="Gain") {                        
                         let preampGain = config.filters.Gain.parameters.gain; 
                         preamp.knob.instance.setVal(preampGain* 10 +181);                        
@@ -140,16 +141,13 @@
                     } else {
                         line = addLine(PEQ,filterName);                    
                         line.instance.JSONtoValues(config.filters[filterName]);                  
-                    }
-                    // line.instance.update();
-                    
-                    // console.log("Line added",line)  
-                }
-            
+                    }                    
+                }            
                 // sortByFreq(PEQ);
                 let max = plot(config.filters,ctx);         
-                console.log("Max Level ",max)
+                console.log("Max Level ",max)            
             }
+            document.loading=false;
         }
 
         function addLine(parent,filterName,insertBefore) {
@@ -211,6 +209,11 @@
                     filters[e.getAttribute("filterName")] = e.instance.valuesToJSON();
                 }
             })
+            // IF there is a preamp setting, create the preamp filter
+            preampGain=(preamp.knob.instance.getVal()-181)/10;
+            if (preampGain!=0) {
+                filters.Gain = {"type":"Gain","parameters":{"gain":preampGain,"inverted":false,"scale":"dB"}}
+            }
             return filters;
         }
     
