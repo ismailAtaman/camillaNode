@@ -209,7 +209,7 @@
                     filters[e.getAttribute("filterName")] = e.instance.valuesToJSON();
                 }
             })
-            // IF there is a preamp setting, create the preamp filter
+            // If there is a preamp setting, create the preamp filter
             preampGain=(preamp.knob.instance.getVal()-181)/10;
             if (preampGain!=0) {
                 filters.Gain = {"type":"Gain","parameters":{"gain":preampGain,"inverted":false,"scale":"dB"}}
