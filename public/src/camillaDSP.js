@@ -311,7 +311,7 @@ class camillaDSP {
         //     "gain"      : parseFloat(gain),
         //     "q"         : parseFloat(qfact)
         // }
-
+        let gain;
         let obj = new Object();                
         if (!filter.enabled) gain=0;                  
         if (filter.type=="Gain") {
@@ -347,18 +347,21 @@ class camillaDSP {
    async convertConfigToText() {        
         this.config = await this.sendDSPMessage("GetConfigJson");                
         let configText=[], lastLine=1;        
+        // let localFilters = [];
+        // Object.keys(this.config.filters).forEach(f=>{localFilters.push(this.config.filters[f])})
 
-        for (let filter of Object.keys(this.config.filters)) {
+        let filterKeys=Object.keys(this.config.filters);
+        for (let filter of filterKeys) {
             console.log(this.config.filters[filter].type)
             if (this.config.filters[filter].type=="Gain") {
-                configText[0]="Preamp "+this.config.filters[filter].parameters.gain+" dB\n";
+                configText[0]="Preamp: "+this.config.filters[filter].parameters.gain+" dB\n";
             } else {
                 let gainText= this.config.filters[filter].parameters.gain;
                 let qText = this.config.filters[filter].parameters.q;
                 let freqText = this.config.filters[filter].parameters.freq;
-                let onOffText = this.config.filters[filter].parameters.gain==0?"Off":"On";
+                let onOffText = this.config.filters[filter].parameters.gain==0?"OFF":"ON";
                 let typeText = this.config.filters[filter].parameters.type=="Peaking"?"PK":this.config.filters[filter].parameters.type=="Lowshelf"?"LSC":"HSC";
-                configText[lastLine]="Filter "+lastLine+" "+onOffText+" "+typeText+" Fc "+freqText+" Hz Gain "+gainText+" dB Q "+qText+"\n";
+                configText[lastLine]="Filter "+lastLine+": "+onOffText+" "+typeText+" Fc "+freqText+" Hz Gain "+gainText+" dB Q "+qText+"\n";
                 lastLine++;
             }            
         }

@@ -433,23 +433,23 @@ select {
     border-radius: 3px;    
 }
 
-.peqline input[type="checkbox"] {    
+input[type="checkbox"] {    
     position: relative;
     appearance: none;
     width: 20px;    
     aspect-ratio: 1;    
     border-radius: 5px;
-    background-color: white;
+    background-color: #999;
     display: flex;
     justify-content: center;
-    align-items: center;    
+    align-items: center;     
 }
 
-.peqline input[type="checkbox"]:hover {        
+input[type="checkbox"]:hover {        
     background-color: hsl(var(--bck-hue), 50%, 70%);    
 }
 
-.peqline input[type="checkbox"]::before {    
+input[type="checkbox"]::before {    
     content: " ";
     position: absolute;
     transform:scale(0);
@@ -460,10 +460,16 @@ select {
     transition: all 200ms linear;
 }
 
+input[type="checkbox"]:checked {
+    background-color: white;
+}
+
 input[type="checkbox"]:checked::before {
-    transform: scale(1) rotate(90deg);
-  }
+    transform: scale(1) rotate(90deg);    
+}
     
+
+
 .peqline select {
     width: 40px;
     text-align: center;

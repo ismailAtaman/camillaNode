@@ -119,8 +119,7 @@ function parseAutoEQText(text) {
 
         let enabled,filterType,gain,freq,qfact;        
 
-        if (name=='Preamp') { 
-            //if (typeof lineFragments[1]!="number") return false;
+        if (name=='Preamp') {             
             enabled=true;
             gain=lineFragments[1]; 
             freq=0;
@@ -165,12 +164,12 @@ function parseAutoEQText(text) {
             "q"         : parseFloat(qfact)
         }
 
-        // console.log(filter[name])
+        console.log(filter[name])
 
         filterArray.push(filter);        
         i++;
     }
-    console.log("parse",filterArray)    
+    // console.log("parse",filterArray)    
     return filterArray;
 }
 
