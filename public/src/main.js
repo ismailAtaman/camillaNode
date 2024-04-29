@@ -125,7 +125,7 @@ async function initIndicators() {
         if (bal<0) balanceInd.innerText=bal+" Left";
         filtersInd.innerText=Object.keys(cfg.filters).length-1+" filters";
         if (crs==-15) crossfeedInd.innerText="x-feed off"; else crossfeedInd.innerText="x-feed : "+crs+"dB"
-    },2000);  
+    },4000);  
 
     setInterval(async function(){                            
         let rate=await window.DSP.sendDSPMessage("GetCaptureRate");
@@ -135,7 +135,7 @@ async function initIndicators() {
         uzilizationInd.innerText=Math.round(await window.DSP.sendSpectrumMessage("GetProcessingLoad")*10)/10+"%";
         if (clp>0) { clippingInd.innerText = "CLIPPED"; clippingInd.style.color="red"; } else {clippingInd.innerText = "No clipping"; clippingInd.style.color="#9A9";}
         
-    },1000);    
+    },2000);    
 }
 
 

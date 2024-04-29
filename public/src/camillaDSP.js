@@ -125,7 +125,13 @@ class camillaDSP {
                 break;     
             case "GetCaptureRate":            
                 if (result=='Ok') return [true,value]; else return[false,value];           
-                break;         
+                break;      
+            case "GetProcessingLoad":            
+                if (result=='Ok') return [true,value]; else return[false,value];           
+                break;           
+            case "ResetClippedSamples":            
+                if (result=='Ok') return [true,value]; else return[false,value];           
+                break;                           
             default:
                 console.log("Unhandled message received from DSP : "+responseCommand);
                 if (result=='Ok') return [true,value]; else return[false,value];                        
