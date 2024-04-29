@@ -7,7 +7,8 @@ class savedConfigs {
     loadConfigs(type) {
         this.configs= window.localStorage.getItem("savedConfigs");        
         if (this.configs==null) {this.configs=[]; return this.configs};
-        if (this.configs.length==0 ) this.configs=[]; else this.configs=JSON.parse(this.configs);
+
+        if (this.configs.length==0 ) { this.configs=[]; return this.configs }else this.configs=JSON.parse(this.configs);
         if (type!=undefined && type!=null) return this.configs.filter(e=>e.type==type); else return this.configs;
     }   
     
