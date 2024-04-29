@@ -71,9 +71,8 @@
             const configName = document.getElementById("configName");
             const date = new Date();
 
-            console.log("saveConfigurationClick running..")
-
             if (configName.value.length<3) {
+                console.log("ConfigName ",configName.value)
                 alert("Configuration name should be at least 3 characters long.");
                 return;
             }
@@ -199,6 +198,7 @@
             if (deleted) {
                 const activePage = getActivePage();
                 const configList = document.getElementById("configList");
+                configName.setAttribute("configId","");
                 loadConfigs(activePage,configList);
             } else {
                 alert("Error deleting configuration!")

@@ -1,3 +1,13 @@
-Gain filter is not maintained in the config when its loaded
+TOPIC : Auto EQ
+TOPIC : Room EQ
+TOPIC : Preferences
+TOPIC : Read me file
+
 
 Add DC Protection
+Add config name visible on the EQ tab
+Add Mute button
+Add Limiter
+Add level meter bars for non spectrum and basic
+
+
