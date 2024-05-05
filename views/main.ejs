@@ -207,7 +207,8 @@
         }
     
         function loadConfigs(activePage,configList) {
-            let configsArray = configsObject.loadConfigs(activePage);                        
+            let configsArray = configsObject.loadConfigs(activePage,true);                        
+
             console.log(configsArray);
             configList.innerHTML='';
             document.getElementById("configName").value='';

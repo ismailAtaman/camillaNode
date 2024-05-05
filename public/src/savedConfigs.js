@@ -4,17 +4,29 @@ class savedConfigs {
     configs;    
     
 
-    loadConfigs(type) {
+    loadConfigs(type, sorted) {
+        if (sorted==undefined) sorted=false;
+
         this.configs= window.localStorage.getItem("savedConfigs");        
-        if (this.configs==null) {this.configs=[]; return this.configs};
-        if (this.configs.length==0 ) { this.configs=[]; return this.configs }else this.configs=JSON.parse(this.configs);
+        if (this.configs==null) {this.configs=[]};
+        if (this.configs.length==0 ) this.configs=[]; else this.configs=JSON.parse(this.configs);
 
         try {
-            if (type!=undefined && type!=null) return this.configs.filter(e=>e.type==type); else return this.configs;
+            if (type!=undefined && type!=null) this.configs= this.configs.filter(e=>e.type==type);          
         }
         catch {
             return [];
         }
+
+        if (sorted) {
+            this.configs.sort((a,b)=>{
+                console.log("loadConfig ",a.name , b.name);
+                if (a.name>b.name) return 1; else return -1;
+            })
+        }
+
+        return this.configs;
+
     }   
     
     getConfig(name,type) {
