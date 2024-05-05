@@ -9,14 +9,37 @@
 
     <div id="sectionMainTitle"><img src="img/icon/preferences.png" class="icon">Preferences</div>
     <div id="preferences">
-        
-        <div>Default page on load</div> <div><input type="text" id="defaultPage"></div>
-        <div>Enable spectrum analyzer</div> <div><input type="checkbox" name="" id=""></div>
-        <div>Enable level meter</div> <div><input type="checkbox" name="" id=""></div>
-        <div>Show EQ plot</div> <div><input type="checkbox" name="" id=""></div>
+
+        <div class="preferenceSection" label="General Options">
+            <div>Enable DC Protection</div> <div><input type="checkbox" name="" id=""></div>
+            <div>DC Protection Highpass Frequency </div> <div><input type="text" name="" id=""></div>
+        </div>
+
+        <div class="preferenceSection" label="User Interface Preferences">
+            <div>Default page on load</div> <div>
+                <select id="defaultPage">
+                    <option value="connections">Connections</option>
+                    <option value="basic">Basic</option>
+                    <option value="equalizer">Equalizer</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="room">Room EQ</option>
+                </select>
+            </div>
+
+            <div>Background hue</div> <div>Range 160</div>
+            <div>Enable spectrum analyzer</div> <div><input type="checkbox" name="" id=""></div>
+            <div>Enable level meter</div> <div><input type="checkbox" name="" id=""></div>
+            <div>Show EQ plot</div> <div><input type="checkbox" name="" id=""></div>
+        </div>        
+
+        <div class="preferenceSection" label="Basic Section Preferences">            
+            <div>Basic Frequency and Q settings</div> <div><input type="checkbox" name="" id=""></div>
+        </div>
+
+
+        <div class="preferenceSection" label="Equalizer Section Preferences">            
         <div>Set pre-amp gain based on filters</div> <div><input type="checkbox" name="" id=""></div>
-        <div>Enable DC Protection</div> <div><input type="checkbox" name="" id=""></div>
-        
+        </div>
 
         
     </div>
