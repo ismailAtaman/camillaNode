@@ -75,7 +75,7 @@ async function conectToDSP() {
 }
 
 async function initIndicators() {
-    console.log("updating indicators")
+    // console.log("updating indicators")
 
     // Update indcators 
     let samplingRateInd=document.getElementById("samplingRateInd"); 

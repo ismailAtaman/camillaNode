@@ -1,5 +1,5 @@
 
-
+"use strict"
 const QUADLEN = 1024;
 const colorArray=[""]
 
@@ -263,12 +263,15 @@ function createGrid(canvas) {
 	
 }
 
-function plot(filterObject,canvas) {
+function plot(filterObject,canvas, name) {
 	const ctx = canvas;        
 	const context = ctx.getContext('2d');             
 	context.clearRect(0, 0, ctx.width, ctx.height)        	
+	context.stroke();
 
+	// Create the grid
 	createGrid(ctx); 
+
 	let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
 	let dataMatrix;
 	let color = parseInt("88e015",16);	
@@ -280,12 +283,23 @@ function plot(filterObject,canvas) {
 			totalArray[i][0]=dataMatrix[i][0]
 			totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
 		}
-		color = color+15;
-		plotArray(ctx,dataMatrix,"#"+color.toString(16),0.3);
 		
-		// plotArray(ctx,dataMatrix,"#88e015",1);
+		// plotArray(ctx,dataMatrix,"#"+color.toString(16),0.3);
+		
+		plotArray(ctx,dataMatrix,"#88e015",0.3);
 		
 	}
+
+	// Centre and print the config name 
+	if (name!=undefined) {
+		context.font="15px Abel";            
+		context.fillStyle="#FEC"
+		const nameText = " "+name+" "
+		const textWidth = context.measureText(nameText).width;
+		const nameLeft = (canvas.width - textWidth)/2;
+		context.fillText(nameText,nameLeft,40);            
+	}
+
 	let t= plotArray(ctx, totalArray,"#FFF",3);	
 	return Math.round(Math.max(...totalArray[1]));
 

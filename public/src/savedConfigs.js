@@ -18,15 +18,8 @@ class savedConfigs {
             return [];
         }
 
-        if (sorted) {
-            this.configs.sort((a,b)=>{
-                console.log("loadConfig ",a.name , b.name);
-                if (a.name>b.name) return 1; else return -1;
-            })
-        }
-
+        if (sorted) {this.configs.sort((a,b)=>{if (a.name>b.name) return 1; else return -1;})}
         return this.configs;
-
     }   
     
     getConfig(name,type) {

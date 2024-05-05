@@ -58,7 +58,7 @@
             const activePage = getActivePage();
 
             let configsAray = configsObject.loadConfigs(activePage);                       
-            console.log(configsAray);
+            // console.log(configsAray);
             loadConfigs(activePage,configList);
             document.getElementById("configName").addEventListener('keyup',function(e){                
                 if (e.key=="Enter") saveConfigurationClick();
@@ -209,7 +209,7 @@
         function loadConfigs(activePage,configList) {
             let configsArray = configsObject.loadConfigs(activePage,true);                        
 
-            console.log(configsArray);
+            // console.log(configsArray);
             configList.innerHTML='';
             document.getElementById("configName").value='';
             let configItemElement;

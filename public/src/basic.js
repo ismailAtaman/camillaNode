@@ -106,7 +106,7 @@ async function loadData() {
     upperMids.knob.instance.setVal(config.filters["upperMids"].parameters.gain*10+181);
     treble.knob.instance.setVal(config.filters["treble"].parameters.gain*10+181);
     
-    plot(config.filters,ctx);
+    plot(config.filters,ctx,config.title);
 }
 
 async function setTone() {
@@ -130,5 +130,5 @@ async function setTone() {
     // console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
     let config = await DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
     const canvas = document.getElementById('plotCanvas');        
-    plot(config.filters,canvas);  
+    plot(config.filters,canvas,config.title);  
 }

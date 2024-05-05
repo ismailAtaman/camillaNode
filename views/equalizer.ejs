@@ -123,30 +123,33 @@
             await DSP.updateConfig(config);
         }
 
-        function loadFiltersFromConfig() {            
-            
+        function loadFiltersFromConfig() {                        
             PEQ.innerHTML='';
-            let config= DSP.config;
+            let config= DSP.config;            
             
-            const ctx = document.getElementById("plotCanvas");            
+            const canvas = document.getElementById("plotCanvas");            
             let line;
             if (config.filters!=null) {
                 for (let filterName of Object.keys(config.filters)) {                               
-                    console.log("LoadingFromConfig",config.filters[filterName].type=="Gain")
-                    if (config.filters[filterName].type=="Gain") {                        
-                        let preampGain = config.filters.Gain.parameters.gain; 
-                        preamp.knob.instance.setVal(preampGain* 10 +181);                        
-                        setPreamp(preampGain);
-                        console.log("Gain",preampGain,preampGain*10+181)
-                    } else {
-                        line = addLine(PEQ,filterName);                    
-                        line.instance.JSONtoValues(config.filters[filterName]);                  
-                    }                    
+                    // console.log("LoadingFromConfig",config.filters[filterName].type=="Gain")
+                    switch (config.filters[filterName].type) {
+                        case "Gain" :
+                            let preampGain = config.filters.Gain.parameters.gain; 
+                            preamp.knob.instance.setVal(preampGain* 10 +181);                        
+                            setPreamp(preampGain);
+                            break;
+                        case "Biquad" :
+                            line = addLine(PEQ,filterName);                    
+                            line.instance.JSONtoValues(config.filters[filterName]);                      
+                            break;
+                    }
                 }            
                 // sortByFreq(PEQ);
-                let max = plot(config.filters,ctx);         
-                console.log("Max Level ",max)            
+                let max = plot(config.filters,canvas,config.title);                         
+                // console.log("Max Level ",max)            
             }
+            
+
             document.loading=false;
         }
 
@@ -192,13 +195,15 @@
             let filters = generateFiltersObject();
             // console.log(filters)
 
-            plot(filters,ctx);              
+            
             let config = await DSP.sendDSPMessage("GetConfigJson");
             config.filters=filters;       
+
+            plot(filters,ctx,config.title);              
             
             config.pipeline= DSP.updatePipeline(config);                 
             await DSP.updateConfig(config);
-            console.log("peqlineupdate")            
+            // console.log("peqlineupdate")            
         }
 
         function generateFiltersObject() {
@@ -299,11 +304,9 @@
     <div id="spectrum" class="group">
     </div>
 
-    <%- include('plot.ejs'); %>
+    <%- include('plot.ejs'); %>    
     
-
-    <div class="group" id="basicControls" label="Basic Controls">                
-    </div> 
+    <div class="group" id="basicControls" label="Basic Controls"></div> 
     <div class="group PEQ" id="PEQ" label="Parametric EQ"></div>    
 
     
