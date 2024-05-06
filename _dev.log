@@ -5,8 +5,8 @@ TOPIC : Read me file
 
 
 Add DC Protection
-// Add config name visible on the EQ tab
-Add Mute button
+// Add config name visible on the EQ tab : Done
+// Add Mute button : double click on volume to mute
 Add Limiter
 Add level meter bars for non spectrum and basic
 

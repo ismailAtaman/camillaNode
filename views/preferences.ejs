@@ -3,45 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=100%, initial-scale=1.0">
-    <link rel="stylesheet" href="css/main.css">    
+    <link rel="stylesheet" href="css/main.css">        
 </head>
+
+<script type="module">
+    import preferences from '/src/preferences.js';
+    window.pref = new preferences;    
+    document.addEventListener("DOMContentLoaded",preferencesOnLoad);
+</script>
+
+<script>
+    function preferencesOnLoad() {
+        pref.createPreferencesElements(document.getElementById("preferences"))
+    }
+
+    function backgroundHueChange() {
+        window.parent.document.documentElement.style.setProperty('--bck-hue',parseInt(this.value));
+        window.parent.document.documentElement.style.setProperty('--hue-rotate',parseInt(this.value)-230+"deg");
+        document.documentElement.style.setProperty('--bck-hue',this.value);        
+    }
+
+</script>
+
 <body>
 
     <div id="sectionMainTitle"><img src="img/icon/preferences.png" class="icon">Preferences</div>
-    <div id="preferences">
-
-        <div class="preferenceSection" label="General Options">
-            <div>Enable DC Protection</div> <div><input type="checkbox" name="" id=""></div>
-            <div>DC Protection Highpass Frequency </div> <div><input type="text" name="" id=""></div>
-        </div>
-
-        <div class="preferenceSection" label="User Interface Preferences">
-            <div>Default page on load</div> <div>
-                <select id="defaultPage">
-                    <option value="connections">Connections</option>
-                    <option value="basic">Basic</option>
-                    <option value="equalizer">Equalizer</option>
-                    <option value="advanced">Advanced</option>
-                    <option value="room">Room EQ</option>
-                </select>
-            </div>
-
-            <div>Background hue</div> <div>Range 160</div>
-            <div>Enable spectrum analyzer</div> <div><input type="checkbox" name="" id=""></div>
-            <div>Enable level meter</div> <div><input type="checkbox" name="" id=""></div>
-            <div>Show EQ plot</div> <div><input type="checkbox" name="" id=""></div>
-        </div>        
-
-        <div class="preferenceSection" label="Basic Section Preferences">            
-            <div>Basic Frequency and Q settings</div> <div><input type="checkbox" name="" id=""></div>
-        </div>
-
-
-        <div class="preferenceSection" label="Equalizer Section Preferences">            
-        <div>Set pre-amp gain based on filters</div> <div><input type="checkbox" name="" id=""></div>
-        </div>
-
-        
+    <div id="preferences">        
     </div>
     
 </body>

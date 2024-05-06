@@ -10,7 +10,8 @@
     --bck-sat: 30%;
     --bck-light : 20%;
     --bck-color: hsl(var(--bck-hue),var(--bck-sat),var(--bck-light));   
-    --bck-group: hsl(var(--bck-hue),var(--bck-sat),15%);   
+    --bck-group: hsl(var(--bck-hue),var(--bck-sat),15%);  
+    --hue-rotate: -90deg; 
 
 
     --font-size: 16px;
@@ -18,6 +19,8 @@
 
     --slider-width: 3em;
     --slider-height: 15rem;
+
+    background-color:hsl(var(--bck-hue), var(--bck-sat), var(--bck-light));
 
     font-family: "Abel", sans-serif;
     font-size: var(--font-size);
@@ -33,12 +36,17 @@
 
 body {    
     color: white;
+    
 } 
+
+#logo {        
+    filter: hue-rotate(var(--hue-rotate));
+}
 
 #mainBody {
     height: 100%;
     color: white;
-    background-color:var(--bck-color);    
+    
     overflow: hidden;
 }
 
@@ -250,6 +258,19 @@ canvas {
     padding-block: 5px;    
 }
 
+
+input {
+    border-radius: 5px;
+}
+
+select {
+    width: var(--param-width);
+    border: none;
+    appearance: none;
+    border-radius: 5px;
+}
+
+
 /*************************************************************************************************/
 
 .knob {             
@@ -371,12 +392,6 @@ canvas {
     padding:0px;
     padding-block: 2px;        
     text-align: center;
-}
-
-select {
-    width: var(--param-width);
-    border: none;
-    appearance: none;
 }
 
 #indicators {
@@ -696,7 +711,7 @@ input[type="checkbox"]:checked::before {
 .preferenceSection {
     position: relative;
     display: grid;
-    grid-template-columns: min(20vh,250px) auto;
+    grid-template-columns: 300px auto;
     gap: 15px;
     margin-bottom: 50px;
     width: 100%;
@@ -712,4 +727,22 @@ input[type="checkbox"]:checked::before {
     display: inline-block;    
     top:0;
     height: 40px;             
+}
+
+.preferenceSection input, select {
+    display: relative;
+    max-width: 200px;
+    text-align: left;
+}
+
+.preferenceSection input[type="range"] {        
+    
+}
+
+#backgroundHue {
+    appearance: none;
+    background: linear-gradient(90deg,hsl(0, 70%, 40%),hsl(155, 70%, 40%),hsl(330, 70%, 40%));
+    border: 0px solid white;
+    border-radius: 5px;
+    height: 10px; 
 }

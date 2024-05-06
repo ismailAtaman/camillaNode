@@ -12,6 +12,9 @@ class camillaDSP {
     connected=false;
     spectrum_connected=false;
 
+    static DCProtectionFilter = {"DCProtection":{"type":"Biquad","parameters":{"type":"Highpass","freq":7,"q":0.7}}}
+    static Limiter = {"Limiter":{"type":"Limiter","parameters":{"clip_limit":-3}}}
+
     constructor() { 
         return this;        
     }
