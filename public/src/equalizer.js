@@ -233,8 +233,8 @@ async function initSpectrum(){
         bar = document.createElement("div");
         bar.className='levelbar';
         // bar.classList.add(bar % 2==0)?'left':'right';
-        bar.setAttribute('freq',freq[i]);
-        hue=180;
+        bar.setAttribute('freq',freq[i]);        
+        let hue=parseInt(window.document.documentElement.style.getPropertyValue('--bck-hue'));
         for (j=1;j<40;j++) {
             box = document.createElement('div');
             box.className='levelbox';                    

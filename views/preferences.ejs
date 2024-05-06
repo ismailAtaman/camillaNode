@@ -8,19 +8,19 @@
 
 <script type="module">
     import preferences from '/src/preferences.js';
-    window.pref = new preferences;    
+    window.preferences = new preferences();    
     document.addEventListener("DOMContentLoaded",preferencesOnLoad);
 </script>
 
 <script>
     function preferencesOnLoad() {
-        pref.createPreferencesElements(document.getElementById("preferences"))
+        preferences.createPreferencesElements(document.getElementById("preferences"))
     }
 
     function backgroundHueChange() {
-        window.parent.document.documentElement.style.setProperty('--bck-hue',parseInt(this.value));
-        window.parent.document.documentElement.style.setProperty('--hue-rotate',parseInt(this.value)-230+"deg");
-        document.documentElement.style.setProperty('--bck-hue',this.value);        
+        preferences.applyBackgroundHue(window.parent.document,this.value)
+        preferences.applyBackgroundHue(document,this.value)
+        
     }
 
 </script>

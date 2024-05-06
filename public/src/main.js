@@ -43,6 +43,11 @@ function mainBodyOnLoad() {
 
     observer.observe(window.mainframe,{attributes:true});
 
+    applyPreferences(document);
+    window.mainframe.addEventListener("load",function(){
+        console.log("Frame loaded.")
+        applyPreferences(window.mainframe.contentDocument)
+    })
     
 }
 
@@ -297,23 +302,10 @@ function downloadFile(filename, text) {
     document.body.removeChild(element);
   }
 
-/*
 
-Preamp: -6dB dB
-Filter 1: ON LSC Fc 45 Hz Gain 4 dB Q 0.7
-Filter 2: ON PK Fc 87 Hz Gain -5 dB Q 8.7
-Filter 3: ON LSC Fc 100 Hz Gain 6 dB Q 0.7
-Filter 4: ON PK Fc 120 Hz Gain -12 dB Q 5.4
-Filter 5: ON PK Fc 185 Hz Gain -8 dB Q 10.7
-Filter 6: ON PK Fc 300 Hz Gain -3 dB Q 3
-Filter 7: ON PK Fc 600 Hz Gain -3 dB Q 0.4
-Filter 8: ON PK Fc 850 Hz Gain 4 dB Q 5
-Filter 9: ON PK Fc 1130 Hz Gain 4 dB Q 6
-Filter 10: ON PK Fc 1500 Hz Gain 4 dB Q 0.5
-Filter 11: ON HSC Fc 2000 Hz Gain -2 dB Q 0.4
-Filter 12: ON PK Fc 2000 Hz Gain 4 dB Q 6
-Filter 13: ON PK Fc 3000 Hz Gain 3 dB Q 1.8
-Filter 14: ON PK Fc 5000 Hz Gain -2 dB Q 1.41
+function applyPreferences(doc) {
+    const hue = window.preferences.getSettingValue('ui','backgroundHue');
+    window.preferences.applyBackgroundHue(doc,hue); 
+    window.preferences.applyBackgroundHue(window.mainframe.contentDocument,hue); 
 
-
-*/
+}

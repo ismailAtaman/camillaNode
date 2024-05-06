@@ -135,7 +135,7 @@ class preferences {
                 subElement.preferences=this;
                 subElement.section=section;
                 subElement.addEventListener("change",function(){
-                    console.log("Event default.",item);
+                    // console.log("Event default.",item);
                     let value;
                     if (this.type=="checkbox") value=this.checked; else value=this.value;
                     this.preferences.applySetting(section,this.id,value)                     
@@ -151,12 +151,14 @@ class preferences {
     }
 
     applySetting(section,setting,value) {       
-        // console.log("Apply Setting",section,setting,value)
-        // this.preferenceObject[section].filter((e)=>e.id==setting)[0].value = value;
+        console.log("Apply Setting",section,setting,value)
+        this.preferenceObject[section].filter((e)=>e.id==setting)[0].value = value;
         console.log(this.preferenceObject[section])
     }
-
     
+    getSettingValue(section,setting) {
+        return this.preferenceObject[section].filter((e)=>e.id==setting)[0].value;
+    }
 
     loadSettings() {
         this.preferenceObject = window.localStorage.getItem("preferences");
@@ -173,6 +175,11 @@ class preferences {
         
     }
 
+
+    applyBackgroundHue(document,hue) {
+        document.documentElement.style.setProperty('--bck-hue',parseInt(hue));
+        document.documentElement.style.setProperty('--hue-rotate',parseInt(hue)-230+"deg");                        
+    }
 
 }
 
