@@ -43,6 +43,9 @@ function mainBodyOnLoad() {
 
     observer.observe(window.mainframe,{attributes:true});
 
+    loadPreferences();
+
+
     applyPreferences(document);
     
     window.mainframe.addEventListener("load",function(){        
@@ -302,6 +305,13 @@ function downloadFile(filename, text) {
     document.body.removeChild(element);
   }
 
+function loadPreferences() {
+    window.parent.activeSettings = window.preferences.getPreferences();
+    // if (window.activeSettings.DCProtection) DSP.DCProtection
+    window.mainframe.src = window.activeSettings.defaultPage;
+
+}
+
 
 function applyPreferences(doc) {
     const hue = window.preferences.getSettingValue('ui','backgroundHue');
@@ -309,3 +319,4 @@ function applyPreferences(doc) {
     window.preferences.applyBackgroundHue(window.mainframe.contentDocument,hue); 
 
 }
+

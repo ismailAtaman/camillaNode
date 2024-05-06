@@ -87,6 +87,8 @@ async function equalizerOnLoad() {
     setInterval(function(){document.loading=false},50);            
 
     initSpectrum();
+
+    console.log(window.parent.activeSettings);
 }
 
 async function setPreamp(gain) {

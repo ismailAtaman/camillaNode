@@ -34,6 +34,19 @@
     padding: 0px;
 }
 
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: hsl(var(--bck-hue), 35%, 15%);
+}
+ 
+
+::-webkit-scrollbar-thumb {
+    background: hsl(var(--bck-hue), 25%, 10%);
+}
+
 body {    
     color: white;
     
@@ -158,7 +171,7 @@ section {
 
 .navigate:hover {    
     background-color: hsl(var(--bck-hue), 35%, 15%); 
-    color: hsl(var(--bck-hue), 75%, 45%); 
+    color: hsl(calc( 180 + var(--bck-hue)), 75%, 65%); 
 }
 
 .navigate img {        
@@ -185,7 +198,7 @@ dialog {
 }
 
 dialog::backdrop {
-    background-color: hsla(289, 24%, 13%, 0.5);
+    background-color: hsla(calc( 180 + var(--bck-hue)), 20%, 15%, 0.75);
 }
 
 dialog .navigate {
@@ -622,7 +635,8 @@ input[type="checkbox"]:checked::before {
 
 
 #importWindow {
-    transform: translate(-50%, -50%);
+    transform: translate(-60%, -50%);
+    width: 30vw;
 }
 
 #importText {

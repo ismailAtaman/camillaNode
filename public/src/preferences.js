@@ -185,16 +185,28 @@ class preferences {
         
     }
 
+    
+    reset () {
+        this.preferenceObject=this.getDefaults();
+        this.saveSettings();
+    }
 
     applyBackgroundHue(document,hue) {
         document.documentElement.style.setProperty('--bck-hue',parseInt(hue));
         document.documentElement.style.setProperty('--hue-rotate',parseInt(hue)-230+"deg");                        
     }
 
-    reset () {
-        this.preferenceObject=this.getDefaults();
-        this.saveSettings();
+    getPreferences() {
+        let returnObject= new Object();
+        for (let section of Object.keys(this.preferenceObject.sections)) {
+            for (let item of this.preferenceObject[section]) {                                
+                returnObject[item.id]=item.value;
+            }
+        }
+        // console.log(returnObject);
+        return returnObject;
     }
+
 
 }
 
