@@ -1,27 +1,30 @@
 
+export default plot;
+
 "use strict"
+"type module"
+
 const QUADLEN = 1024;
-const colorArray=[""]
 
 function calculateFilterDataMatrix(type, freq, gain, qfact) {	
 	let sampleRate=48000;
-	var a0,a1,a2,b1,b2,norm;
-	var minVal, maxVal;
+	let a0,a1,a2,b1,b2,norm;
+	let minVal, maxVal;
 	
-	var V = Math.pow(10, Math.abs(gain) / 20);
-	var K = Math.tan(Math.PI * freq /sampleRate);
+	let V = Math.pow(10, Math.abs(gain) / 20);
+	let K = Math.tan(Math.PI * freq /sampleRate);
 	switch (type) {
 		case "one-pole lp":
 			b1 = Math.exp(-2.0 * Math.PI * (freq /sampleRate));
-            a0 = 1.0 - b1;
-            b1 = -b1;
+			a0 = 1.0 - b1;
+			b1 = -b1;
 			a1 = a2 = b2 = 0;
 			break;
 
 		case "one-pole hp":
 			b1 = -Math.exp(-2.0 * Math.PI * (0.5 - freq /sampleRate));
-            a0 = 1.0 + b1;
-            b1 = -b1;
+			a0 = 1.0 + b1;
+			b1 = -b1;
 			a1 = a2 = b2 = 0;
 			break;            
 
@@ -100,33 +103,33 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 			break;
 
 		case "Highshelf":
-            if (gain >= 0) {
-                norm = 1 / (1 + Math.SQRT2 * K + K * K);
-                a0 = (V + Math.sqrt(2*V) * K + K * K) * norm;
-                a1 = 2 * (K * K - V) * norm;
-                a2 = (V - Math.sqrt(2*V) * K + K * K) * norm;
-                b1 = 2 * (K * K - 1) * norm;
-                b2 = (1 - Math.SQRT2 * K + K * K) * norm;
-            }
-            else {	
-                norm = 1 / (V + Math.sqrt(2*V) * K + K * K);
-                a0 = (1 + Math.SQRT2 * K + K * K) * norm;
-                a1 = 2 * (K * K - 1) * norm;
-                a2 = (1 - Math.SQRT2 * K + K * K) * norm;
-                b1 = 2 * (K * K - V) * norm;
-                b2 = (V - Math.sqrt(2*V) * K + K * K) * norm;
+			if (gain >= 0) {
+				norm = 1 / (1 + Math.SQRT2 * K + K * K);
+				a0 = (V + Math.sqrt(2*V) * K + K * K) * norm;
+				a1 = 2 * (K * K - V) * norm;
+				a2 = (V - Math.sqrt(2*V) * K + K * K) * norm;
+				b1 = 2 * (K * K - 1) * norm;
+				b2 = (1 - Math.SQRT2 * K + K * K) * norm;
+			}
+			else {	
+				norm = 1 / (V + Math.sqrt(2*V) * K + K * K);
+				a0 = (1 + Math.SQRT2 * K + K * K) * norm;
+				a1 = 2 * (K * K - 1) * norm;
+				a2 = (1 - Math.SQRT2 * K + K * K) * norm;
+				b1 = 2 * (K * K - V) * norm;
+				b2 = (V - Math.sqrt(2*V) * K + K * K) * norm;
 			}
 			break;
 	}
 
-	var len = QUADLEN;
-	var magPlot = [];
-	for (var idx = 0; idx < len; idx++) {
-		var w;
+	let len = QUADLEN;
+	let magPlot = [];
+	for (let idx = 0; idx < len; idx++) {
+		let w;
 		w = Math.exp(Math.log(1 / 0.001) * idx / (len - 1)) * 0.001 * Math.PI;	// 0.001 to 1, times pi, log scale
 
-		var phi = Math.pow(Math.sin(w/2), 2);
-		var y = Math.log(Math.pow(a0+a1+a2, 2) - 4*(a0*a1 + 4*a0*a2 + a1*a2)*phi + 16*a0*a2*phi*phi) - Math.log(Math.pow(1+b1+b2, 2) - 4*(b1 + 4*b2 + b1*b2)*phi + 16*b2*phi*phi);
+		let phi = Math.pow(Math.sin(w/2), 2);
+		let y = Math.log(Math.pow(a0+a1+a2, 2) - 4*(a0*a1 + 4*a0*a2 + a1*a2)*phi + 16*a0*a2*phi*phi) - Math.log(Math.pow(1+b1+b2, 2) - 4*(b1 + 4*b2 + b1*b2)*phi + 16*b2*phi*phi);
 		y = y * 10 / Math.LN10
 		if (y == -Infinity)
 			y = -200;
@@ -164,22 +167,22 @@ function calculateFilterDataMatrix(type, freq, gain, qfact) {
 	// 		else if (minVal < ymin)
 	// 			ymin = minVal;
 	// 		break;
-    //     case "one-pole lp":
-    //     case "one-pole hp":
+	//     case "one-pole lp":
+	//     case "one-pole hp":
 	// 		ymin = -40;
 	// 		ymax = 0;
-    //         break;
+	//         break;
 	// }
 		
-    //console.log(magPlot);
+	//console.log(magPlot);
 	return magPlot;
 }
 
 function plotArray(canvas, array, col, lineWidth){       
-	var ctx = canvas.getContext("2d");
-    var h = canvas.height;    
-    var w = canvas.width;    
-    var ch = h / 2; 
+	let ctx = canvas.getContext("2d");
+	let h = canvas.height;    
+	let w = canvas.width;    
+	let ch = h / 2; 
 	let x,y;
 	
 	ctx.beginPath();			
@@ -204,10 +207,10 @@ function plotArray(canvas, array, col, lineWidth){
 }
 
 function createGrid(canvas) {
-	var ctx = canvas.getContext("2d");
+	let ctx = canvas.getContext("2d");
 
-    var h = canvas.height;	
-	var w = canvas.width;    		
+	let h = canvas.height;	
+	let w = canvas.width;    		
 
 	let verticalLineCount= 30;        	
 	let verticalStepSize = h /verticalLineCount -1
@@ -306,4 +309,4 @@ function plot(filterObject,canvas, name) {
 }
 
 
-export default plot;
+
