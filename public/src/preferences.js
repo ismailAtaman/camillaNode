@@ -28,6 +28,15 @@ class preferences {
             "type":"boolean",
             "enabled":true,
             },       
+
+            {"id":"loadLastOnStartup",
+            "name":"Load last config on startup",        
+            "value":true,
+            "type":"boolean",
+            "enabled":true,
+            },       
+
+            
         ]
 
         tmpPref["ui"] = [
@@ -129,16 +138,16 @@ class preferences {
                     subElement.disabled = !document.getElementById(item.dependsOn).checked;
                 }
 
-                // Process special callback event
+                // Process special callback event > calls the function named item.callback 
                 if (item.callback!=undefined) subElement.addEventListener("callback",window[item.callback]);                                       
                 
                 subElement.preferences=this;
                 subElement.section=section;
-                subElement.addEventListener("change",function(){
+                subElement.addEventListener("mouseup",function(){
                     // console.log("Event default.",item);
                     let value;
-                    if (this.type=="checkbox") value=this.checked; else value=this.value;
-                    this.preferences.applySetting(section,this.id,value)                     
+                    if (this.type=="checkbox") value=this.checked; else value=this.value;                    
+                    this.preferences.applySetting(section,this.id,value)                                         
                     this.preferences.saveSettings();
                     this.dispatchEvent(new Event("callback"));
                 });
@@ -157,6 +166,7 @@ class preferences {
     }
     
     getSettingValue(section,setting) {
+        this.loadSettings();        
         return this.preferenceObject[section].filter((e)=>e.id==setting)[0].value;
     }
 
@@ -179,6 +189,11 @@ class preferences {
     applyBackgroundHue(document,hue) {
         document.documentElement.style.setProperty('--bck-hue',parseInt(hue));
         document.documentElement.style.setProperty('--hue-rotate',parseInt(hue)-230+"deg");                        
+    }
+
+    reset () {
+        this.preferenceObject=this.getDefaults();
+        this.saveSettings();
     }
 
 }

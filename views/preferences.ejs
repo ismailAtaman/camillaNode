@@ -19,8 +19,7 @@
 
     function backgroundHueChange() {
         preferences.applyBackgroundHue(window.parent.document,this.value)
-        preferences.applyBackgroundHue(document,this.value)
-        
+        preferences.applyBackgroundHue(document,this.value)        
     }
 
 </script>
@@ -30,6 +29,8 @@
     <div id="sectionMainTitle"><img src="img/icon/preferences.png" class="icon">Preferences</div>
     <div id="preferences">        
     </div>
+
+    <input type="button" value="Reset" onclick="preferences.reset()">
     
 </body>
 </html>

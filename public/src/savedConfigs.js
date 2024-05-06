@@ -78,6 +78,17 @@ class savedConfigs {
         window.localStorage.setItem("savedConfigs",JSON.stringify(this.configs));        
         return true;
     }
+    
+    saveLastConfig(configName) {
+        window.localStorage.setItem("lastConfigName",configName);
+        return true;
+    }
+
+    getLastConfig() {
+        return window.localStorage.getItem("lastConfigName");        
+    }
+    
+
 
 }
 

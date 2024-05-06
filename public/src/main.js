@@ -1,7 +1,4 @@
 
-
-
-
 function mainBodyOnLoad() {    
     if (document.title !='CamillaNode') return;
     window.mainframe = document.getElementById('mainframe');    
@@ -35,8 +32,11 @@ function mainBodyOnLoad() {
     const observer = new MutationObserver(mut=>{        
         mut.forEach(m=>{
             if (m.attributeName=="src") {
-                const page = m.target.getAttribute('src').replace("/","");
-                updateActions(page);                
+                const page = m.target.getAttribute('src').replace("/","");                
+                const hue = window.preferences.getSettingValue('ui','backgroundHue');
+                // window.preferences.applyBackgroundHue(m.target.contentDocument,hue);        
+                console.log("Observed ",hue)         
+                updateActions(page);                                
             }            
         })
     })
@@ -44,9 +44,9 @@ function mainBodyOnLoad() {
     observer.observe(window.mainframe,{attributes:true});
 
     applyPreferences(document);
-    window.mainframe.addEventListener("load",function(){
-        console.log("Frame loaded.")
-        applyPreferences(window.mainframe.contentDocument)
+    
+    window.mainframe.addEventListener("load",function(){        
+        applyPreferences(window.mainframe.contentDocument);
     })
     
 }
