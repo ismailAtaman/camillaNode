@@ -478,36 +478,50 @@ select {
 input[type="checkbox"] {    
     position: relative;
     appearance: none;
-    width: 20px;    
-    aspect-ratio: 1;    
+    width: 35px;    
+    height: 20px;    
     border-radius: 5px;
-    background-color: #999;
+    background-color: #B7A797;
     display: flex;
     justify-content: center;
-    align-items: center;     
+    align-items: center;
+    margin: 0px;     
+    padding: 0px;    
+    transition: all 300ms linear;
 }
 
+
+input[type="checkbox"]:checked {
+    background-color: #DDFFEE;
+    transition: all 300ms linear;
+}
+
+
 input[type="checkbox"]:hover {        
-    background-color: hsl(var(--bck-hue), 50%, 70%);    
+    /* background-color: hsl(var(--bck-hue), 50%, 70%);     */
 }
 
 input[type="checkbox"]::before {    
     content: " ";
     position: absolute;
-    transform:scale(0);
-    width: 50%;
-    height: 50%;
-    background-color: hsl(var(--bck-hue), 35%, 35%); 
-    border-radius: 2px;
-    transition: all 200ms linear;
-}
-
-input[type="checkbox"]:checked {
-    background-color: white;
+    left: 2px;    
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background-color: red;
+    transition: all 300ms linear;
 }
 
 input[type="checkbox"]:checked::before {
-    transform: scale(1) rotate(90deg);    
+    content: " ";
+    position: absolute;
+    left: 2px;    
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background-color: green;
+    transition: all 300ms linear;
+    transform: translateX(14px);
 }
     
 

@@ -39,10 +39,8 @@ async function mainBodyOnLoad() {
     const observer = new MutationObserver(mut=>{        
         mut.forEach(m=>{
             if (m.attributeName=="src") {
-                const page = m.target.getAttribute('src').replace("/","");                
-                const hue = window.preferences.getSettingValue('ui','backgroundHue');
-                // window.preferences.applyBackgroundHue(m.target.contentDocument,hue);        
-                console.log("Observed ",hue)         
+                const page = m.target.getAttribute('src').replace("/","");                                                
+                // console.log("Observed ",hue)         
                 updateActions(page);                                
             }            
         })
@@ -156,8 +154,21 @@ function saveToLocalStorage(val) {
 async function importFilters(filterText,DSP) {
     let filterArray = parseAutoEQText(filterText);
     // console.log(filterArray);
-    DSP.updateFilters(filterArray);
+
+    // Convert filterArray to filters object
+    let tmpFilters={};
+    filterArray.forEach(e => {
+        let name = Object.keys(e)[0];
+        obj = filterToJSON(e[name]);
+        tmpFilters[name] = obj;            
+    });
     
+    
+    await DSP.clearFilters();
+    console.log("Import after clear",DSP.config.filters);
+    Object.assign(DSP.config.filters,tmpFilters);
+    DSP.config.pipeline=DSP.updatePipeline(DSP.config);
+    DSP.uploadConfig();
 }
 
 function filterToJSON(filter) {                        
@@ -170,7 +181,7 @@ function filterToJSON(filter) {
      } else {
         tmpObj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
      }
-     console.log("json",tmpObj)    
+    //  console.log("json",tmpObj)    
     return tmpObj;
 }
 
@@ -235,7 +246,7 @@ function parseAutoEQText(text) {
             "q"         : parseFloat(qfact)
         }
 
-        console.log(filter[name])
+        // console.log(filter[name])
 
         filterArray.push(filter);        
         i++;

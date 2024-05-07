@@ -44,7 +44,7 @@ class preferences {
             "name":"Default page on load",            
             "value":"Equalizer",
             "type":"select",
-            "options":{"Connections":"connections","Basic":"basic","Equalizer":"equalizer","Advanced":"advanced","Room EQ":"room"},            
+            "options":{"Connections":"connections","Basic":"basic","Equalizer":"equalizer","Advanced":"advanced","Room EQ":"room","Preferences":"preferences"},            
             "enabled":true,
             },
 
@@ -160,9 +160,9 @@ class preferences {
     }
 
     applySetting(section,setting,value) {       
-        console.log("Apply Setting",section,setting,value)
+        // console.log("Apply Setting",section,setting,value)
         this.preferenceObject[section].filter((e)=>e.id==setting)[0].value = value;
-        console.log(this.preferenceObject[section])
+        // console.log(this.preferenceObject[section])
     }
     
     getSettingValue(section,setting) {

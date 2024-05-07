@@ -39,7 +39,7 @@
         // Export Functions
         async function exportConfig() {
             let configText = await DSP.convertConfigToText();
-            console.log(configText);
+            // console.log(configText);
             if (DSP.config.title.length>0) title = DSP.config.title; else title="";
             downloadFile("CamillaNode PEQ Export - "+title,configText);
             // window.mainframe.contentWindow._configName

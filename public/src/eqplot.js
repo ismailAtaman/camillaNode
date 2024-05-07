@@ -1,8 +1,8 @@
 
-export default plot;
+
 
 "use strict"
-"type module"
+
 
 const QUADLEN = 1024;
 
@@ -316,4 +316,4 @@ function plot(filterObject,canvas, name) {
 }
 
 
-
+export default plot;

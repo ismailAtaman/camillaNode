@@ -298,31 +298,18 @@ class camillaDSP {
         return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
     }
 
-    // async updateFilters(filters) {
-    //     if (this.config==undefined) this.config = await this.sendDSPMessage("GetConfigJson");
-    //     let name, obj, ret;
-    //     filters.forEach(e => {
-    //         name = Object.keys(e)[0];
-    //         obj = this.filterToJSON(e[name]);
-    //         this.config.filters[name] = obj;            
-    //     });
-
-    //     this.config.pipeline= this.updatePipeline(this.config);
-
-    //     this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).catch(e=>console.error("upload error",e));        
-
-    // }
-
-    filterToJSON(filter) {                                        
-        let obj = new Object();                
-        if (!filter.enabled) gain=0;                  
+    filterToJSON(filter) {                        
+        let tmpObj = new Object();        
+        
+        if (filter.enabled) gain=0;
+                
         if (filter.type=="Gain") {
-             obj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
+             tmpObj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
          } else {
-            if (filter.parameters.type=="Peaking" || filter.parameters.type=="Highshelf" || filter.parameters.type=="Lowshelf")
-            obj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
-         }         
-        return obj;
+            tmpObj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
+         }
+        //  console.log("json",tmpObj)    
+        return tmpObj;
     }
 
     async convertConfigToText() {        
@@ -337,6 +324,7 @@ class camillaDSP {
             if (this.config.filters[filter].type=="Gain") {
                 configText[0]="Preamp: "+this.config.filters[filter].parameters.gain+" dB\n";
             } else {
+                if (filter.startsWith("__")) continue;
                 let gainText= this.config.filters[filter].parameters.gain;
                 let qText = this.config.filters[filter].parameters.q;
                 let freqText = this.config.filters[filter].parameters.freq;
