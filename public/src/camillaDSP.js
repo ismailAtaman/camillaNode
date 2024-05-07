@@ -12,8 +12,8 @@ class camillaDSP {
     connected=false;
     spectrum_connected=false;
 
-    static DCProtectionFilter = {"DCProtection":{"type":"Biquad","parameters":{"type":"Highpass","freq":7,"q":0.7}}}
-    static Limiter = {"Limiter":{"type":"Limiter","parameters":{"clip_limit":-3}}}
+    DCProtectionFilter = {"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}};
+    Limiter = {"type":"Limiter","parameters":{"clip_limit":-3}};
 
     constructor() { 
         return this;        
@@ -215,7 +215,8 @@ class camillaDSP {
     }
 
     async downloadConfig() {
-        return await this.sendDSPMessage("GetConfigJson");
+        this.config = await this.sendDSPMessage("GetConfigJson");
+        return this.config;
     }
 
     async setBalance(bal) {
@@ -333,8 +334,7 @@ class camillaDSP {
     }
 
     async updateConfig(config) {
-        await this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});
-        this.config = await this.sendDSPMessage("GetConfigJson");        
+        await this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});        
         return true;
 
         // let currentConfig= await this.sendDSPMessage("GetConfigJson");
@@ -353,7 +353,7 @@ class camillaDSP {
         
     }
 
-   async convertConfigToText() {        
+    async convertConfigToText() {        
         this.config = await this.sendDSPMessage("GetConfigJson");                
         let configText=[], lastLine=1;        
         // let localFilters = [];
@@ -375,6 +375,35 @@ class camillaDSP {
             }            
         }
         return configText.toString().replaceAll(',','');
+    }
+
+    async enableDCProtection() {
+        await this.downloadConfig();
+        this.config.filters["DCProtection"]=this.DCProtectionFilter;
+        console.log("DC Protection",this.config.filters);
+        this.config.pipeline=this.updatePipeline(this.config);
+        await this.uploadConfig(this.config);
+    }
+
+    async clearSpecificFilters() {
+        // Clears all filters except specific one such as DC Protection, Gain and filters from Basic Section
+        await this.downloadConfig();
+        let tmpFilters= new Object();
+        for (let filterName of Object.keys(this.config.filters)) {
+            if (filterName.indexOf('Filter')==-1) tmpFilters[filterName]=this.config.filters[filterName];
+        }
+        this.config.filters=tmpFilters;        
+    }
+
+    async replaceSpecificFilters(filters, clearPrevious) {
+        // adds specific filters keeping the special ones such as DC Protection, Gain and filters from Basic Section
+        await this.clearSpecificFilters(); 
+        console.log("Clean filters",this.config.filters);
+        for (let filterName of Object.keys(filters)) {
+            this.config.filters[filterName]=filters[filterName];
+        }
+        console.log("Replaced filters",this.config.filters);
+        
     }
 }
 
@@ -409,6 +438,7 @@ function checkObjectsForEquality(objA, objB) {
     }    
     return true;
 }
+
 
 
 export default camillaDSP;

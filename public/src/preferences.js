@@ -143,7 +143,7 @@ class preferences {
                 
                 subElement.preferences=this;
                 subElement.section=section;
-                subElement.addEventListener("mouseup",function(){
+                subElement.addEventListener("change",function(){
                     // console.log("Event default.",item);
                     let value;
                     if (this.type=="checkbox") value=this.checked; else value=this.value;                    

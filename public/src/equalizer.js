@@ -86,9 +86,7 @@ async function equalizerOnLoad() {
     // change loading to false after 100ms to avoud update running multiple times during loading.            
     setInterval(function(){document.loading=false},50);            
 
-    initSpectrum();
-
-    console.log(window.parent.activeSettings);
+    initSpectrum();    
 }
 
 async function setPreamp(gain) {
@@ -137,8 +135,8 @@ function addLine(parent,filterName,insertBefore) {
     let line = PEQline.addPEQLine(parent,insertBefore);            
     line.setAttribute("filterName",filterName);            
     line.addEventListener("update",peqlineUpdate);            
-    line.addEventListener("remove",function(e){peqlineRemove(this)});     
-    line.addEventListener("add",function(e){peqlineAdd(this)});  
+    line.addEventListener("remove",function(){peqlineRemove(this)});     
+    line.addEventListener("add",function(){peqlineAdd(this)});  
     return line;   
 }
 

@@ -1,11 +1,16 @@
 
-function mainBodyOnLoad() {    
+async function mainBodyOnLoad() {    
     if (document.title !='CamillaNode') return;
+
+    
+    window.mainframe.addEventListener("load",function(){        
+        applyPreferences(window.mainframe.contentDocument);
+    })
+
     window.mainframe = document.getElementById('mainframe');    
 
     window.mainframe.addEventListener("load",function() {
-        updateActions(this.getAttribute('src').replace("/",""));
-        
+        updateActions(this.getAttribute('src').replace("/",""));        
     })
 
     // Find all navigate items and add event handler to change them to links to their target attribute        
@@ -22,13 +27,15 @@ function mainBodyOnLoad() {
     // if (indicators!=null) indicators.style = 'display:none'
 
     // Connect to camillaDSP
-    conectToDSP();
+    await conectToDSP();
+
+    loadPreferences();
+    applyPreferences(document);
 
     // Track which page we are on to update tools accordingly
     const eqTools = document.getElementById("eqTools");
     eqTools.childNodes.forEach(e=>{if (e.tagName=='DIV') e.style.display='none'});
-    eqTools.style.display='flex';
-
+    eqTools.style.display='flex';    
     const observer = new MutationObserver(mut=>{        
         mut.forEach(m=>{
             if (m.attributeName=="src") {
@@ -41,17 +48,7 @@ function mainBodyOnLoad() {
         })
     })
 
-    observer.observe(window.mainframe,{attributes:true});
-
-    loadPreferences();
-
-
-    applyPreferences(document);
-    
-    window.mainframe.addEventListener("load",function(){        
-        applyPreferences(window.mainframe.contentDocument);
-    })
-    
+    observer.observe(window.mainframe,{attributes:true});    
 }
 
 function updateActions(page) {
@@ -307,9 +304,11 @@ function downloadFile(filename, text) {
 
 function loadPreferences() {
     window.parent.activeSettings = window.preferences.getPreferences();
-    // if (window.activeSettings.DCProtection) DSP.DCProtection
-    window.mainframe.src = window.activeSettings.defaultPage;
+    if (window.activeSettings.DCProtection) window.parent.DSP.enableDCProtection()
 
+    window.mainframe.src = window.activeSettings.defaultPage;    
+    
+    console.log(window.parent.activeSettings);
 }
 
 

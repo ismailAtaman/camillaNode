@@ -171,10 +171,11 @@
 
                 case "equalizer":                
                     DSPConfig = await DSP.sendDSPMessage("GetConfigJson");                    
-                    DSPConfig.filters=data.filters;
                     DSPConfig.mixers=data.mixers;
-                    DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);         
+                    DSP.replaceSpecificFilters(data.filters);                   
+                    DSPConfig=DSP.config;                     
                     DSPConfig.title=configName.value;                     
+                    DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);
                     await DSP.updateConfig(DSPConfig);                                        
                     window.mainframe.contentWindow.loadFiltersFromConfig.apply();                    
                     break;

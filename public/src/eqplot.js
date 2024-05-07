@@ -269,18 +269,24 @@ function createGrid(canvas) {
 function plot(filterObject,canvas, name) {
 	const ctx = canvas;        
 	const context = ctx.getContext('2d');             
+
+	// Clear the canvas
 	context.clearRect(0, 0, ctx.width, ctx.height)        	
-	context.stroke();
+	
 
 	// Create the grid
 	createGrid(ctx); 
 
-	let totalArray = new Array(1024).fill(0).map(() => new Array(1024).fill(0));
-	let dataMatrix;
-	let color = parseInt("88e015",16);	
+	// Create a QUADLEN length array filled with zero
+	let totalArray = new Array(QUADLEN).fill(0).map(() => new Array(QUADLEN).fill(0));
+	let dataMatrix=[];	
 	
 	for (let filter of Object.keys(filterObject)) {  
-		if (filterObject[filter].type=="Gain") continue;
+		// if (filterObject[filter].type=="Gain") continue;
+		if (filterObject[filter].type!="Biquad") continue;
+		if (filterObject[filter].parameters.type!="Peaking" && filterObject[filter].parameters.type!="Highshelf" && filterObject[filter].parameters.type!="Lowshelf") continue;
+
+
 		dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
 		for (let i=0;i<dataMatrix.length;i++) {
 			totalArray[i][0]=dataMatrix[i][0]
@@ -289,9 +295,11 @@ function plot(filterObject,canvas, name) {
 		
 		// plotArray(ctx,dataMatrix,"#"+color.toString(16),0.3);
 		
-		plotArray(ctx,dataMatrix,"#88e015",0.3);
+		plotArray(ctx,dataMatrix,"#CCFFBB",0.3);
 		
 	}
+	
+	let t= plotArray(ctx, totalArray,"#FFF",3);	
 
 	// Centre and print the config name 
 	if (name!=undefined) {
@@ -303,7 +311,6 @@ function plot(filterObject,canvas, name) {
 		context.fillText(nameText,nameLeft,40);            
 	}
 
-	let t= plotArray(ctx, totalArray,"#FFF",3);	
 	return Math.round(Math.max(...totalArray[1]));
 
 }
