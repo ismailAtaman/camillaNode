@@ -12,8 +12,8 @@ class camillaDSP {
     connected=false;
     spectrum_connected=false;
 
-    DCProtectionFilter = {"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}};
-    Limiter = {"type":"Limiter","parameters":{"clip_limit":-3}};
+    DCProtectionFilter = {"__DCProtectionFilter":{"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}}};
+    Limiter = {"__Limiter":{"type":"Limiter","parameters":{"clip_limit":-3}}};
 
     constructor() { 
         return this;        
@@ -203,20 +203,21 @@ class camillaDSP {
         return config;
     }
 
-    async uploadConfig(config) {        
-        return this.sendDSPMessage({"SetConfigJson":JSON.stringify(config)}).then(r=>{
+    /********************************** end of basic *************************************************************/
+
+    async uploadConfig() {        
+        return this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
             if (debugLevel=='high') console.log("Config uploaded successfully.",config);
             return true;
         }).catch(e=>{
-            console.error("Upload error");
-            if (debugLevel=='high') console.log("Config being uploaded",config);
+            console.error("Upload error",this.config);
+            if (debugLevel=='high') console.log("Error while config being uploaded.",this.config);
             return false;
         });        
     }
 
     async downloadConfig() {
-        this.config = await this.sendDSPMessage("GetConfigJson");
-        return this.config;
+        this.config = await this.sendDSPMessage("GetConfigJson");        
     }
 
     async setBalance(bal) {
@@ -234,7 +235,7 @@ class camillaDSP {
     }
 
     async setTone(subBass, bass, mids, upperMids, treble) {
-        let config = await this.sendDSPMessage("GetConfigJson");
+        await this.downloadConfig();
 
         const subBassFilter = camillaDSP.createPeakFilterJSON(70,subBass,1.41);
         const bassFilter = camillaDSP.createPeakFilterJSON(200,bass,1.41);
@@ -242,16 +243,16 @@ class camillaDSP {
         const upperMidsFilter = camillaDSP.createPeakFilterJSON(3000,upperMids,1.41);
         const trebleFilter = camillaDSP.createPeakFilterJSON(8000,treble,1.41);
         
-        config.filters["subBass"]=subBassFilter;
-        config.filters["bass"]=bassFilter;
-        config.filters["mids"]=midsFilter;
-        config.filters["upperMids"]=upperMidsFilter;
-        config.filters["treble"]=trebleFilter;
+        this.config.filters["subBass"]=subBassFilter;
+        this.config.filters["bass"]=bassFilter;
+        this.config.filters["mids"]=midsFilter;
+        this.config.filters["upperMids"]=upperMidsFilter;
+        this.config.filters["treble"]=trebleFilter;
         
-        config.pipeline=this.updatePipeline(config);        
+        this.config.pipeline=this.updatePipeline(this.config);        
         
-        await this.uploadConfig(config);
-        return config;
+        await this.uploadConfig();
+        return this.config;
     }
 
     async setCrossfeed(crossfeedVal) {
@@ -297,60 +298,31 @@ class camillaDSP {
         return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
     }
 
-    async updateFilters(filters) {
-        if (this.config==undefined) this.config = await this.sendDSPMessage("GetConfigJson");
-        let name, obj, ret;
-        filters.forEach(e => {
-            name = Object.keys(e)[0];
-            obj = this.filterToJSON(e[name]);
-            this.config.filters[name] = obj;            
-        });
+    // async updateFilters(filters) {
+    //     if (this.config==undefined) this.config = await this.sendDSPMessage("GetConfigJson");
+    //     let name, obj, ret;
+    //     filters.forEach(e => {
+    //         name = Object.keys(e)[0];
+    //         obj = this.filterToJSON(e[name]);
+    //         this.config.filters[name] = obj;            
+    //     });
 
-        this.config.pipeline= this.updatePipeline(this.config);
+    //     this.config.pipeline= this.updatePipeline(this.config);
 
-        this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).catch(e=>console.error("upload error",e));        
+    //     this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).catch(e=>console.error("upload error",e));        
 
-    }
+    // }
 
-    filterToJSON(filter) {                        
-        // Filter Format 
-        // filter[name] = {
-        //     "enabled"   : enabled,
-        //     "type"      : filterType,
-        //     "freq"      : parseInt(freq),
-        //     "gain"      : parseFloat(gain),
-        //     "q"         : parseFloat(qfact)
-        // }
-        let gain;
+    filterToJSON(filter) {                                        
         let obj = new Object();                
         if (!filter.enabled) gain=0;                  
         if (filter.type=="Gain") {
              obj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
          } else {
+            if (filter.parameters.type=="Peaking" || filter.parameters.type=="Highshelf" || filter.parameters.type=="Lowshelf")
             obj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
-         }
-         //console.log("json",obj)    
+         }         
         return obj;
-    }
-
-    async updateConfig(config) {
-        await this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)});        
-        return true;
-
-        // let currentConfig= await this.sendDSPMessage("GetConfigJson");
-        // configsEqual(currentConfig,config);
-        // return true;
-
-        // return new Promise((resolve,reject)=>{
-        //     this.sendDSPMessage({'SetConfigJson':JSON.stringify(config)}).then(r=>{
-        //         this.sendDSPMessage("GetConfigJson").then(currentConfig=>{    
-        //             configsEqual(currentConfig,config);
-        //             resolve(true);
-        //             //resolve([true,"Config upload successful."]); //else reject([false,"Config validation failed!"])
-        //         }).catch(e=>{reject([false,"Config validation failed."])})        
-        //     }).catch(e=>reject([false,"Config upload failed."]));            
-        // })
-        
     }
 
     async convertConfigToText() {        
@@ -377,29 +349,22 @@ class camillaDSP {
         return configText.toString().replaceAll(',','');
     }
  
-    async clearFilters() {
-        // Clears all filters except specific one such as DC Protection, Gain and filters from Basic Section
-        await this.downloadConfig();
-        let tmpFilters= new Object();
-        for (let filterName of Object.keys(this.config.filters)) {
-            if (filterName.indexOf('Filter')==-1) tmpFilters[filterName]=this.config.filters[filterName];
+    async clearFilters(clearAll) {        
+        await this.downloadConfig();        
 
+        if (clearAll) { this.config.filters={}; return; }       
+        
+        let tmpFilters = {};
+        for (let filterName of Object.keys(this.config.filters)) {            
+            if (filterName.startsWith('__')) tmpFilters[filterName]=this.config.filters[filterName];
         }
+
         this.config.filters=tmpFilters;        
+        this.config.pipeline=this.updatePipeline(this.config);
         console.log("Clear Filters",this.config.filters);
     }
 
-    async replaceSpecificFilters(filters, clearPrevious) {
-        // adds specific filters keeping the special ones such as DC Protection, Gain and filters from Basic Section
-        
-        for (let filterName of Object.keys(filters)) {
-            this.config.filters[filterName]=filters[filterName];
-        }
-        console.log("Replaced filters",this.config.filters);
-        
-    }
 
-    
 }
 
 

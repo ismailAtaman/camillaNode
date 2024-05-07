@@ -135,8 +135,7 @@
             }
         }
 
-        async function openConfigurationClick() {         
-            
+        async function openConfigurationClick() {                     
             const activePage = getActivePage();
             const configName = document.getElementById("configName");
             const configId = configName.getAttribute("configId");
@@ -165,19 +164,21 @@
                     DSPConfig.mixers=data.mixers;
                     DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);
                     DSPConfig.title="loading from config"
-                    await DSP.updateConfig(DSPConfig);                    
+                    await DSP.uploadConfig(DSPConfig);                    
                     await window.mainframe.contentWindow.loadData.apply();                    
                     break;
 
                 case "equalizer":                
-                    DSPConfig = await DSP.sendDSPMessage("GetConfigJson");                    
-                    DSPConfig.mixers=data.mixers;
-                    DSP.replaceSpecificFilters(data.filters);                   
-                    DSPConfig=DSP.config;                     
-                    DSPConfig.title=configName.value;                     
-                    DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);
-                    await DSP.updateConfig(DSPConfig);                                        
-                    window.mainframe.contentWindow.loadFiltersFromConfig.apply();                    
+                    await DSP.downloadConfig();                    
+                    DSP.config.mixers=data.mixers;
+                    DSP.clearFilters();
+                    console.log(DSP.config);
+                    Object.assign(DSP.config.filters,data.filters);
+                    DSP.config.title=configName.value;                     
+                    DSP.config.pipeline=DSP.updatePipeline(DSP.config);
+                    await DSP.uploadConfig(DSP.config);                                        
+                    await window.mainframe.contentWindow.loadFiltersFromConfig.apply();
+                    window.mainframe.contentWindow.plotConfig.apply();              
                     break;
 
                 case "advanced":

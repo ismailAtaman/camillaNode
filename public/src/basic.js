@@ -97,16 +97,16 @@ async function loadData() {
     
     if (config.filters["subBass"]==undefined) {        
         await DSP.setTone(0,0,0,0,0);        
-        config = await DSP.sendDSPMessage("GetConfigJson");             
+        await DSP.downloadConfig();
     }            
     
-    subBass.knob.instance.setVal(config.filters["subBass"].parameters.gain*10+181);
-    bass.knob.instance.setVal(config.filters["bass"].parameters.gain*10+181);
-    mids.knob.instance.setVal(config.filters["mids"].parameters.gain*10+181);
-    upperMids.knob.instance.setVal(config.filters["upperMids"].parameters.gain*10+181);
-    treble.knob.instance.setVal(config.filters["treble"].parameters.gain*10+181);
+    subBass.knob.instance.setVal(DSP.config.filters["subBass"].parameters.gain*10+181);
+    bass.knob.instance.setVal(DSP.config.filters["bass"].parameters.gain*10+181);
+    mids.knob.instance.setVal(DSP.config.filters["mids"].parameters.gain*10+181);
+    upperMids.knob.instance.setVal(DSP.config.filters["upperMids"].parameters.gain*10+181);
+    treble.knob.instance.setVal(DSP.config.filters["treble"].parameters.gain*10+181);
     
-    plot(config.filters,ctx,config.title);
+    plot(DSP.config.filters,ctx,config.title);
 }
 
 async function setTone() {

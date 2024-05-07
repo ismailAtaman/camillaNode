@@ -79,47 +79,39 @@ async function equalizerOnLoad() {
 
 
     /// Parametric EQ section
-    loadFiltersFromConfig()
+    loadFiltersFromConfig();
 
-    const canvas = document.getElementById("plotCanvas");            
-    let max = plot(DSP.config.filters,canvas,DSP.config.title);                         
+    // Plot the config
+    plotConfig();              
 
-    // change loading to false after 100ms to avoud update running multiple times during loading.            
+    // change loading to false after 50ms to avoud update running multiple times during loading.            
     setInterval(function(){document.loading=false},50);            
 
     initSpectrum();    
 }
 
-async function setPreamp(gain) {
-    let config = await DSP.sendDSPMessage("GetConfigJson");
-    if (config.filters.Gain == undefined) {
-        config.filters.Gain = {"type":"Gain","parameters":{"gain":0,"inverted":false,"scale":"dB"}}
-    }  
-    config.filters.Gain.parameters.gain=gain;                
-    config.pipeline=DSP.updatePipeline(config);
-    await DSP.updateConfig(config);
-}
 
-function loadFiltersFromConfig() {                        
+async function loadFiltersFromConfig() {                        
     PEQ.innerHTML='';
-    let config= DSP.config;            
+    await DSP.downloadConfig()
     
     
     let line;
-    if (config.filters!=null) {
-        for (let filterName of Object.keys(config.filters)) {                               
-            // console.log("LoadingFromConfig",config.filters[filterName].type=="Gain")
-            switch (config.filters[filterName].type) {
+    if (DSP.config.filters!=null) {
+        for (let filterName of Object.keys(DSP.config.filters)) {                               
+            // console.log(">>> Loading from config",filterName, config.filters[filterName]);
+            if (filterName,filterName.startsWith("__")) continue;
+            switch (DSP.config.filters[filterName].type) {
                 case "Gain" :
-                    let preampGain = config.filters.Gain.parameters.gain; 
+                    let preampGain = DSP.config.filters.Gain.parameters.gain; 
                     preamp.knob.instance.setVal(preampGain* 10 +181);                        
                     setPreamp(preampGain);
                     break;
                 case "Biquad" :                    
-                    let filterType= config.filters[filterName].parameters.type;                    
+                    let filterType= DSP.config.filters[filterName].parameters.type;                    
                     if (filterType=="Peaking" || filterType=="Highshelf" || filterType=="Lowshelf") {
                         line = addLine(PEQ,filterName);                    
-                        line.instance.JSONtoValues(config.filters[filterName]);                        
+                        line.instance.JSONtoValues(DSP.config.filters[filterName]);                        
                     }
             }
         }            
@@ -129,6 +121,21 @@ function loadFiltersFromConfig() {
     
 
     document.loading=false;
+}
+
+function plotConfig() {
+    const canvas = document.getElementById("plotCanvas");            
+    let max = plot(DSP.config.filters,canvas,DSP.config.title);           
+}
+
+async function setPreamp(gain) {
+    await DSP.downloadConfig();
+    if (DSP.config.filters.Gain == undefined) {
+        DSP.config.filters.Gain = {"type":"Gain","parameters":{"gain":0,"inverted":false,"scale":"dB"}}
+    }  
+    DSP.config.filters.Gain.parameters.gain=gain;                
+    DSP.config.pipeline=DSP.updatePipeline(DSP.config);
+    await DSP.uploadConfig(DSP.config);
 }
 
 function addLine(parent,filterName,insertBefore) {
@@ -180,7 +187,7 @@ async function peqlineUpdate() {
     plot(filters,ctx,config.title);              
     
     config.pipeline= DSP.updatePipeline(config);                 
-    await DSP.updateConfig(config);
+    await DSP.uploadConfig(config);
     // console.log("peqlineupdate")            
 }
 
@@ -213,10 +220,13 @@ function peqlineAdd(peqline) {
     addLine(PEQ,"NewFilter"+PEQ.children.length+1,peqline)
 }
 
-async function clearPEQ() {
+async function clearPEQ() {        
+    setPreamp(0);
+    await DSP.clearFilters();        
+    await DSP.uploadConfig();
     document.getElementById('PEQ').innerHTML='';
-    await peqlineUpdate();
-    console.log("PEQ Cleared.");
+    peqlineUpdate();
+ 
 }
 
 const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
@@ -273,3 +283,5 @@ async function initSpectrum(){
 
     },100)
 }
+
+

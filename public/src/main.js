@@ -274,7 +274,7 @@ async function connect(camillaDSP) {
     let config =  await DSP.sendDSPMessage("GetConfigJson");                     
     if (config.pipeline==null || config.mixers==null || config.filter==null) config = camillaDSP.getDefaultConfig(config,true);
                 
-    conencted = DSP.updateConfig(config);            
+    conencted = DSP.uploadConfig(config);            
     if (connected) {
         state.innerText="Connected.";
         state.style.color="#6C6";
@@ -302,16 +302,20 @@ function downloadFile(filename, text) {
     document.body.removeChild(element);
   }
 
-function loadPreferences() {
+async function loadPreferences() {
+    // Load preferences
     window.parent.activeSettings = window.preferences.getPreferences();
-    // if (window.activeSettings.DCProtection) {
-    //     const DSP = window.parent.DSP;
-    //     let config = DSP.config;
-    //     config.filters["DCProtection"]=DSP.DCProtection;
-    //     config.pipeline = DSP.updatePipeline(config);
-    //     DSP.updateConfig(config);
-    // }
+
+    // Apply preferences
     window.mainframe.src = window.activeSettings.defaultPage;            
+
+    if (window.activeSettings.DCProtection) {
+        const DSP = window.parent.DSP;
+        await DSP.downloadConfig();        
+        Object.assign(DSP.config.filters,DSP.DCProtectionFilter);
+        DSP.config.pipeline = DSP.updatePipeline(DSP.config);
+        DSP.uploadConfig();
+    }
 }
 
 
