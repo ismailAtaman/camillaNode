@@ -302,7 +302,7 @@ class camillaDSP {
         let tmpObj = new Object();        
         
         if (filter.enabled) gain=0;
-                
+
         if (filter.type=="Gain") {
              tmpObj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
          } else {
@@ -350,6 +350,12 @@ class camillaDSP {
         this.config.filters=tmpFilters;        
         this.config.pipeline=this.updatePipeline(this.config);
         console.log("Clear Filters",this.config.filters);
+    }
+
+    addFilters(filters) {
+        Object.assign(this.config.filters,filters);
+        this.config.pipeline=this.updatePipeline(this.config);
+        return true;
     }
 
 

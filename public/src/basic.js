@@ -92,10 +92,10 @@ async function loadData() {
     balance.knob.instance.setVal(bal)
 
     // Load filters
-    let config = await DSP.sendDSPMessage("GetConfigJson");            
-    if (config.filters==undefined) config.filters={};
+    await DSP.downloadConfig()
+    if (DSP.config.filters==undefined) DSP.config.filters={};
     
-    if (config.filters["subBass"]==undefined) {        
+    if (DSP.config.filters["subBass"]==undefined) {        
         await DSP.setTone(0,0,0,0,0);        
         await DSP.downloadConfig();
     }            

@@ -179,15 +179,14 @@ async function peqlineUpdate() {
     const ctx = document.getElementById("plotCanvas")
     let filters = generateFiltersObject();
     // console.log(filters)
-
     
-    let config = await DSP.sendDSPMessage("GetConfigJson");
-    config.filters=filters;       
-
-    plot(filters,ctx,config.title);              
+    await DSP.downloadConfig();
+    await DSP.clearFilters();
+    DSP.addFilters(filters);
     
-    config.pipeline= DSP.updatePipeline(config);                 
-    await DSP.uploadConfig(config);
+    plot(DSP.config.filters,ctx,DSP.config.title);                      
+
+    await DSP.uploadConfig()    
     // console.log("peqlineupdate")            
 }
 
