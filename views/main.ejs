@@ -141,7 +141,7 @@
             const configId = configName.getAttribute("configId");
             let config = configsObject.getConfigById(configId);
             let data = config.data;
-            console.log("Open config",activePage,data)
+            // console.log("Open config",activePage,data)
 
             switch (activePage) {
                 case "connections":          
@@ -172,7 +172,7 @@
                     await DSP.downloadConfig();                    
                     DSP.config.mixers=data.mixers;
                     DSP.clearFilters();
-                    console.log(DSP.config);
+                    // console.log(DSP.config);
                     Object.assign(DSP.config.filters,data.filters);
                     DSP.config.title=configName.value;                     
                     DSP.config.pipeline=DSP.updatePipeline(DSP.config);

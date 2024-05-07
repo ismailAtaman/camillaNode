@@ -349,7 +349,7 @@ class camillaDSP {
 
         this.config.filters=tmpFilters;        
         this.config.pipeline=this.updatePipeline(this.config);
-        console.log("Clear Filters",this.config.filters);
+        // console.log("Clear Filters",this.config.filters);
     }
 
     addFilters(filters) {

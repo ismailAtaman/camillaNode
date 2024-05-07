@@ -106,7 +106,7 @@ async function loadData() {
     upperMids.knob.instance.setVal(DSP.config.filters["upperMids"].parameters.gain*10+181);
     treble.knob.instance.setVal(DSP.config.filters["treble"].parameters.gain*10+181);
     
-    plot(DSP.config.filters,ctx,config.title);
+    plot(DSP.config.filters,ctx,DSP.config.title);
 }
 
 async function setTone() {
