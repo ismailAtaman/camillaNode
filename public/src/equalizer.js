@@ -16,9 +16,7 @@ async function equalizerOnLoad() {
     document.loading=true;
     const PEQ = document.getElementById('PEQ');            
     
-    DSP=window.parent.DSP;
-
-    let config= DSP.config;
+    DSP=window.parent.DSP;    
     
     /// Basics Controls Section
     const basicControls = document.getElementById('basicControls');
@@ -83,6 +81,9 @@ async function equalizerOnLoad() {
     /// Parametric EQ section
     loadFiltersFromConfig()
 
+    const canvas = document.getElementById("plotCanvas");            
+    let max = plot(DSP.config.filters,canvas,DSP.config.title);                         
+
     // change loading to false after 100ms to avoud update running multiple times during loading.            
     setInterval(function(){document.loading=false},50);            
 
@@ -103,7 +104,7 @@ function loadFiltersFromConfig() {
     PEQ.innerHTML='';
     let config= DSP.config;            
     
-    const canvas = document.getElementById("plotCanvas");            
+    
     let line;
     if (config.filters!=null) {
         for (let filterName of Object.keys(config.filters)) {                               
@@ -122,8 +123,7 @@ function loadFiltersFromConfig() {
                     }
             }
         }            
-        // sortByFreq(PEQ);
-        let max = plot(config.filters,canvas,config.title);                         
+        // sortByFreq(PEQ);        
         // console.log("Max Level ",max)            
     }
     
@@ -252,15 +252,13 @@ async function initSpectrum(){
         const spec = document.getElementById("spectrum");
         let r = await DSP.getSpectrumData();                
         
-        let i=0, height, hue, boxCount, count;
+        let i=0, height, boxCount, count;
         spec.childNodes.forEach(e=>{
             if (e.tagName=="DIV") {                         
                 height = 200 + (2*Math.round(r[i]));  
                 if (height<0) height=0;
                 if (height>200) height=0;     
-                boxCount= Math.round(height/8)-1;
-                hue = -height;
-                // e.style='height: '+height+'px; filter: hue-rotate('+hue+'deg);'   
+                boxCount= Math.round(height/8)-1;                                
                 count=0;
                 e.childNodes.forEach(e=>{
                     if (e.tagName=="DIV") {

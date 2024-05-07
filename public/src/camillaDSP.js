@@ -376,69 +376,31 @@ class camillaDSP {
         }
         return configText.toString().replaceAll(',','');
     }
-
-    async enableDCProtection() {
-        await this.downloadConfig();
-        this.config.filters["DCProtection"]=this.DCProtectionFilter;
-        console.log("DC Protection",this.config.filters);
-        this.config.pipeline=this.updatePipeline(this.config);
-        await this.uploadConfig(this.config);
-    }
-
-    async clearSpecificFilters() {
+ 
+    async clearFilters() {
         // Clears all filters except specific one such as DC Protection, Gain and filters from Basic Section
         await this.downloadConfig();
         let tmpFilters= new Object();
         for (let filterName of Object.keys(this.config.filters)) {
             if (filterName.indexOf('Filter')==-1) tmpFilters[filterName]=this.config.filters[filterName];
+
         }
         this.config.filters=tmpFilters;        
+        console.log("Clear Filters",this.config.filters);
     }
 
     async replaceSpecificFilters(filters, clearPrevious) {
         // adds specific filters keeping the special ones such as DC Protection, Gain and filters from Basic Section
-        await this.clearSpecificFilters(); 
-        console.log("Clean filters",this.config.filters);
+        
         for (let filterName of Object.keys(filters)) {
             this.config.filters[filterName]=filters[filterName];
         }
         console.log("Replaced filters",this.config.filters);
         
     }
+
+    
 }
-
-
-/****************************************************************************************************************** */
-
-function configsEqual(configA, configB) {
-    console.log("Equal logs");
-    let equal = checkObjectsForEquality(configA,configB);
-    console.log("Configs are equal :", equal)
-
-}
-
-function checkObjectsForEquality(objA, objB) {    
-    let ret;
-    for (let key of Object.keys(objA).sort((a,b)=>{return a-b})) {
-        console.log("===>KEY : ",key, " of type ", typeof(objA[key]))
-        if (typeof(objA[key])!='object') {            
-            if (objB[key]==undefined ) { console.log("Miss  =>", key," does not exist in second object.",objA[key]); return false };
-            if (objB[key]!=objA[key]) { console.log("Miss  =>",key," does not match between objects. A : ",objA[key]," B :",objB[key]);return false } ;            
-            if (objB[key]==objA[key]) { console.log("Match =>",key," is '",objA[key],"' in both objects.") } ;            
-        } else {      
-            if (Array.isArray(objA[key])) {
-                console.log(">>>>>>>>>>>>>>>>>>>>>>Array");
-                return true;
-            }            
-            if (objA[key]==null && objB[key]==null) continue;
-            if (objB[key]==undefined && objA[key]!=null) { console.log(key," does not exist in second object.",objA[key]); return false };
-            ret = checkObjectsForEquality(objA[key],objB[key]);                        
-            if (ret==false) return false;
-        }    
-    }    
-    return true;
-}
-
 
 
 export default camillaDSP;

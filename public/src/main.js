@@ -2,9 +2,10 @@
 async function mainBodyOnLoad() {    
     if (document.title !='CamillaNode') return;
 
+    applyColorScheme(document);
     
     window.mainframe.addEventListener("load",function(){        
-        applyPreferences(window.mainframe.contentDocument);
+        applyColorScheme(window.mainframe.contentDocument);
     })
 
     window.mainframe = document.getElementById('mainframe');    
@@ -29,8 +30,7 @@ async function mainBodyOnLoad() {
     // Connect to camillaDSP
     await conectToDSP();
 
-    loadPreferences();
-    applyPreferences(document);
+    loadPreferences();    
 
     // Track which page we are on to update tools accordingly
     const eqTools = document.getElementById("eqTools");
@@ -304,15 +304,18 @@ function downloadFile(filename, text) {
 
 function loadPreferences() {
     window.parent.activeSettings = window.preferences.getPreferences();
-    if (window.activeSettings.DCProtection) window.parent.DSP.enableDCProtection()
-
-    window.mainframe.src = window.activeSettings.defaultPage;    
-    
-    console.log(window.parent.activeSettings);
+    // if (window.activeSettings.DCProtection) {
+    //     const DSP = window.parent.DSP;
+    //     let config = DSP.config;
+    //     config.filters["DCProtection"]=DSP.DCProtection;
+    //     config.pipeline = DSP.updatePipeline(config);
+    //     DSP.updateConfig(config);
+    // }
+    window.mainframe.src = window.activeSettings.defaultPage;            
 }
 
 
-function applyPreferences(doc) {
+function applyColorScheme(doc) {
     const hue = window.preferences.getSettingValue('ui','backgroundHue');
     window.preferences.applyBackgroundHue(doc,hue); 
     window.preferences.applyBackgroundHue(window.mainframe.contentDocument,hue); 
