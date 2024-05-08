@@ -6,6 +6,7 @@ const { json } = require('express');
 const app = express();
 const fs = require('fs');
 const WebSocket = require('ws');
+const configsFile = "savedConfigs.dat"
 
 //// Global variables
 let strAppConfig;
@@ -100,6 +101,40 @@ app.post('/saveConfig',(req,res)=>{
         res.end();
     });    
 }) 
+
+// saveConfigFile and getConfigFile are new implementations of saving configurations
+// on the server as a string file which is converted to an array for loading.
+
+app.post('/saveConfigFile',(req,res)=>{
+    let queryResponse="";
+    req.on('data', function(chunk) {
+        queryResponse+=chunk;        
+    }).on('end', function(){
+        let config = JSON.parse(queryResponse);              
+        let fileName = configsFile;
+        console.log(fileName)
+        let fileBuffer = Buffer.from(JSON.stringify(config),'utf-8');        
+        fs.writeFileSync(fileName,fileBuffer,function(err){
+            console.log("Error saving file ",fileName,"\n",err);            
+        });        
+        res.end();
+    });    
+}) 
+
+app.get('/getConfigFile',function(req,res){    
+    let filePath=configsFile;
+    console.log("File exists?",fs.existsSync(filePath))
+    if (!fs.existsSync(filePath)) { 
+        res.write(JSON.stringify([])); 
+        res.end();
+        return;
+    }
+
+    let config = fs.readFileSync(filePath);
+    //console.log(config.toString());
+    res.write (config.toString());
+    res.end();
+});
 
 app.get('/getConfigList',(req,res)=>{    
     let files = fs.readdirSync('./config',);

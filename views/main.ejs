@@ -60,7 +60,7 @@
             const configList = document.getElementById("configList")
             const activePage = getActivePage();
 
-            let configsAray = configsObject.loadConfigs(activePage);                       
+            let configsAray = configsObject.loadConfigsRemote(activePage);                       
             // console.log(configsAray);
             loadConfigs(activePage,configList);
             document.getElementById("configName").addEventListener('keyup',function(e){                
@@ -117,18 +117,19 @@
 
 
             let tmpConfig={"type":activePage,"name":configName.value,"createdDate":date,"data":data}
-            console.log(tmpConfig);
-            let saved = configsObject.saveConfig(tmpConfig);                        
-            console.log(saved)
+            // console.log(tmpConfig);
+
+            let saved = await configsObject.saveConfigRemote(tmpConfig);                        
+            console.log("Saved : ", saved)
             if (saved[0]) {
-                loadConfigs(activePage,document.getElementById("configList"))
+                await loadConfigs(activePage,document.getElementById("configList"))
                 configName.value="";                
             } else {
                 if (saved[1]=="exists") {
                     if (!confirm("A config with that name already exists. Would you like add another one?")) return;
                     saved = configsObject.saveConfig(tmpConfig,true);                        
                     if (saved[0]) {
-                        loadConfigs(activePage,document.getElementById("configList"))
+                        await configsObject.loadConfigsRemote(activePage,document.getElementById("configList"))
                         configName.value="";     
                     }
                 };
@@ -139,7 +140,7 @@
             const activePage = getActivePage();
             const configName = document.getElementById("configName");
             const configId = configName.getAttribute("configId");
-            let config = configsObject.getConfigById(configId);
+            let config = await configsObject.getConfigByIdRemote(configId);
             let data = config.data;
             // console.log("Open config",activePage,data)
 
@@ -190,17 +191,17 @@
 
             }
 
-            configsObject.saveLastConfig(configName);
+            // configsObject.saveLastConfig(configName);
             document.getElementById("manageConfigs").close();
         }
     
-        function deleteConfigurationClick() {            
+        async function deleteConfigurationClick() {            
             
             const configName = document.getElementById("configName");
             const configId = configName.getAttribute("configId");
             if (confirm("Are you sure you want to delete configuration?\n\n"+configName.value+"\n")==false) return
 
-            let deleted = configsObject.delete(configId);
+            let deleted = await configsObject.deleteRemote(configId);
             if (deleted) {
                 const activePage = getActivePage();
                 const configList = document.getElementById("configList");
@@ -212,9 +213,8 @@
 
         }
     
-        function loadConfigs(activePage,configList) {
-            let configsArray = configsObject.loadConfigs(activePage,true);                        
-
+        async function loadConfigs(activePage,configList) {
+            let configsArray = await configsObject.loadConfigsRemote(activePage,true);                        
             // console.log(configsArray);
             configList.innerHTML='';
             document.getElementById("configName").value='';
