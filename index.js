@@ -103,7 +103,8 @@ app.post('/saveConfig',(req,res)=>{
 }) 
 
 // saveConfigFile and getConfigFile are new implementations of saving configurations
-// on the server as a string file which is converted to an array for loading.
+// on the server as a string file which is converted to an array for loading. Rest of the config related 
+// functions are obselete. (2024-05-07)
 
 app.post('/saveConfigFile',(req,res)=>{
     let queryResponse="";
@@ -135,6 +136,9 @@ app.get('/getConfigFile',function(req,res){
     res.write (config.toString());
     res.end();
 });
+
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 app.get('/getConfigList',(req,res)=>{    
     let files = fs.readdirSync('./config',);
