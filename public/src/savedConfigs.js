@@ -95,7 +95,12 @@ class savedConfigs {
         return new Promise((resolve,reject)=>{
             fetch('/getConfigFile').then((res)=>res.text().then(data=>{
                 // let config =JSON.parse(JSON.parse(data));                                   
-                if (data.length==0) this.configs=[]; else this.configs=JSON.parse(data);            
+                if (data.length==0) { 
+                    this.configs=[]; 
+                } else { 
+                    try { this.configs=JSON.parse(data); }
+                    catch { this.configs=[]; }
+                }
                 // console.log(this.configs);
     
                 if (this.configs==null) {this.configs=[]};
