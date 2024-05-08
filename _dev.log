@@ -2,12 +2,14 @@ TOPIC : Auto EQ
 TOPIC : Room EQ
 TOPIC : Preferences
 TOPIC : Read me file
+TOPIC : Advanced
 
 
-Add DC Protection
+// Add DC Protection : Done
 // Add config name visible on the EQ tab : Done
 // Add Mute button : double click on volume to mute
 Add Limiter
 Add level meter bars for non spectrum and basic
+Add options to import filterArray
 
 

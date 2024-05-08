@@ -283,4 +283,36 @@ async function initSpectrum(){
     },100)
 }
 
+async function convertConfigs() {
+    fetch("/getConfigList").then((res)=>res.text().then(data=>{
+        const configList = JSON.parse(data);
+        for (let config of configList) {
+            fetch("/getConfig?configName="+config).then((res)=>res.text().then(data=>{
+                configObject = JSON.parse(data);                
+                let volumeIndex = configObject.filterArray.indexOf(configObject.filterArray.Volume);
+                configObject.filterArray.splice(volumeIndex,1);
+
+                volumeIndex = configObject.filterArray.indexOf(configObject.filterArray.Preamp);
+                configObject.filterArray.splice(volumeIndex,1);
+
+                console.log(configObject.filterArray);
+                let filters={};
+                for (let filter of configObject.filterArray) {
+                    filters[Object.keys(filter)[0]]={"type":"Biquad","parameters":filter[Object.keys(filter)[0]]};
+                }
+
+                console.log(filters);
+
+                
+                DSP.clearFilters();
+                DSP.addFilters(filters);
+                DSP.config.name=config;
+                DSP.uploadConfig();
+                console.log(DSP.config)
+            }))
+            return;
+        }
+
+    }))
+}
 
