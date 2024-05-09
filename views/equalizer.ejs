@@ -16,7 +16,9 @@
         import camillaDSP from "/src/camillaDSP.js";       
         import EQKnob from '/src/knob.js';
         import plot from '/src/eqplot.js';        
+        import savedConfigs from "/src/savedConfigs.js";        
         
+        window.savedConfigs = new savedConfigs();        
         window.PEQline = PEQline;
         window.camillaDSP = camillaDSP;                        
         window.EQKnob=EQKnob;

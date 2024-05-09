@@ -296,36 +296,55 @@ function resetPEQ() {
 }
 
 async function convertConfigs() {
-    fetch("/getConfigList").then((res)=>res.text().then(data=>{
-        const configList = JSON.parse(data);
+    fetch("/getConfigList").then((res)=>res.text().then(async cData=>{
+        const configList = JSON.parse(cData);
+
         for (let configName of configList) {
-            fetch("/getConfig?configName="+configName).then((res)=>res.text().then(async data=> {
-                configObject = JSON.parse(data);                
-
-                let volumeIndex = configObject.filterArray.indexOf(configObject.filterArray.Volume);
-                configObject.filterArray.splice(volumeIndex,1);
-
-                let preampIndex = configObject.filterArray.indexOf(configObject.filterArray.Preamp);
-                configObject.filterArray.splice(preampIndex,1);
-
-                console.log(configObject.filterArray);
-                let filters={};
-                for (let filter of configObject.filterArray) {
-                    filters[Object.keys(filter)[0]]={"type":"Biquad","parameters":filter[Object.keys(filter)[0]]};
-                }
-
-                console.log("Converted filters : ",filters);
-
-                await DSP.downloadConfig();
-                DSP.clearFilters();
-                DSP.addFilters(filters);
-                DSP.config.title=configName;
-                await DSP.uploadConfig();
-                console.log(DSP.config)
-            }))
-            return;
-        }
-
+            let data = await fetch("/getConfig?configName="+configName).then((res)=>res.text());
+            let configObject = JSON.parse(data);                
+            await saveConfigObjectAsConfig(configName,configObject);            
+        }        
     }))
+
+    async function saveConfigObjectAsConfig(configName,configObject) {
+        return new Promise(async (resolve,reject)=>{
+            let filters={};
+
+            if (configObject.filterArray==undefined) { resolve(false);  return }
+
+            let Volume = configObject.filterArray.find(e=>Object.keys(e)[0]=="Volume");
+            let Preamp = configObject.filterArray.find(e=>Object.keys(e)[0]=="Preamp");
+    
+            if (Volume!=undefined) {
+                volumeIndex = configObject.filterArray.indexOf(Volume);
+                configObject.filterArray.splice(volumeIndex,1);
+            }
+    
+            if (Preamp!=undefined) {
+                preampIndex = configObject.filterArray.indexOf(Preamp);                            
+                filters["Gain"]={"type":"Gain","parameters":{"gain":Object.values(Preamp)[0].gain,"inverted":false,"scale":"dB"}};
+                configObject.filterArray.splice(preampIndex,1);
+            }               
+            
+            for (let filter of configObject.filterArray) {
+                filters[Object.keys(filter)[0]]={"type":"Biquad","parameters":filter[Object.keys(filter)[0]]};
+            }
+    
+            console.log("Converted filters : ",filters);
+            await DSP.downloadConfig();
+            await DSP.clearFilters();
+            DSP.addFilters(filters);                
+            const date = new Date();
+    
+            const configData={"title":DSP.configName,"filters":DSP.config.filters,"mixers":DSP.config.mixers,"pipeline":DSP.config.pipeline}
+            const tmpConfig={"type":"equalizer","name":configName,"createdDate":date,"data":configData}
+    
+            await window.savedConfigs.saveConfigRemote(tmpConfig,true);
+            resolve(true);                
+            
+        })
+        
+    }
+
 }
 
