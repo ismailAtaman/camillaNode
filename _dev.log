@@ -10,6 +10,6 @@ TOPIC : Advanced
 // Add Mute button : double click on volume to mute
 Add Limiter
 Add level meter bars for non spectrum and basic
-Add options to import filterArray
+// Add options to import filterArray : Done -> added import old configs 
 
 
