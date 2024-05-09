@@ -1,4 +1,4 @@
-Unit]
+[Unit]
 Description=CamillaDSP Daemon
 After=syslog.target
 StartLimitIntervalSec=10

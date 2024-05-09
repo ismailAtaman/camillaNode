@@ -10,5 +10,5 @@ devices:
   playback:
     type: Alsa
     channels: 2
-    device: hw:Pro
+    device: hw:OUTPUTDEVICE
     format: S32LE
