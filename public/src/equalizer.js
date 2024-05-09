@@ -283,6 +283,10 @@ async function initSpectrum(){
     },100)
 }
 
+function addNewLine() {
+    peqlineAdd();
+}
+
 async function convertConfigs() {
     fetch("/getConfigList").then((res)=>res.text().then(data=>{
         const configList = JSON.parse(data);
