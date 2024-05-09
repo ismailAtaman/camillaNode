@@ -1,0 +1,14 @@
+devices:
+  samplerate: 48000
+  chunksize: 4096
+  enable_rate_adjust: true
+  capture:
+    type: Alsa
+    channels: 2
+    device: "gadget"
+    format: S32LE
+  playback:
+    type: Alsa
+    channels: 2
+    device: hw:Pro
+    format: S32LE

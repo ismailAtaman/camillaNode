@@ -1,0 +1,14 @@
+[Unit]
+Description=camillaNode Service
+After=network.target
+
+[Service]
+User=root
+Group=nogroup
+ExecStart=/usr/bin/node /home/USERNAME/camillanode/index.js
+WorkingDirectory=/home/USERNAME/camillanode/
+Environment=PATH=/home/USERNAME/camillanode/
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

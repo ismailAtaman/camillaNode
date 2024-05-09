@@ -1,0 +1,688 @@
+devices:
+  samplerate: 48000
+  chunksize: 4096
+  enable_rate_adjust: true
+  playback:
+    type: File
+    filename: "/dev/null"
+    channels: 60
+    format: S32LE
+  capture:
+    type: ALSA
+    device: "gadget"
+    channels: 2
+    format: S32LE
+
+filters:
+  band_0:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 25
+      q: 12
+  band_1:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 31.5
+      q: 12
+  band_2:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 40
+      q: 12
+  band_3:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 50
+      q: 12
+  band_4:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 63
+      q: 12
+  band_5:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 80
+      q: 12
+  band_6:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 100
+      q: 12
+  band_7:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 125
+      q: 12
+  band_8:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 160
+      q: 12
+  band_9:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 200
+      q: 12
+  band_10:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 250
+      q: 12
+  band_11:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 315
+      q: 12
+  band_12:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 400
+      q: 12
+  band_13:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 500
+      q: 12
+  band_14:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 630
+      q: 12
+  band_15:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 800
+      q: 12
+  band_16:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 1000
+      q: 12
+  band_17:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 1250
+      q: 12
+  band_18:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 1600
+      q: 12
+  band_19:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 2000
+      q: 12
+  band_20:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 2500
+      q: 12
+  band_21:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 3150
+      q: 12
+  band_22:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 4000
+      q: 12
+  band_23:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 5000
+      q: 12
+  band_24:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 6300
+      q: 12
+  band_25:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 8000
+      q: 12
+  band_26:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 10000
+      q: 12
+  band_27:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 12500
+      q: 12
+  band_28:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 16000
+      q: 12
+  band_29:
+    type: Biquad
+    parameters:
+      type: Bandpass
+      freq: 20000
+      q: 12
+
+mixers:
+  30band:
+    channels:
+      in: 2
+      out: 60
+    mapping:
+      - dest: 0
+        sources:
+          - channel: 0
+      - dest: 1
+        sources:
+          - channel: 1
+      - dest: 2
+        sources:
+          - channel: 0
+      - dest: 3
+        sources:
+          - channel: 1
+      - dest: 4
+        sources:
+          - channel: 0
+      - dest: 5
+        sources:
+          - channel: 1
+      - dest: 6
+        sources:
+          - channel: 0
+      - dest: 7
+        sources:
+          - channel: 1
+      - dest: 8
+        sources:
+          - channel: 0
+      - dest: 9
+        sources:
+          - channel: 1
+      - dest: 10
+        sources:
+          - channel: 0
+      - dest: 11
+        sources:
+          - channel: 1
+      - dest: 12
+        sources:
+          - channel: 0
+      - dest: 13
+        sources:
+          - channel: 1
+      - dest: 14
+        sources:
+          - channel: 0
+      - dest: 15
+        sources:
+          - channel: 1
+      - dest: 16
+        sources:
+          - channel: 0
+      - dest: 17
+        sources:
+          - channel: 1
+      - dest: 18
+        sources:
+          - channel: 0
+      - dest: 19
+        sources:
+          - channel: 1
+      - dest: 20
+        sources:
+          - channel: 0
+      - dest: 21
+        sources:
+          - channel: 1
+      - dest: 22
+        sources:
+          - channel: 0
+      - dest: 23
+        sources:
+          - channel: 1
+      - dest: 24
+        sources:
+          - channel: 0
+      - dest: 25
+        sources:
+          - channel: 1
+      - dest: 26
+        sources:
+          - channel: 0
+      - dest: 27
+        sources:
+          - channel: 1
+      - dest: 28
+        sources:
+          - channel: 0
+      - dest: 29
+        sources:
+          - channel: 1
+      - dest: 30
+        sources:
+          - channel: 0
+      - dest: 31
+        sources:
+          - channel: 1
+      - dest: 32
+        sources:
+          - channel: 0
+      - dest: 33
+        sources:
+          - channel: 1
+      - dest: 34
+        sources:
+          - channel: 0
+      - dest: 35
+        sources:
+          - channel: 1
+      - dest: 36
+        sources:
+          - channel: 0
+      - dest: 37
+        sources:
+          - channel: 1
+      - dest: 38
+        sources:
+          - channel: 0
+      - dest: 39
+        sources:
+          - channel: 1
+      - dest: 40
+        sources:
+          - channel: 0
+      - dest: 41
+        sources:
+          - channel: 1
+      - dest: 42
+        sources:
+          - channel: 0
+      - dest: 43
+        sources:
+          - channel: 1
+      - dest: 44
+        sources:
+          - channel: 0
+      - dest: 45
+        sources:
+          - channel: 1
+      - dest: 46
+        sources:
+          - channel: 0
+      - dest: 47
+        sources:
+          - channel: 1
+      - dest: 48
+        sources:
+          - channel: 0
+      - dest: 49
+        sources:
+          - channel: 1
+      - dest: 50
+        sources:
+          - channel: 0
+      - dest: 51
+        sources:
+          - channel: 1
+      - dest: 52
+        sources:
+          - channel: 0
+      - dest: 53
+        sources:
+          - channel: 1
+      - dest: 54
+        sources:
+          - channel: 0
+      - dest: 55
+        sources:
+          - channel: 1
+      - dest: 56
+        sources:
+          - channel: 0
+      - dest: 57
+        sources:
+          - channel: 1
+      - dest: 58
+        sources:
+          - channel: 0
+      - dest: 59
+        sources:
+          - channel: 1
+
+pipeline:
+
+  - type: Mixer
+    name: 30band
+  - type: Filter
+    channel: 1
+    names:
+      - band_0
+      - band_0
+  - type: Filter
+    channel: 3
+    names:
+      - band_1
+      - band_1
+  - type: Filter
+    channel: 5
+    names:
+      - band_2
+      - band_2
+  - type: Filter
+    channel: 7
+    names:
+      - band_3
+      - band_3
+  - type: Filter
+    channel: 9
+    names:
+      - band_4
+      - band_4
+  - type: Filter
+    channel: 11
+    names:
+      - band_5
+      - band_5
+  - type: Filter
+    channel: 13
+    names:
+      - band_6
+      - band_6
+  - type: Filter
+    channel: 15
+    names:
+      - band_7
+      - band_7
+  - type: Filter
+    channel: 17
+    names:
+      - band_8
+      - band_8
+  - type: Filter
+    channel: 19
+    names:
+      - band_9
+      - band_9
+  - type: Filter
+    channel: 21
+    names:
+      - band_10
+      - band_10
+  - type: Filter
+    channel: 23
+    names:
+      - band_11
+      - band_11
+  - type: Filter
+    channel: 25
+    names:
+      - band_12
+      - band_12
+  - type: Filter
+    channel: 27
+    names:
+      - band_13
+      - band_13
+  - type: Filter
+    channel: 29
+    names:
+      - band_14
+      - band_14
+  - type: Filter
+    channel: 31
+    names:
+      - band_15
+      - band_15
+  - type: Filter
+    channel: 33
+    names:
+      - band_16
+      - band_16
+  - type: Filter
+    channel: 35
+    names:
+      - band_17
+      - band_17
+  - type: Filter
+    channel: 37
+    names:
+      - band_18
+      - band_18
+  - type: Filter
+    channel: 39
+    names:
+      - band_19
+      - band_19
+  - type: Filter
+    channel: 41
+    names:
+      - band_20
+      - band_20
+  - type: Filter
+    channel: 43
+    names:
+      - band_21
+      - band_21
+  - type: Filter
+    channel: 45
+    names:
+      - band_22
+      - band_22
+  - type: Filter
+    channel: 47
+    names:
+      - band_23
+      - band_23
+  - type: Filter
+    channel: 49
+    names:
+      - band_24
+      - band_24
+  - type: Filter
+    channel: 51
+    names:
+      - band_25
+      - band_25
+  - type: Filter
+    channel: 53
+    names:
+      - band_26
+      - band_26
+  - type: Filter
+    channel: 55
+    names:
+      - band_27
+      - band_27
+  - type: Filter
+    channel: 57
+    names:
+      - band_28
+      - band_28
+  - type: Filter
+    channel: 59
+    names:
+      - band_29
+      - band_29
+  - type: Filter
+    channel: 0
+    names:
+      - band_0
+      - band_0
+  - type: Filter
+    channel: 2
+    names:
+      - band_1
+      - band_1
+  - type: Filter
+    channel: 4
+    names:
+      - band_2
+      - band_2
+  - type: Filter
+    channel: 6
+    names:
+      - band_3
+      - band_3
+  - type: Filter
+    channel: 8
+    names:
+      - band_4
+      - band_4
+  - type: Filter
+    channel: 10
+    names:
+      - band_5
+      - band_5
+  - type: Filter
+    channel: 12
+    names:
+      - band_6
+      - band_6
+  - type: Filter
+    channel: 14
+    names:
+      - band_7
+      - band_7
+  - type: Filter
+    channel: 16
+    names:
+      - band_8
+      - band_8
+  - type: Filter
+    channel: 18
+    names:
+      - band_9
+      - band_9
+  - type: Filter
+    channel: 20
+    names:
+      - band_10
+      - band_10
+  - type: Filter
+    channel: 22
+    names:
+      - band_11
+      - band_11
+  - type: Filter
+    channel: 24
+    names:
+      - band_12
+      - band_12
+  - type: Filter
+    channel: 26
+    names:
+      - band_13
+      - band_13
+  - type: Filter
+    channel: 28
+    names:
+      - band_14
+      - band_14
+  - type: Filter
+    channel: 30
+    names:
+      - band_15
+      - band_15
+  - type: Filter
+    channel: 32
+    names:
+      - band_16
+      - band_16
+  - type: Filter
+    channel: 34
+    names:
+      - band_17
+      - band_17
+  - type: Filter
+    channel: 36
+    names:
+      - band_18
+      - band_18
+  - type: Filter
+    channel: 38
+    names:
+      - band_19
+      - band_19
+  - type: Filter
+    channel: 40
+    names:
+      - band_20
+      - band_20
+  - type: Filter
+    channel: 42
+    names:
+      - band_21
+      - band_21
+  - type: Filter
+    channel: 44
+    names:
+      - band_22
+      - band_22
+  - type: Filter
+    channel: 46
+    names:
+      - band_23
+      - band_23
+  - type: Filter
+    channel: 48
+    names:
+      - band_24
+      - band_24
+  - type: Filter
+    channel: 50
+    names:
+      - band_25
+      - band_25
+  - type: Filter
+    channel: 52
+    names:
+      - band_26
+      - band_26
+  - type: Filter
+    channel: 54
+    names:
+      - band_27
+      - band_27
+  - type: Filter
+    channel: 56
+    names:
+      - band_28
+      - band_28
+  - type: Filter
+    channel: 58
+    names:
+      - band_29
+      - band_29

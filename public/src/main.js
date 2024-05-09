@@ -62,19 +62,7 @@ function updateActions(page) {
 
 async function conectToDSP() {
     const DSP = new camillaDSP();
-    await DSP.connect();
-
-    let version = document.getElementById('version')
-    DSP.sendDSPMessage("GetVersion").then(r=>version.innerText="CamillaDSP Version "+r);
-
-    let status = document.getElementById('status')            
-    DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);    
-
-
-    setInterval(async ()=>{
-        let status = document.getElementById('status')            
-        DSP.sendDSPMessage("GetState").then(r=>status.innerText=r);                        
-    },5000);
+    await DSP.connect();    
     window.DSP= DSP;        
     initIndicators();
 }
@@ -321,10 +309,8 @@ async function loadPreferences() {
     // Apply preferences
     //// Find the navigator that default page is pointing and invote its click event
     let navigators = document.getElementsByClassName("navigate");
-    for (let navigator of navigators) {        
-        console.log(window.activeSettings.defaultPage)
-        if (navigator.getAttribute("target").replace("/","")==window.activeSettings.defaultPage.toLowerCase()) {
-            console.log("navigating..")
+    for (let navigator of navigators) {                
+        if (navigator.getAttribute("target").replace("/","")==window.activeSettings.defaultPage.toLowerCase()) {            
             navigator.dispatchEvent(new Event("click"));
             break;
         }
