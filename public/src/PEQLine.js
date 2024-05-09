@@ -229,9 +229,9 @@ class PEQLine {
         if (filterObject.type=="Gain") {            
             // this.peqline.children["gain"].value = parameters.gain;            
         } else {                        
-            this.peqline.children["type"].value=parameters.type;
-            this.peqline.children["freq"].value= parameters.freq;        
-            this.peqline.children["gain"].value = parameters.gain;
+            this.peqline.children["type"].value  = parameters.type;
+            this.peqline.children["freq"].value  = parameters.freq;        
+            this.peqline.children["gain"].value  = parameters.gain;
             this.peqline.children["qfact"].value = parameters.q;
         }
     }

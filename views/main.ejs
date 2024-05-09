@@ -119,21 +119,21 @@
             let tmpConfig={"type":activePage,"name":configName.value,"createdDate":date,"data":data}
             // console.log(tmpConfig);
 
-            let saved = await configsObject.saveConfigRemote(tmpConfig);                        
-            console.log("Saved : ", saved)
-            if (saved[0]) {
-                await loadConfigs(activePage,document.getElementById("configList"))
-                configName.value="";                
-            } else {
-                if (saved[1]=="exists") {
-                    if (!confirm("A config with that name already exists. Would you like add another one?")) return;
-                    saved = configsObject.saveConfig(tmpConfig,true);                        
-                    if (saved[0]) {
-                        await configsObject.loadConfigsRemote(activePage,document.getElementById("configList"))
-                        configName.value="";     
-                    }
-                };
-            }
+            configsObject.saveConfigRemote(tmpConfig).then(async r=>{}).catch(async e=>{                
+                if (!confirm("A config with that name already exists. Would you like add another one?")) return;
+                await configsObject.saveConfigRemote(tmpConfig,true);
+            })                     
+
+            await loadConfigs(activePage,document.getElementById("configList"))
+            configName.value="";     
+            
+            // console.log("Saved : ", saved)
+            // if (saved[0]) {
+            //     await loadConfigs(activePage,document.getElementById("configList"))
+            //     configName.value="";                
+            // } else {
+                
+            // }
         }
 
         async function openConfigurationClick() {                     

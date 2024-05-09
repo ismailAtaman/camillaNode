@@ -113,7 +113,7 @@ app.post('/saveConfigFile',(req,res)=>{
     }).on('end', function(){
         let config = JSON.parse(queryResponse);              
         let fileName = configsFile;
-        console.log(fileName)
+        // console.log(fileName)
         let fileBuffer = Buffer.from(JSON.stringify(config),'utf-8');        
         fs.writeFileSync(fileName,fileBuffer,function(err){
             console.log("Error saving file ",fileName,"\n",err);            
@@ -124,7 +124,7 @@ app.post('/saveConfigFile',(req,res)=>{
 
 app.get('/getConfigFile',function(req,res){    
     let filePath=configsFile;
-    console.log("File exists?",fs.existsSync(filePath))
+    // console.log("File exists?",fs.existsSync(filePath))
     if (!fs.existsSync(filePath)) { 
         res.write(JSON.stringify([])); 
         res.end();
