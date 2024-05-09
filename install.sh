@@ -6,6 +6,16 @@ read inputdevice
 echo "Enter device name of the output device (use 'aplay -l' to check)"
 read outputdevice
 
+printf 'Username : '${username}' , Input Device Name : '${inputdevice}', Output Device Name : '${outputdevice}' \nIs this information correct?(y/n)? '
+read answer
+
+if [ "$answer" != "${answer#[Yy]}" ] ;then 
+    echo Yes
+else
+    echo "Install script aborted."
+    exit
+fi
+
 mkdir /home/${username}/dev/test/camilladsp 
 mkdir /home/${username}/dev/test/camillanode
 
