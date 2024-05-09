@@ -77,6 +77,14 @@ class preferences {
             "dependsOn":"enableSpectrum",    
             "enabled":false,
             },        
+
+            {"id":"autoPreampGain",
+            "name":"Set preamp gain automatically based on filters",
+            "value":false,
+            "type":"boolean",                        
+            "enabled":true,
+            },        
+
         ]  
         return tmpPref;
     }

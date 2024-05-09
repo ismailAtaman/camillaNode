@@ -125,7 +125,9 @@ async function loadFiltersFromConfig() {
 
 function plotConfig() {
     const canvas = document.getElementById("plotCanvas");            
-    let max = plot(DSP.config.filters,canvas,DSP.config.title);           
+    let max = Math.round(plot(DSP.config.filters,canvas,DSP.config.title));        
+    // if (window.parent.activeSettings.autoPreampGain) setPreamp(-max);
+    // console.log("Preamp : ",-max);
 }
 
 async function setPreamp(gain) {
@@ -133,7 +135,7 @@ async function setPreamp(gain) {
     if (DSP.config.filters.Gain == undefined) {
         DSP.config.filters.Gain = {"type":"Gain","parameters":{"gain":0,"inverted":false,"scale":"dB"}}
     }  
-    DSP.config.filters.Gain.parameters.gain=gain;                
+    DSP.config.filters.Gain.parameters.gain= Math.round(gain);                
     DSP.config.pipeline=DSP.updatePipeline(DSP.config);
     await DSP.uploadConfig(DSP.config);
 }
