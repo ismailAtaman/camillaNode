@@ -249,6 +249,13 @@ class PEQLine {
         return obj;
     }
 
+    reset() {
+        this.peqline.children["freq"].value="1,000Hz";
+        this.peqline.children["gain"].value="0dB";
+        this.peqline.children["qfact"].value=1.41;
+        this.update();
+    }
+
     /**************************************************************************************************************************************/
 
     static addPEQLine(parent,insertBefore) {

@@ -287,6 +287,14 @@ function addNewLine() {
     peqlineAdd();
 }
 
+function resetPEQ() {
+    const PEQ = document.getElementById('PEQ');
+    for (let peqLine of PEQ.childNodes) {
+        peqLine.instance.reset();
+        
+    }
+}
+
 async function convertConfigs() {
     fetch("/getConfigList").then((res)=>res.text().then(data=>{
         const configList = JSON.parse(data);
