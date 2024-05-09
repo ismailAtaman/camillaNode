@@ -286,14 +286,15 @@ async function initSpectrum(){
 async function convertConfigs() {
     fetch("/getConfigList").then((res)=>res.text().then(data=>{
         const configList = JSON.parse(data);
-        for (let config of configList) {
-            fetch("/getConfig?configName="+config).then((res)=>res.text().then(data=>{
+        for (let configName of configList) {
+            fetch("/getConfig?configName="+configName).then((res)=>res.text().then(async data=> {
                 configObject = JSON.parse(data);                
+
                 let volumeIndex = configObject.filterArray.indexOf(configObject.filterArray.Volume);
                 configObject.filterArray.splice(volumeIndex,1);
 
-                volumeIndex = configObject.filterArray.indexOf(configObject.filterArray.Preamp);
-                configObject.filterArray.splice(volumeIndex,1);
+                let preampIndex = configObject.filterArray.indexOf(configObject.filterArray.Preamp);
+                configObject.filterArray.splice(preampIndex,1);
 
                 console.log(configObject.filterArray);
                 let filters={};
@@ -301,13 +302,13 @@ async function convertConfigs() {
                     filters[Object.keys(filter)[0]]={"type":"Biquad","parameters":filter[Object.keys(filter)[0]]};
                 }
 
-                console.log(filters);
+                console.log("Converted filters : ",filters);
 
-                
+                await DSP.downloadConfig();
                 DSP.clearFilters();
                 DSP.addFilters(filters);
-                DSP.config.name=config;
-                DSP.uploadConfig();
+                DSP.config.title=configName;
+                await DSP.uploadConfig();
                 console.log(DSP.config)
             }))
             return;
