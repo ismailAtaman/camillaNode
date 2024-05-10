@@ -279,7 +279,7 @@ async function connect(camillaDSP) {
     conencted = DSP.uploadConfig(config);            
     if (connected) {
         state.innerText="Connected.";
-        state.style.color="#6C6";
+        state.style.color="#6C6";        
     } else {
         state.innerText="Error uploading configuration.";
         state.style.color="#EC6";

@@ -16,12 +16,27 @@
     <script type="module" >
         import camillaDSP from "/src/camillaDSP.js"        
         window.camillaDSP = camillaDSP;
+        document.addEventListener("DOMContentLoaded",connectionsOnLoad)
     </script>
 
         
     <script>
         
-
+        function connectionsOnLoad() {
+            // Load saved details from local storage if they exist.
+            const server = window.localStorage.getItem("server")
+            const port  = window.localStorage.getItem("port")
+            const spectrumPort = window.localStorage.getItem("spectrumPort")
+            if (server!=undefined) {
+                document.getElementById("server").value = server;
+                document.getElementById("port").value=port;
+                document.getElementById("spectrumPort")=spectrumPort;
+            } else {
+                document.getElementById("server").value = window.location.hostname;
+                document.getElementById("port").value=1234;
+                document.getElementById("spectrumPort")=4321;
+            }
+        }
 
     </script>
     <style>
