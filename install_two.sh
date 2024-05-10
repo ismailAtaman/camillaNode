@@ -27,7 +27,7 @@ cp setupFiles/camilladsp2.service /etc/systemd/system/camilladsp2.service
 cp setupFiles/camillanode.service /etc/systemd/system/camillanode.service
 cp setupFiles/default.yml /home/${username}/camilladsp/
 cp setupFiles/spectrum.yml /home/${username}/camilladsp/
-cp setupFiles/asound.conf /home/${username}/etc/
+cp setupFiles/asound.conf /etc/
 
 file=/home/${username}/dev/test/systemd/camilladsp.service
 sed -i -e 's/USERNAME/'${username}'/g' ${file}
@@ -47,7 +47,7 @@ sed -i -e 's/OUTPUTDEVICE/'${outputdevice}'/g' ${file}
 
 cd /home/${username}/camilladsp
 wget https://github.com/HEnquist/camilladsp/releases/download/v2.0.3/camilladsp-linux-aarch64.tar.gz -P ~/camilladsp/
-sudo tar -xvf ~/camilladsp/camilladsp-linux-aarch64.tar.gz -C /home/${username}/dev/test/
+sudo tar -xvf ~/camilladsp/camilladsp-linux-aarch64.tar.gz -C /usr/local/bin/
 
 systemctl enable camilladsp.service
 systemctl enable camilladsp2.service
