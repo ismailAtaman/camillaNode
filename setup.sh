@@ -6,5 +6,5 @@ cd camillanode
 git init
 git pull https://github.com/ismailAtaman/camillaNode.git
 npm install
-sudo bash install.sh	
+install.sh	
 
