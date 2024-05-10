@@ -17,14 +17,14 @@ else
 fi
 
 mkdir /home/${username}/dev/test/camilladsp 
-mkdir /home/${username}/dev/test/camillanode
 
-mkdir /home/${username}/dev/test/systemd/
-mkdir /home/${username}/dev/test/etc/
+# mkdir /home/${username}/dev/test/camillanode
+# mkdir /home/${username}/dev/test/systemd/
+# mkdir /home/${username}/dev/test/etc/
 
-cp setupFiles/camilladsp.service /home/${username}/dev/test/systemd/
-cp setupFiles/camilladsp2.service /home/${username}/dev/test/systemd/
-cp setupFiles/camillanode.service /home/${username}/dev/test/systemd/
+cp setupFiles/camilladsp.service /etc/systemd/system/camilladsp.service
+cp setupFiles/camilladsp2.service /etc/systemd/system/camilladsp2.service
+cp setupFiles/camillanode.service /etc/systemd/system/camillanode.service
 cp setupFiles/default.yml /home/${username}/dev/test/camilladsp/
 cp setupFiles/spectrum.yml /home/${username}/dev/test/camilladsp/
 cp setupFiles/asound.conf /home/${username}/dev/test/etc/
@@ -45,27 +45,23 @@ file=/home/${username}/dev/test/camilladsp/default.yml
 sed -i -e 's/OUTPUTDEVICE/'${outputdevice}'/g' ${file}
 
 
-cd /home/${username}/dev/test/camilladsp
-#wget https://github.com/HEnquist/camilladsp/releases/download/v2.0.3/camilladsp-linux-aarch64.tar.gz -P ~/camilladsp/
-#sudo tar -xvf ~/camilladsp/camilladsp-linux-aarch64.tar.gz -C /home/${username}/dev/test/
+cd /home/${username}/camilladsp
+wget https://github.com/HEnquist/camilladsp/releases/download/v2.0.3/camilladsp-linux-aarch64.tar.gz -P ~/camilladsp/
+sudo tar -xvf ~/camilladsp/camilladsp-linux-aarch64.tar.gz -C /home/${username}/dev/test/
 
+systemctl enable camilladsp.service
+systemctl enable camilladsp2.service
+systemctl enable camillanode.service
 
+echo "Install and configuration of CamillaNode is complete. Check for error message to see if something went wrong."
+echo "Would you like to reboot now?(y/n)?"
 
-# ls -i "$file"
-# printf '%s' H ".g/^USERNAME.*/s//${username}/" wq | ed -s "$file"
-# ls -i "$file"
+read answer
 
-#cd /home/${username}/camillanode
-#sudo apt update
-#sudo apt install npm
-#sudo apt install git
-#git init 
-#git pull https://github.com/ismailAtaman/camillaNode.git
-#npm install
-#bash install.sh
-
-#systemctl enable camilladsp.service
-#systemctl enable camilladsp2.service
-#systemctl enable camillanode.service
-
-echo "Install of CamillaNode is complete."
+if [ "$answer" != "${answer#[Yy]}" ] ;then 
+    echo "Rebooting.."
+    sudo reboot
+else
+    echo "Please reboot for changes to take effect."
+    exit
+fi

@@ -1,0 +1,1 @@
+options g_audio c_srate=48000 c_ssize=4
