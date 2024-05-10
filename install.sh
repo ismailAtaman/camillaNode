@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "g_audio" > "/etc/modules"
+cp setupFiles/usb_g_audio.conf /etc/modprobe.d/usb_g_audio.conf
 
 read -p "Enter username chosen during installation : " username
 read -p "Enter device name of the input device (use 'arecord -l' to check) [UAC2Gadget] : " inputdevice
