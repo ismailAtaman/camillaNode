@@ -1,11 +1,11 @@
 #!/bin/bash
 
-read -p "Enter username chosen during installation" username
-read -p "Enter device name of the input device (use 'arecord -l' to check) [UAC2Gadget]" inputdevice
+read -p "Enter username chosen during installation : " username
+read -p "Enter device name of the input device (use 'arecord -l' to check) [UAC2Gadget] : " inputdevice
 inputdevice=${inputdevice:-UAC2Gadget}
-read -p "Enter device name of the output device (use 'aplay -l' to check)" outputdevice
+read -p "Enter device name of the output device (use 'aplay -l' to check) : " outputdevice
 
-printf 'Username : '${username}' , Input Device Name : '${inputdevice}', Output Device Name : '${outputdevice}' \nIs this information correct?(y/n)? '
+printf 'Username : '${username}' , Input : '${inputdevice}', Output : '${outputdevice}' \nIs this information correct?(y/n)? '
 read answer
 
 if [ "$answer" != "${answer#[Yy]}" ] ;then 
