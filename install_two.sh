@@ -25,9 +25,9 @@ mkdir /home/${username}/dev/test/camilladsp
 cp setupFiles/camilladsp.service /etc/systemd/system/camilladsp.service
 cp setupFiles/camilladsp2.service /etc/systemd/system/camilladsp2.service
 cp setupFiles/camillanode.service /etc/systemd/system/camillanode.service
-cp setupFiles/default.yml /home/${username}/dev/test/camilladsp/
-cp setupFiles/spectrum.yml /home/${username}/dev/test/camilladsp/
-cp setupFiles/asound.conf /home/${username}/dev/test/etc/
+cp setupFiles/default.yml /home/${username}/camilladsp/
+cp setupFiles/spectrum.yml /home/${username}/camilladsp/
+cp setupFiles/asound.conf /home/${username}/etc/
 
 file=/home/${username}/dev/test/systemd/camilladsp.service
 sed -i -e 's/USERNAME/'${username}'/g' ${file}
