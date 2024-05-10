@@ -16,7 +16,7 @@ else
     exit
 fi
 
-mkdir /home/${username}/dev/test/camilladsp 
+mkdir /home/${username}/camilladsp 
 
 # mkdir /home/${username}/dev/test/camillanode
 # mkdir /home/${username}/dev/test/systemd/
