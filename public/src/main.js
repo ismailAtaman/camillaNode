@@ -140,8 +140,9 @@ function saveToLocalStorage(val) {
     
 }
 
-async function importFilters(filterText,DSP) {
+async function importFilters(filterText,DSP,title) {
     let filterArray = parseAutoEQText(filterText);
+    // console.log(filterText);
     // console.log(filterArray);
 
     // Convert filterArray to filters object
@@ -152,12 +153,11 @@ async function importFilters(filterText,DSP) {
         tmpFilters[name] = obj;            
     });
     
-    
+    //const DSP = window.DSP;    
     await DSP.clearFilters();
-    console.log("Import after clear",DSP.config.filters);
-    Object.assign(DSP.config.filters,tmpFilters);
-    DSP.config.pipeline=DSP.updatePipeline(DSP.config);
-    DSP.uploadConfig();
+    DSP.addFilters(tmpFilters);
+    if (!title==undefined) DSP.config.title=title;    
+    await DSP.uploadConfig();    
 }
 
 function filterToJSON(filter) {                        
@@ -215,9 +215,11 @@ function parseAutoEQText(text) {
                 filterType="Peaking";
                 break;
             case "LSC":
+            case "LS":
                 filterType="Lowshelf";
                 break;
             case "HSC":
+            case "HS":
                 filterType="Highshelf"
                 break;
             default:
@@ -416,6 +418,8 @@ function loadHeadphoneList(filter) {
     // console.log(headphoneRecords)    
     let div;    
 
+    if ( headphoneRecords===null) return;
+
     for (let headphone of headphoneRecords) {
         div = document.createElement('div');
         div.className='config';        
@@ -425,29 +429,29 @@ function loadHeadphoneList(filter) {
         div.setAttribute('sourceName',headphone.sourceName);
 
         
-        div.addEventListener('dblclick',function(){
+        div.addEventListener('dblclick',async function(){
             let url = this.getAttribute('url')
-            fetch(url).then((res)=>res.text().then(fileList=>{        
-                let list = JSON.parse(fileList).tree;
-                let paramEQUrl;
-                for (i=0;i<list.length;i++) {
-                    if (list[i].path.toLowerCase().search('parametriceq')>-1) {
-                        paramEQUrl=list[i].url;
-                        break;
-                    }
-                }                
-                //console.log(JSON.parse(fileList).tree);
-                fetch(paramEQUrl).then((res)=>res.json().then(paramEQ=>{                            
-                    let paramEQText = atob(paramEQ.content);                    
-                    let filterArray = parseAutoEQText(paramEQText);
-                    let filterArrayJSON = convertFilterArayToJSON(filterArray);            
-                    applyFilters(filterArrayJSON.filters);
-                    canvasClick();
-                    document.getElementById('configName').value=this.innerText;
-                    document.getElementById('configShortcut').value='';
-                    document.getElementById('autoEQDialog').close();
-                }))
-            }))
+            let fileList = await fetch(url).then((res)=>res.text());
+            let list = JSON.parse(fileList).tree;
+            let paramEQUrl;
+            for (i=0;i<list.length;i++) {
+                if (list[i].path.toLowerCase().search('parametriceq')>-1) {
+                    paramEQUrl=list[i].url;
+                    break;
+                }
+            }                
+            //console.log(JSON.parse(fileList).tree);
+            let paramEQ = await fetch(paramEQUrl).then((res)=>res.json());
+            let paramEQText = atob(paramEQ.content);                                 
+            
+            
+            await importFilters(paramEQText,window.DSP,this.innerText);                                    
+            window.DSP.config.title=this.innerText;
+            await window.DSP.uploadConfig();
+            window.mainframe.contentWindow.loadFiltersFromConfig.apply();
+            window.mainframe.contentWindow.plotConfig.apply();
+            this.parentElement.parentElement.parentElement.close()
+            
         })
         listObject.appendChild(div)
     }

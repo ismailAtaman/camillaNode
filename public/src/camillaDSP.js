@@ -357,8 +357,6 @@ class camillaDSP {
         this.config.pipeline=this.updatePipeline(this.config);
         return true;
     }
-
-
 }
 
 

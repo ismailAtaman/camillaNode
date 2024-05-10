@@ -94,8 +94,7 @@ async function equalizerOnLoad() {
 async function loadFiltersFromConfig() {                        
     PEQ.innerHTML='';
     await DSP.downloadConfig()
-    
-    
+        
     let line;
     if (DSP.config.filters!=null) {
         for (let filterName of Object.keys(DSP.config.filters)) {                               
@@ -338,7 +337,7 @@ async function convertConfigs() {
             DSP.addFilters(filters);                
             const date = new Date();
     
-            const configData={"title":DSP.configName,"filters":DSP.config.filters,"mixers":DSP.config.mixers,"pipeline":DSP.config.pipeline}
+            const configData={"title":DSP.config.title,"filters":DSP.config.filters,"mixers":DSP.config.mixers,"pipeline":DSP.config.pipeline}
             const tmpConfig={"type":"equalizer","name":configName,"createdDate":date,"data":configData}
     
             await window.savedConfigs.saveConfigRemote(tmpConfig,true);
