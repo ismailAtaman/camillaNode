@@ -10,7 +10,7 @@ printf 'Username : '${username}' , Input Device Name : '${inputdevice}', Output 
 read answer
 
 if [ "$answer" != "${answer#[Yy]}" ] ;then 
-    echo Yes
+    echo "Yes. Installing..."
 else
     echo "Install script aborted."
     exit
@@ -62,7 +62,10 @@ cd /home/${username}/dev/test/camilladsp
 #git init 
 #git pull https://github.com/ismailAtaman/camillaNode.git
 #npm install
+#bash install.sh
 
 #systemctl enable camilladsp.service
 #systemctl enable camilladsp2.service
 #systemctl enable camillanode.service
+
+echo "Install of CamillaNode is complete."

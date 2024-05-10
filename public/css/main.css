@@ -610,7 +610,7 @@ input[type="checkbox"]:checked::before {
     flex-direction: column;
     flex-grow: 1;
     flex-basis: 0;    
-    background-color: #222;    
+    background-color: hsl(var(--bck-hue),var(--bck-sat), 40%);    
     border-radius: 5px;    
     width: 100%;
     height: 350px;
@@ -658,8 +658,8 @@ input[type="checkbox"]:checked::before {
     display: block;
     font-family: 'Courier New', Courier, monospace;
     padding: 10px;   
-    height: 450px; 
-    background-color: hsl(var(--bck-hue), var(--bck-sat),5%);
+    height: 450px;     
+    background-color: hsl(var(--bck-hue),var(--bck-sat), 35%);    
     border-radius: 7px;    
     margin: 15px;
     color:white;
@@ -774,4 +774,20 @@ input[type="checkbox"]:checked::before {
     border: 0px solid white;
     border-radius: 5px;
     height: 10px; 
+}
+
+
+#headphoneList {
+    display: block;
+    margin-top: 10px;    
+    width: auto;
+    height: 500px;
+    overflow-y: scroll;
+    background-color: hsl(var(--bck-hue),var(--bck-sat), 35%);    
+}
+
+#autoEQDialog {
+    height: 600px;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
 }

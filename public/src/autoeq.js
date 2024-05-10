@@ -1,7 +1,5 @@
 
 
-
-
 // AutoEQ Results folder 
 // https://api.github.com/repos/jaakkopasanen/AutoEq/git/trees/27c4591c3fc158d1bfc73a0710bde842261189f4
 // oratory in-ear URL 
@@ -11,6 +9,7 @@
 
 class autoEQ {
     autoEQDB= [];
+    AutoEQResults={};
 
     constructor() {
         return this;
@@ -45,22 +44,23 @@ class autoEQ {
     }
 
 async initAutoEQDB(source) {    
-    loadAutoEQDB(source).then(ret=>{        
-        console.log("AutoEQ Database initialized with "+autoEQDB.length+" records.");
-        window.localStorage.setItem("autoEQDB",JSON.stringify(autoEQDB));
+    this.loadAutoEQDB(source).then(ret=>{        
+        console.log("AutoEQ Database initialized with "+this.autoEQDB.length+" records.");
+        window.localStorage.setItem("autoEQDB",JSON.stringify(this.autoEQDB));
     });    
 }
 
-async  loadAutoEQDB(source) {    
+async loadAutoEQDB(source) {    
     this.autoEQDB= [];      
-    const AutoEQResults= getAutoEQResults();
-    return promise = new Promise(async (resolve,reject)=>{        
-        for ( let sourceName of Object.keys(AutoEQResults)) {               
+    this.AutoEQResults= this.getAutoEQResults();
+
+    return new Promise(async (resolve,reject)=>{        
+        for ( let sourceName of Object.keys(this.AutoEQResults)) {               
                 if (source!= undefined && source!=sourceName) continue;  
-                for (let repoName of Object.keys(AutoEQResults[sourceName])) {        
-                    let repoURL = AutoEQResults[sourceName][repoName].url;
-                    let repoList = await downloadEQList(repoURL);
-                    repoObj = JSON.parse(repoList);
+                for (let repoName of Object.keys(this.AutoEQResults[sourceName])) {        
+                    let repoURL = this.AutoEQResults[sourceName][repoName].url;
+                    let repoList = await this.downloadEQList(repoURL);
+                    let repoObj = JSON.parse(repoList);
                     for (let device of repoObj.tree) {                            
                         let autoEQRecord = {
                             "deviceName"    :device.path,
@@ -69,7 +69,7 @@ async  loadAutoEQDB(source) {
                             "url"           :device.url,
                         }
                         //console.log(autoEQRecord);
-                        autoEQDB.push(autoEQRecord)                               }                    
+                        this.autoEQDB.push(autoEQRecord)                               }                    
                 }                                        
             }                
             resolve(true);
@@ -164,3 +164,6 @@ async  loadAutoEQDB(source) {
         return filterArray;
 
     }}
+
+
+    export default autoEQ;

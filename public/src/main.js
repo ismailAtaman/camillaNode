@@ -358,9 +358,101 @@ async function exportConfig() {
 
 // AutoEQ Functions /////////////////////////////////////////////////////////////////////////////////////////////////////
 function showAutoEQ() {
-    const mod = document.getElementById("modalWindow");
+    const mod = document.getElementById("autoEQDialog");
+    const repoList = document.getElementById('autoEQRepo');
+    loadRepoList(repoList);
+    loadHeadphoneList();
     mod.showModal();            
+    
 }
+
+function loadRepoList(repoList) {
+    repoList.replaceChildren();
+    let o = document.createElement('option');
+    o.innerText="[All]";
+    repoList.appendChild(o);
+
+    const autoEQ = window.autoEQ;
+    autoEQ.loadAutoEQDB();
+
+
+    for (let source of Object.keys(autoEQ.AutoEQResults)) {        
+        let o = document.createElement('option');
+        o.innerText=source;
+        o.value=source;
+        repoList.appendChild(o)
+    }
+    
+    let lastVal = window.localStorage.getItem('lastRepo');
+    if (lastVal!=undefined) repoList.value=lastVal;
+
+    repoList.addEventListener('change',function(){
+        repoList.value=="[All]"?autoEQ.initAutoEQDB():autoEQ.initAutoEQDB(repoList.value);
+        window.localStorage.setItem('lastRepo',repoList.value);
+    })
+}
+
+
+async function searchAutoEq() {
+    let searchText = document.getElementById('autoEQSearch').value.toLowerCase();        
+    let sourceText = document.getElementById("autoEQRepo").value;
+
+    sourceText=='[All]'?sourceText=undefined:sourceText=sourceText;    
+    loadHeadphoneList(searchText);    
+}
+
+
+
+function loadHeadphoneList(filter) {    
+    const listObject = document.getElementById('headphoneList');
+    const autoEQ = window.autoEQ;
+    listObject.replaceChildren();
+    
+    let headphoneRecords = JSON.parse(window.localStorage.getItem('autoEQDB'));    
+
+    // Filter the array if any search filter is applied
+    if (filter!=undefined) headphoneRecords=headphoneRecords.filter(e=>e.deviceName.toLowerCase().match(filter));    
+
+    // console.log(headphoneRecords)    
+    let div;    
+
+    for (let headphone of headphoneRecords) {
+        div = document.createElement('div');
+        div.className='config';        
+        div.innerText=headphone.deviceName;
+        div.setAttribute('url',headphone.url);
+        div.setAttribute('repoName',headphone.repoName);
+        div.setAttribute('sourceName',headphone.sourceName);
+
+        
+        div.addEventListener('dblclick',function(){
+            let url = this.getAttribute('url')
+            fetch(url).then((res)=>res.text().then(fileList=>{        
+                let list = JSON.parse(fileList).tree;
+                let paramEQUrl;
+                for (i=0;i<list.length;i++) {
+                    if (list[i].path.toLowerCase().search('parametriceq')>-1) {
+                        paramEQUrl=list[i].url;
+                        break;
+                    }
+                }                
+                //console.log(JSON.parse(fileList).tree);
+                fetch(paramEQUrl).then((res)=>res.json().then(paramEQ=>{                            
+                    let paramEQText = atob(paramEQ.content);                    
+                    let filterArray = parseAutoEQText(paramEQText);
+                    let filterArrayJSON = convertFilterArayToJSON(filterArray);            
+                    applyFilters(filterArrayJSON.filters);
+                    canvasClick();
+                    document.getElementById('configName').value=this.innerText;
+                    document.getElementById('configShortcut').value='';
+                    document.getElementById('autoEQDialog').close();
+                }))
+            }))
+        })
+        listObject.appendChild(div)
+    }
+}
+
 
 // Configuration functions //////////////////////////////////////////////////////////////////////////////////////////////
 

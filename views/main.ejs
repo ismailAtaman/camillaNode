@@ -1,31 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=100vw, initial-scale=1.0">
-    <title>CamillaNode</title>       
+    <title>CamillaNode</title>
     <script src="src/main.js" defer></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
 </head>
+
 <body id="mainBody">
     <script type="module">
         import camillaDSP from "/src/camillaDSP.js";
         import savedConfigs from "/src/savedConfigs.js";
         import preferences from '/src/preferences.js';
+        import autoEQ from '/src/autoeq.js';
 
-        
-        window.camillaDSP= camillaDSP;        
+
+        window.camillaDSP = camillaDSP;
         window.configsObject = new savedConfigs();
         window.preferences = new preferences();
+        window.autoEQ = new autoEQ();
 
-        document.addEventListener('DOMContentLoaded',mainBodyOnLoad);
-    </script>
-
-    <script>
-        
-
+        document.addEventListener('DOMContentLoaded', mainBodyOnLoad);
     </script>
 
     <header>
@@ -33,8 +32,8 @@
             <div id="title">
                 <img id="logo" src="img/icon.jpg" alt="" style="height: 50px; margin:10px;">
                 <span>CamillaNode</span>
-            </div>             
-        </div>    
+            </div>
+        </div>
         <div id="indicators">
             <div class="indicator indicator-on" id="samplingRateInd">41,400</div>
             <div class="indicator indicator-on" id="uzilizationInd">20%</div>
@@ -46,7 +45,7 @@
             <div class="indicator" id="spectrumInd">Spectrum On</div>
             <div class="indicator" id="DSPstateInd">Running</div>
             <div class="indicator" id="DSPversionInd">DSP : 2.0.3</div>
-            <div class="indicator" id="nodeVersionInd">Node : 2.0.12</div>            
+            <div class="indicator" id="nodeVersionInd">Node : 2.0.12</div>
         </div>
         <!-- <div id="version" class="smallInfo"></div> 
         <div class="smallInfo">CamillaNode Version 2.0.1</div> 
@@ -54,43 +53,49 @@
     </header>
 
     <main>
-        
+
         <section id="sectionLeft">
 
             <span class="leftTitle">Navigation</span>
-            <div class="navigate" target="/connections"><img src="img/icon/connections.png" class="icon">Connections</div>
+            <div class="navigate" target="/connections"><img src="img/icon/connections.png" class="icon">Connections
+            </div>
             <div class="navigate" target="/basic"><img src="img/icon/basic.png" class="icon">Basic</div>
             <div class="navigate" target="/equalizer"><img src="img/icon/equalizer.png" class="icon">Equalizer</div>
             <div class="navigate" target="/advanced"><img src="img/icon/advanced.png" class="icon">Advanced</div>
             <div class="navigate" target="/room"><img src="img/icon/room.png" class="icon">Room EQ</div>
-            <div class="navigate" target="/preferences"><img src="img/icon/preferences.png" class="icon">Preferences</div>            
+            <div class="navigate" target="/preferences"><img src="img/icon/preferences.png" class="icon">Preferences
+            </div>
             <br>
 
-            
+
             <div class="leftTitle">Tools</div>
-            
-            <div class="navigate" onclick="showImport()"  target=""><img src="img/icon/import.png" class="icon">Import</div>
-            <div class="navigate" onclick="exportConfig()"  target=""><img src="img/icon/export.png" class="icon">Export</div>
-            <div class="navigate" onclick="showAutoEQ()" target=""><img src="img/icon/connections.png" class="icon">Auto EQ</div>
-        
-       
+
+            <div class="navigate" onclick="showImport()" target=""><img src="img/icon/import.png" class="icon">Import
+            </div>
+            <div class="navigate" onclick="exportConfig()" target=""><img src="img/icon/export.png" class="icon">Export
+            </div>
+            <div class="navigate" onclick="showAutoEQ()" target=""><img src="img/icon/connections.png" class="icon">Auto
+                EQ</div>
+
+
             <div class="leftTitle">Configurations</div>
-                <!-- <div style="margin-top:10px"><span>Current</span><input style="margin-left:10px" type="text" value="untitled"></div> -->
-                <!-- <div class="navigate" onclick="showSave()" target=""><img src="img/icon/save.png" class="icon">Save</div>
-                <div class="navigate" onclick="showOpen()" target=""><img src="img/icon/open.png" class="icon">Open</div>
-                <div class="navigate" onclick="" target=""><img src="img/icon/delete.png" class="icon">Delete</div> -->
-                <div class="navigate" onclick="showManageConfigs()" target=""><img src="img/icon/manageconfig.png" class="icon">Manage Configurations</div>
+            <div class="navigate" onclick="showManageConfigs()" target=""><img src="img/icon/manageconfig.png"
+                    class="icon">Manage Configurations</div>
 
             <div class="leftTitle">Actions</div>
             <div id="eqTools">
                 <div id="basicTools" class="tools">
                     <div class="navigate" onclick="" target=""><img src="img/icon/reset.png" class="icon">Reset</div>
-                </div>                
-                <div id="equalizerTools" class="tools" >
-                    <div class="navigate" onclick="window.mainframe.contentWindow.sortAll.apply()" target=""><img src="img/icon/sort.png" class="icon">Sort</div>
-                    <div class="navigate" onclick="window.mainframe.contentWindow.resetPEQ.apply()" target=""><img src="img/icon/reset.png" class="icon">Reset</div>
-                    <div class="navigate" onclick="window.mainframe.contentWindow.clearPEQ.apply()" target=""><img src="img/icon/delete.png" class="icon">Clear</div>
-                    <div class="navigate" onclick="window.mainframe.contentWindow.addNewLine.apply()" target=""><img src="img/icon/add.png" class="icon">Add New</div>        
+                </div>
+                <div id="equalizerTools" class="tools">
+                    <div class="navigate" onclick="window.mainframe.contentWindow.sortAll.apply()" target=""><img
+                            src="img/icon/sort.png" class="icon">Sort</div>
+                    <div class="navigate" onclick="window.mainframe.contentWindow.resetPEQ.apply()" target=""><img
+                            src="img/icon/reset.png" class="icon">Reset</div>
+                    <div class="navigate" onclick="window.mainframe.contentWindow.clearPEQ.apply()" target=""><img
+                            src="img/icon/delete.png" class="icon">Clear</div>
+                    <div class="navigate" onclick="window.mainframe.contentWindow.addNewLine.apply()" target=""><img
+                            src="img/icon/add.png" class="icon">Add New</div>
                 </div>
                 <div id="advancedTools" class="tools">
 
@@ -100,39 +105,58 @@
 
         </section>
 
-        <section id="sectionMain">                        
+        <section id="sectionMain">
             <iframe id="mainframe" src="/preferences" frameborder="0"></iframe>
         </section>
-        
+
     </main>
 
-    
+
     <dialog id="modalWindow">
-        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png"
+                class="icon">Close</div>
     </dialog>
 
 
-    <dialog id="importWindow">        
-        <p>Import EQ settings from a text file. Please paste the text to import below.</p>          
+    <dialog id="importWindow">
+        <p>Import EQ settings from a text file. Please paste the text to import below.</p>
         <div id="importText" contenteditable="true"></div>
-        <div class="navigate" onclick="importClick()" target=""><img src="img/icon/import.png" class="icon">Import</div>   
-        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div> 
+        <div class="navigate" onclick="importClick()" target=""><img src="img/icon/import.png" class="icon">Import</div>
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png"
+                class="icon">Close</div>
     </dialog>
 
 
-    <dialog id="manageConfigs">        
-        <span>Name : </span><input type="text" name="" id="configName"><br>        
-        <div id="configList">                        
+    <dialog id="manageConfigs">
+        <span>Name : </span><input type="text" name="" id="configName"><br>
+        <div id="configList">
         </div>
-        <div class="navigate" onclick="openConfigurationClick()" target=""><img src="img/icon/open.png" class="icon">Open</div>               
-        <div class="navigate" onclick="saveConfigurationClick()" target=""><img src="img/icon/save.png" class="icon">Save</div>               
-        <div class="navigate" onclick="deleteConfigurationClick()" target=""><img src="img/icon/delete.png" class="icon">Delete</div>               
-        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>   
+        <div class="navigate" onclick="openConfigurationClick()" target=""><img src="img/icon/open.png"
+                class="icon">Open</div>
+        <div class="navigate" onclick="saveConfigurationClick()" target=""><img src="img/icon/save.png"
+                class="icon">Save</div>
+        <div class="navigate" onclick="deleteConfigurationClick()" target=""><img src="img/icon/delete.png"
+                class="icon">Delete</div>
+        <div class="navigate" onclick="this.parentElement.close()" target=""><img src="img/icon/remove.png"
+                class="icon">Close</div>
     </dialog>
 
-    
+    <dialog id="autoEQDialog">
+        <div id="autoEQWindow">
+            <div>AutoEQ Search</div>
+            <select id="autoEQRepo"></select>
+            <input type="text" name="" id="autoEQSearch" onkeydown="autoEQSearchKeyDown()"/>
+
+            <div class="navigate" onclick="searchAutoEq()" target=""><img src="img/icon/search.png" class="icon">Search</div>
+            <div class="navigate" onclick="this.parentElement.parentElement.close()" target=""><img src="img/icon/remove.png" class="icon">Close</div>
+            <br>
+            <div id="headphoneList"></div>
+        </div>
+    </dialog>
+
 
 </body>
+
 </html>
 
 
