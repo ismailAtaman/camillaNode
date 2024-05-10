@@ -16,7 +16,7 @@ else
     exit
 fi
 
-mkdir /home/${username}/camilladsp 
+mkdir /home/${username}/camilladsp/
 
 # mkdir /home/${username}/dev/test/camillanode
 # mkdir /home/${username}/dev/test/systemd/
@@ -29,19 +29,19 @@ cp setupFiles/default.yml /home/${username}/camilladsp/
 cp setupFiles/spectrum.yml /home/${username}/camilladsp/
 cp setupFiles/asound.conf /etc/
 
-file=/home/${username}/dev/test/systemd/camilladsp.service
+file=/etc/systemd/system/camilladsp.service
 sed -i -e 's/USERNAME/'${username}'/g' ${file}
 
-file=/home/${username}/dev/test/systemd/camilladsp2.service
+file=/etc/systemd/system/camilladsp2.service
 sed -i -e 's/USERNAME/'${username}'/g' ${file}
 
-file=/home/${username}/dev/test/systemd/camillanode.service
+file=/etc/systemd/system/camillanode.service
 sed -i -e 's/USERNAME/'${username}'/g' ${file}
 
-file=/home/${username}/dev/test/etc/asound.conf
+file=/etc/asound.conf
 sed -i -e 's/INPUTDEVICE/'${inputdevice}'/g' ${file}
 
-file=/home/${username}/dev/test/camilladsp/default.yml
+file=/home/${username}/camilladsp/default.yml
 sed -i -e 's/OUTPUTDEVICE/'${outputdevice}'/g' ${file}
 
 
