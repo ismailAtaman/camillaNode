@@ -1,10 +1,9 @@
 #!/bin/bash
-echo "Enter username chosen during for installation"
-read username
-echo "Enter device name of the input device (use 'arecord -l' to check)"
-read inputdevice
-echo "Enter device name of the output device (use 'aplay -l' to check)"
-read outputdevice
+
+read -p "Enter username chosen during installation" username
+read -p "Enter device name of the input device (use 'arecord -l' to check) [UAC2Gadget]" inputdevice
+inputdevice=${inputdevice:-UAC2Gadget}
+read -p "Enter device name of the output device (use 'aplay -l' to check)" outputdevice
 
 printf 'Username : '${username}' , Input Device Name : '${inputdevice}', Output Device Name : '${outputdevice}' \nIs this information correct?(y/n)? '
 read answer
