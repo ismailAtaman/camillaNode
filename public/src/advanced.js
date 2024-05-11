@@ -3,23 +3,24 @@
 async function advancedOnLoad() {
     
 
-    const filter = new filterClass();
+    
     const advancedFilters = document.getElementById("advancedFilters");
     const pipelineManagement = document.getElementById("pipelineManagement");
     const channelMapping = document.getElementById("channelMapping");
     const visualContainer = document.getElementById("visualContainer");
     
 
-    advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
-    advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
-    advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
-    advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));    
+    // advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
+    // advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
+    // advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
+    // advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));    
 
     // loadPipeline(pipelineManagement,window.config.pipeline)
     // loadMixers(channelMapping,window.config.mixers)
     await window.parent.DSP.downloadConfig();
     
     await visualizeConfig(visualContainer,window.parent.DSP)
+    loadFilters(advancedFilters,window.parent.DSP.config.filters)
 }
 
 function loadPipeline(element,pipeline) {
@@ -80,13 +81,42 @@ function loadMixers(element, mixers) {
     }    
 }
 
+function loadFilters(element,filters) {
+    element.innerHTML='';
+    
+    const filter = new filterClass();
+    for (let filterName of Object.keys(filters)) {
+        let filterElement = filter.createElement(filterName);        
+        filterElement.children["filterType"].value=filters[filterName].type;
+        filterElement.children["filterType"].dispatchEvent(new Event("change"));
+        if (filterElement.children["filterSubType"]) {
+
+            filterElement.children["filterSubType"].value=filters[filterName].parameters.type;
+            filterElement.children["filterSubType"].dispatchEvent(new Event("change"));
+
+            let filterSubType = filters[filterName].parameters.type
+            if (filterSubType=="Peaking" || filterSubType == "Lowshelf" || filterSubType == "Highshelf") {
+                filterElement.children["filterParams"].children["frequency"].value=filters[filterName].parameters.freq;
+                filterElement.children["filterParams"].children["gain"].value=filters[filterName].parameters.gain;
+                filterElement.children["filterParams"].children["q"].value=filters[filterName].parameters.q;
+            }
+            if (filterSubType=="Highpass" || filterSubType == "Lowpass" || filterSubType == "Allpass" || filterSubType == "Bandpass") {
+                filterElement.children["filterParams"].children["frequency"].value=filters[filterName].parameters.freq;                
+                filterElement.children["filterParams"].children["q"].value=filters[filterName].parameters.q;
+            }
+
+        }
+        element.appendChild(filterElement);
+    }
+} 
+
 async function visualizeConfig(element, DSP) {
     
     element.innerHTML='';   
     const channels = await DSP.linearizeConfig();
     const channelCount = channels.length;
-    const nodeHeight = 60;
-    const nodeWidth = 80;
+    const nodeWidth = 100;
+    const nodeHeight = 110;    
     const channelDistance = 20;
     const margin = 10;
     
@@ -97,8 +127,34 @@ async function visualizeConfig(element, DSP) {
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
         for (let component of channels[channelNo]) {
             console.log(component)
-            let node = addNode(element,position);
-            node.innerText=Object.keys(component)[0];
+            let type = component.type;
+            let node = addNode(element,position,type);
+            
+            if (type=="input" || type=="output") {
+                node.innerText = type.toUpperCase() +"\n"+ component.device.device+"\n"+ component.device.format;
+            }
+
+            if (type=="mixer") {
+                node.innerText = type.toUpperCase()+"\n";
+                let sources = component["sources"];
+                for (let source of sources) {
+                    node.innerText=node.innerText+" C:"+source.channel+" G:"+source.gain+ " Muted:"+ source.mute+"\n";
+                }
+            }
+
+            if (type=="filter") {
+                let filterName = Object.keys(component)[1];
+                node.innerText =  filterName;
+                if (component[filterName].type=="Biquad") {                    
+                    node.innerText = node.innerText + "\n"+component[filterName].type+"\n" + component[filterName].parameters.type+"\n"+ component[filterName].parameters.freq + "Hz"
+                    if (component[filterName].parameters.gain!=undefined) node.innerText = node.innerText+ "\n"+component[filterName].parameters.gain+'dB';
+                }
+                if (component[filterName].type=="Gain") {
+                    node.innerText = node.innerText + "\n"+component[filterName].type+"\n" + component[filterName].parameters.gain+"dB";
+                }                            
+            }
+            
+
             position.left = position.left + nodeWidth + margin * 2;                        
         }
         position.left=margin;
@@ -112,7 +168,7 @@ function addNode(parent, position, type) {
     node.className='visualNode';
     node.style.left = position.left+'px';
     node.style.top = position.top+'px';
-    node.classList.add(type+"node");    
+    node.classList.add(type+"Node");    
     parent.appendChild(node);
     return node;
 }

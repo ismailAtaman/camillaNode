@@ -68,8 +68,7 @@ class filter {
         const filterSubType = filterElement.children["filterSubType"]; 
         updateParams(this,filterType,filterSubType)
 
-        function updateParams(filter,type,subType) {
-            console.log("Updating params");
+        function updateParams(filter,type,subType) {            
             let typeVal = type.value;
             let subTypeVal;
             if (subType!=undefined) subTypeVal=subType.value;

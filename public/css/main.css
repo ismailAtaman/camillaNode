@@ -780,7 +780,7 @@ input[type="checkbox"]:disabled::before {
     color: white;
     display: inline-block;    
     top:0;
-    height: 40px;             
+    height: 40px;                 
 }
 
 .preferenceSection input[type="text"], select {
@@ -902,4 +902,44 @@ input[type="checkbox"]:disabled::before {
 
 .pipe:first-of-type {
     margin-top: 10px;
+}
+
+
+#visualContainer{
+    position: relative;
+    display: block;
+    width: 100%;
+    overflow-x: scroll;
+    padding-right: 0px;
+}
+
+.visualNode {        
+    position: absolute;
+    display: block;
+    left:50px;
+    top:50px;        
+    width: 100px;
+    height: 110px;
+    border:1px solid white;
+    background-color: green;
+    border-radius: 5px;
+    padding: 5px;
+    cursor:grab;
+    user-select: none;
+    text-align: center;
+    margin:0px;        
+    font-size: 15px;
+    text-wrap :wrap;
+}
+
+.inputNode, .outputNode  {
+    background-color: hsl(calc( 20 + var(--bck-hue)), 20%, 30%);
+}
+
+.mixerNode {
+    background-color: hsl(calc( 30 + var(--bck-hue)), 30%, 20%);
+}
+
+.filterNode {
+    background-color: hsl(calc( 40 + var(--bck-hue)), 30%, 30%);
 }

@@ -378,7 +378,7 @@ class camillaDSP {
 
         for (let i=0;i<channelCount;i++) {
             channels[i]=new Array();
-            channels[i].push({"input":this.config.devices.capture});
+            channels[i].push({"type":"input","device":this.config.devices.capture});
         }
 
         let pipeCount=0;
@@ -389,21 +389,24 @@ class camillaDSP {
             if (pipe.type=="Mixer") {
                 let mixer = this.config.mixers[pipe.name];
                 for (let map of mixer.mapping) {                    
-                    channels[map.dest].push({"mixer":map.sources});
+                    channels[map.dest].push({"type":"mixer","sources":map.sources});
                 }
             }
 
             if (pipe.type=="Filter") {
                 for (let filterName of pipe.names) {
                     let filter = this.config.filters[filterName];
-                   channels[pipe.channel].push({"filter":filter});
+                    let filterObject={}
+                    filterObject["type"]  = "filter";
+                    filterObject[filterName]=filter;
+                    channels[pipe.channel].push(filterObject);
                 }
             }
             pipeCount++;
         }
 
         for (let i=0;i<channelCount;i++) {         
-            channels[i].push({"output":this.config.devices.playback});
+            channels[i].push({"type":"output","device":this.config.devices.playback});
         }
 
 
