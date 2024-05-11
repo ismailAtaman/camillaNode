@@ -16,7 +16,8 @@ async function equalizerOnLoad() {
     document.loading=true;
     const PEQ = document.getElementById('PEQ');            
     
-    DSP=window.parent.DSP;    
+    DSP=window.parent.DSP;        
+    
     
     /// Basics Controls Section
     const basicControls = document.getElementById('basicControls');
@@ -77,6 +78,25 @@ async function equalizerOnLoad() {
         setPreamp(preampGain);                 
     })
 
+    const spec = document.getElementById("spectrum");   
+    const barCount=spec.childNodes.length-1;
+    const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
+    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
+    
+    const canvas = document.getElementById("plotCanvas");           
+    canvas.width = spec.getBoundingClientRect().width;
+
+    window.addEventListener("resize",function(){
+        
+        const spec = document.getElementById("spectrum");   
+        const barCount=spec.childNodes.length-1;
+        const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
+        document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
+        
+        const canvas = document.getElementById("plotCanvas");           
+        canvas.width = spec.getBoundingClientRect().width;
+        plotConfig();
+    })
 
     /// Parametric EQ section
     loadFiltersFromConfig();
@@ -240,13 +260,7 @@ async function initSpectrum(){
     const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
     document.documentElement.style.setProperty("--levelbar-width",barWidth+"px")
 
-    window.addEventListener("resize",function(){
-        console.log("window resize")
-        const spec = document.getElementById("spectrum");   
-        const barCount=spec.childNodes.length-1;
-        const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
-        document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
-    })
+    
 
     console.log("Bar Width:",barWidth);
 
