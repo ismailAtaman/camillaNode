@@ -237,13 +237,26 @@ async function initSpectrum(){
     // Create bars and boxes
     const spec = document.getElementById("spectrum");   
     const barCount=freq.length-1;
+    const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
+    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px")
+
+    window.addEventListener("resize",function(){
+        console.log("window resize")
+        const spec = document.getElementById("spectrum");   
+        const barCount=spec.childNodes.length-1;
+        const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
+        document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
+    })
+
+    console.log("Bar Width:",barWidth);
+
     let bar,box;
     spec.innerHTML='';
     for (i=0;i<=barCount;i++){
         bar = document.createElement("div");
-        bar.className='levelbar';
-        // bar.classList.add(bar % 2==0)?'left':'right';
+        bar.className='levelbar';        
         bar.setAttribute('freq',freq[i]);        
+        
         let hue=parseInt(window.document.documentElement.style.getPropertyValue('--bck-hue'));
         for (j=1;j<40;j++) {
             box = document.createElement('div');

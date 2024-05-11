@@ -30,7 +30,7 @@
             if (server!=undefined) {
                 document.getElementById("server").value = server;
                 document.getElementById("port").value=port;
-                document.getElementById("spectrumPort")=spectrumPort;
+                document.getElementById("spectrumPort").value=spectrumPort;
             } else {
                 document.getElementById("server").value = window.location.hostname;
                 document.getElementById("port").value=1234;
@@ -44,7 +44,7 @@
             text-align: left;
         }
     </style>
-    <div>
+    <div id="connectionsSection">
         
         <div><span>IP Address</span><input id="server" type="text" value="opizero2.local"></div>
         <div><span>Audio Port</span><input id="port" type="text" value="1234"></div>

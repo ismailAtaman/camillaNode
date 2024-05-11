@@ -20,6 +20,8 @@
     --slider-width: 3em;
     --slider-height: 15rem;
 
+    --levelbar-width: 31px;
+
     background-color:hsl(var(--bck-hue), var(--bck-sat), var(--bck-light));
 
     font-family: "Abel", sans-serif;
@@ -253,18 +255,20 @@ canvas {
 }
 
 .group {
+    position: relative;
     margin-block: 10px;
     background-image: linear-gradient(45deg,hsl(var(--bck-hue), 35%, 15%) ,hsl(var(--bck-hue), 45%, 10%));    
     display: block;
-    border-radius: 10px;
-    width: 1024px;
-    padding-bottom: 10px;
+    border-radius: 10px;    
+    padding-bottom: 10px;    
+    margin-right: 150px;
 }
 
 .group::before {
     content: attr(label);
     display: block;      
-    /* background-color: #113311; */
+    font-size: 1.2rem;        
+    background-color: hsl(var(--bck-hue), 45%, 10%);
     color: white;  
     border-radius: 10px 10px 0 0 ;    
     padding-left: 10px;
@@ -481,7 +485,7 @@ input[type="checkbox"] {
     width: 35px;    
     height: 20px;    
     border-radius: 5px;
-    background-color: hsl(0, 50%, 90%);
+    background-color: hsl(var(--bck-hue), 10%, 50%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -492,14 +496,10 @@ input[type="checkbox"] {
 
 
 input[type="checkbox"]:checked {
-    background-color: hsl(150, 50%, 90%);
+    background-color: hsl(var(--bck-hue), 50%, 80%);
     transition: all 300ms linear;
 }
 
-
-input[type="checkbox"]:hover {        
-    /* background-color: hsl(var(--bck-hue), 50%, 70%);     */
-}
 
 input[type="checkbox"]::before {    
     content: " ";
@@ -508,7 +508,7 @@ input[type="checkbox"]::before {
     width: 18px;
     height: 18px;
     border-radius: 5px;
-    background-color: hsl(0, 30%, 25%);
+    background-color: hsl(var(--bck-hue), 20%, 20%);
     transition: all 300ms linear;
 }
 
@@ -519,7 +519,7 @@ input[type="checkbox"]:checked::before {
     width: 18px;
     height: 18px;
     border-radius: 5px;
-    background-color: hsl(120, 30%, 25%);
+    background-color: hsl(var(--bck-hue), 60%, 50%);
     transition: all 300ms linear;
     transform: translateX(15px);
 }
@@ -682,9 +682,9 @@ input[type="checkbox"]:checked::before {
     align-items: center;
     justify-items: baseline;
     position: relative;
-    width: 31px;
+    width: var(--levelbar-width);
     height: 238px;
-    margin-inline: 1px;    
+    margin-inline: 2px;    
     font-size: 12px;
     background-color: hsla(160, 50%, 50%,10%) ;        
     border-radius: 4px;        
@@ -764,10 +764,6 @@ input[type="checkbox"]:checked::before {
     text-align: left;
 }
 
-.preferenceSection input[type="range"] {        
-    
-}
-
 #backgroundHue {
     appearance: none;
     background: linear-gradient(90deg,hsl(0, 70%, 40%),hsl(155, 70%, 40%),hsl(330, 70%, 40%));
@@ -794,10 +790,8 @@ input[type="checkbox"]:checked::before {
 
 #advancedFilters {
     display: grid;
-    grid-template-columns: 1fr;    
-    padding: 0;
-    margin: 0;
-    gap:5px;
+    grid-template-columns: 1fr;            
+    gap:5px;        
 }
 
 .filterElement {
@@ -806,9 +800,11 @@ input[type="checkbox"]:checked::before {
     height: 50px;     
     margin: 0px;    
     padding: 0px;
+    padding-left: 10px;
     align-items: center;
-    border-bottom: 1px dashed hsl(var(--bck-hue), 40%, 40%);
-    /* background-color: rebeccapurple; */
+    border-bottom: 1px dashed hsl(var(--bck-hue), 40%, 40%);    
+    width: calc( 100% - 10px)
+    
 }
 
 .filterElement:last-of-type {
@@ -824,7 +820,7 @@ input[type="checkbox"]:checked::before {
     padding-left: 5px;  
 }
 
-.filterElement > div, select, input {
+.filterElement >  select, input, span {
     margin-inline: 10px;
     margin-block: 5px;    
     
@@ -836,15 +832,14 @@ input[type="checkbox"]:checked::before {
 }
 
 .filterParams {
-    display: flex;   
-    position: absolute; 
-    left: 450px;
+    display: flex;         
     align-items: center;
-    background-color: hsl(var(--bck-hue), 20%, 30%);    
+    background-color: hsl(var(--bck-hue), 20%, 20%);    
     height: 40px;
-    border-radius: 5px;
-    margin-inline: 5px;
-    padding-right: 10px;
+    border-radius: 7px;        
+    padding-right: 10px;    
+    left: 500px;
+    
 }
 
 .filterParams > div, input {
@@ -859,3 +854,6 @@ input[type="checkbox"]:checked::before {
     max-width: 120px;
 }
 
+#connectionsSection #server {
+    max-width: unset;
+}

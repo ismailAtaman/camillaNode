@@ -81,7 +81,7 @@ class filter {
             filterParams.setAttribute("id","filterParams"); filterParams.className="filterParams";
             let elem;
             for (let param of filter.getFilterParams(typeVal,subTypeVal)) { 
-                let title=document.createElement("span"); title.innerText=Object.keys(param)[0];
+                let title=document.createElement("span"); title.innerText=Object.keys(param)[0]+" :";
                 filterParams.appendChild(title);
                 switch (Object.values(param)[0]) {
                     case "num":
