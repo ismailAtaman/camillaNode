@@ -71,6 +71,20 @@ async function basicLoad() {
     mids.knob.addEventListener("change",setTone);
     upperMids.knob.addEventListener("change",setTone);
     treble.knob.addEventListener("change",setTone);
+
+    updateElementWidth();
+
+    window.addEventListener("resize",updateElementWidth);
+}
+
+function updateElementWidth() {
+    const basicControls = document.getElementById("basicControls");       
+    const canvas = document.getElementById("plotCanvas");           
+    const ctx = document.getElementById('plotCanvas');    
+    DSP = window.parent.DSP;            
+    
+    canvas.width = basicControls.getBoundingClientRect().width;
+    plot(DSP.config.filters,ctx,DSP.config.title);
 }
 
 async function loadData() {
