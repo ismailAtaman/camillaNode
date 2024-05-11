@@ -791,3 +791,71 @@ input[type="checkbox"]:checked::before {
     transform: translate(-50%, -50%);
     overflow: hidden;
 }
+
+#advancedFilters {
+    display: grid;
+    grid-template-columns: 1fr;    
+    padding: 0;
+    margin: 0;
+    gap:5px;
+}
+
+.filterElement {
+    display: flex;        
+    position: relative;
+    height: 50px;     
+    margin: 0px;    
+    padding: 0px;
+    align-items: center;
+    border-bottom: 1px dashed hsl(var(--bck-hue), 40%, 40%);
+    /* background-color: rebeccapurple; */
+}
+
+.filterElement:last-of-type {
+    border-bottom: none;
+}
+
+.filterName {    
+    background-color: white;
+    color: black;
+    height: 22px;
+    width: 120px;
+    border-radius: 5px;  
+    padding-left: 5px;  
+}
+
+.filterElement > div, select, input {
+    margin-inline: 10px;
+    margin-block: 5px;    
+    
+}
+
+.filterElement > select {
+    max-width: 120px;
+    background-color: hsl(var(--bck-hue), 50%, 80%);
+}
+
+.filterParams {
+    display: flex;   
+    position: absolute; 
+    left: 450px;
+    align-items: center;
+    background-color: hsl(var(--bck-hue), 20%, 30%);    
+    height: 40px;
+    border-radius: 5px;
+    margin-inline: 5px;
+    padding-right: 10px;
+}
+
+.filterParams > div, input {
+    margin-inline: 5px;
+    margin-block: 5px;
+    height: 22px;
+    max-width: 70px;        
+}
+
+.filterParams span {
+    margin-inline: 10px;
+    max-width: 120px;
+}
+
