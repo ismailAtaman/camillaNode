@@ -790,6 +790,10 @@ input[type="checkbox"]:disabled::before {
     text-align: left;
 }
 
+.preferenceSection input[type="range"] {
+    max-width: 200px;
+}
+
 .preferenceName {
     margin-block: 3px;
     /* border: 1px solid red; */

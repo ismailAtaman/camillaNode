@@ -18,8 +18,8 @@ async function advancedOnLoad() {
     // loadPipeline(pipelineManagement,window.config.pipeline)
     // loadMixers(channelMapping,window.config.mixers)
     await window.parent.DSP.downloadConfig();
-    window.config = window.parent.DSP.config;
-    visualizeConfig(visualContainer,window.config)
+    
+    await visualizeConfig(visualContainer,window.parent.DSP)
 }
 
 function loadPipeline(element,pipeline) {
@@ -80,46 +80,39 @@ function loadMixers(element, mixers) {
     }    
 }
 
-function visualizeConfig(element, config) {
+async function visualizeConfig(element, DSP) {
+    
     element.innerHTML='';   
-    let position = {"left":20,"top":20}
+    const channels = await DSP.linearizeConfig();
+    const channelCount = channels.length;
+    const nodeHeight = 60;
+    const nodeWidth = 80;
+    const channelDistance = 20;
+    const margin = 10;
     
-
-    for (let i=0;i<config.devices.capture.channels;i++) {
-        let node = addNode(element,position)
-        node.innerText=config.devices.capture.device+"\nChannel "+i;
-        position.top = position.top + node.getBoundingClientRect().height + 20;
-    }
-
-    position.left = position.left + 150;
-    position.top = 20;
+    // Resize element based on # of channels 
+    element.style.height = channelCount * (nodeHeight + 2 * margin ) + (channelCount - 1) * channelDistance+'px';    
+    let position = {"left":margin,"top":margin}  
     
-
-    for (let pipe of config.pipeline) {        
-        console.log(pipe);
-        switch (pipe.type) {
-            case "Mixer":
-                const mixer = config.mixers[pipe.name];
-                console.log("Mixer ",mixer);                
-                for (let i=0;i<mixer.channels.out;i++) {
-                    let node = addNode(element,position);
-                    position.top = position.top + node.getBoundingClientRect().height + 20;
-                    // mixer.mapping[i].
-
-                }
-                break;
-            case "Filter":
-                break;
+    for (let channelNo=0;channelNo<channelCount;channelNo++) {
+        for (let component of channels[channelNo]) {
+            console.log(component)
+            let node = addNode(element,position);
+            node.innerText=Object.keys(component)[0];
+            position.left = position.left + nodeWidth + margin * 2;                        
         }
+        position.left=margin;
+        position.top = position.top + nodeHeight + margin * 2;
     }
-
+    
 }
 
-function addNode(parent, position) {
+function addNode(parent, position, type) {
     let node = document.createElement('div');
     node.className='visualNode';
     node.style.left = position.left+'px';
-    node.style.top = position.top+'px';    
+    node.style.top = position.top+'px';
+    node.classList.add(type+"node");    
     parent.appendChild(node);
     return node;
 }

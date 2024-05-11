@@ -197,8 +197,8 @@ class camillaDSP {
         const mixers = {"recombine":{
             "channels":{"in":2,"out":2},
             "mapping":[
-                {"dest":0,"sources":[{"channel":0,"gain":0,"inverted":false,"mute":false},{"channel":1,"gain":0,"inverted":false,"mute":true,"scale":"dB"}],"mute":false},
-                {"dest":1,"sources":[{"channel":1,"gain":0,"inverted":false,"mute":false},{"channel":0,"gain":0,"inverted":false,"mute":true,"scale":"dB"}],"mute":false}
+                {"dest":0,"sources":[{"channel":0,"gain":0,"inverted":false,"mute":false,"scale":"dB"},{"channel":1,"gain":0,"inverted":false,"mute":true,"scale":"dB"}],"mute":false},
+                {"dest":1,"sources":[{"channel":1,"gain":0,"inverted":false,"mute":false,"scale":"dB"},{"channel":0,"gain":0,"inverted":false,"mute":true,"scale":"dB"}],"mute":false}
                 ]
             }
         };          
@@ -364,74 +364,54 @@ class camillaDSP {
         return true;
     }
 
-    async linearizeConfig() {
-        // devices.capture.device 
-        // devices.capture.channels number of inputs
-        // check mixers in pipeline. 
-        //     find the mixer from name in mixers
-        //     check the mapping. there should be playback number of dest objects
-        //     check sources.
-        // 
-        // devices.playback.channels number of outputs
-        // devices.playback.device 
-
-        await this.downloadConfig();
+    async linearizeConfig() {    
         let retObject={};
-        
 
-        const input = {"input":{            
-                "name":this.config.devices.capture.device,
-                "channels":this.config.devices.capture.channels,
-            }}
-        Object.assign(retObject,input);
+        // Breakdown config into channel pipelines
+        await this.downloadConfig();
+
+        let inChannels = this.config.mixers[Object.keys(this.config.mixers)[0]].channels.in;
+        let outChannels = this.config.mixers[Object.keys(this.config.mixers)[0]].channels.out;    
+        const channelCount = Math.max(this.config.devices.playback.channels,this.config.devices.capture.channels,inChannels,outChannels);
+
+        let channels=[];
+
+        for (let i=0;i<channelCount;i++) {
+            channels[i]=new Array();
+            channels[i].push({"input":this.config.devices.capture});
+        }
+
+        let pipeCount=0;
 
         for (let pipe of this.config.pipeline) {
             
+
+            if (pipe.type=="Mixer") {
+                let mixer = this.config.mixers[pipe.name];
+                for (let map of mixer.mapping) {                    
+                    channels[map.dest].push({"mixer":map.sources});
+                }
+            }
+
+            if (pipe.type=="Filter") {
+                for (let filterName of pipe.names) {
+                    let filter = this.config.filters[filterName];
+                   channels[pipe.channel].push({"filter":filter});
+                }
+            }
+            pipeCount++;
         }
 
-        let mixers = Object.keys(this.config.mixers)
-        for (let i=0;i<mixers.length;i++) {
-            let currentMixer = this.config.mixers[mixers[i]];
-
-        }  
+        for (let i=0;i<channelCount;i++) {         
+            channels[i].push({"output":this.config.devices.playback});
+        }
 
 
-        const output = {"output":{
-            "name":this.config.devices.playback.device,
-            "channels":this.config.devices.playback.channels,
-        }}
-        Object.assign(retObject,output);
-       
-        return retObject;
-    }
-
-
-}
-
-class configNode {    
-    previousNodes=[];
-    id=[];
-    name;
-    description;
-    type;    
-    channel;
-    params={};
-    nextNodes=[];   
-    
-
-    constructor() {
-        this.id=new Date().getTime();
-        return this;
-    }
-    
-    set(property,value) {
-        this[property]=value;
-    }
-
-    get(property) {
-        return this[property];
+        console.log("Linearized channels : ",channels);
+        return channels;        
     }
 }
+
 
 
 export default camillaDSP;
