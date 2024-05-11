@@ -75,7 +75,7 @@ function loadMixers(element, mixers) {
         let mapping; // element
         //loop mixers.mapping       
 
-        element.appendChild(mixerElement)
+        element.appendChild(mixerElement)        
     }    
 }
 
