@@ -78,25 +78,9 @@ async function equalizerOnLoad() {
         setPreamp(preampGain);                 
     })
 
-    const spec = document.getElementById("spectrum");   
-    const barCount=spec.childNodes.length-1;
-    const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
-    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
-    
-    const canvas = document.getElementById("plotCanvas");           
-    canvas.width = spec.getBoundingClientRect().width;
+    updateElementWidth();
 
-    window.addEventListener("resize",function(){
-        
-        const spec = document.getElementById("spectrum");   
-        const barCount=spec.childNodes.length-1;
-        const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
-        document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
-        
-        const canvas = document.getElementById("plotCanvas");           
-        canvas.width = spec.getBoundingClientRect().width;
-        plotConfig();
-    })
+    window.addEventListener("resize",updateElementWidth);        
 
     /// Parametric EQ section
     loadFiltersFromConfig();
@@ -108,6 +92,17 @@ async function equalizerOnLoad() {
     setInterval(function(){document.loading=false},50);            
 
     initSpectrum();    
+}
+
+function updateElementWidth() {
+    const spec = document.getElementById("spectrum");   
+    const barCount=spec.childNodes.length-1;
+    const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
+    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
+    
+    const canvas = document.getElementById("plotCanvas");           
+    canvas.width = spec.getBoundingClientRect().width;
+    plotConfig();
 }
 
 
@@ -259,10 +254,7 @@ async function initSpectrum(){
     const barCount=freq.length-1;
     const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
     document.documentElement.style.setProperty("--levelbar-width",barWidth+"px")
-
     
-
-    console.log("Bar Width:",barWidth);
 
     let bar,box;
     spec.innerHTML='';
