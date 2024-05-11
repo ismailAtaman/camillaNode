@@ -777,10 +777,16 @@ input[type="checkbox"]:disabled::before {
     height: 40px;             
 }
 
-.preferenceSection input, select {
+.preferenceSection input[type="text"], select {
     display: relative;
-    max-width: 200px;
+    max-width: 100px;
+    height: 18px;
     text-align: left;
+}
+
+.preferenceName {
+    margin-block: 3px;
+    /* border: 1px solid red; */
 }
 
 #backgroundHue {

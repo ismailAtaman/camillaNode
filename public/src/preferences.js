@@ -67,6 +67,43 @@ class preferences {
             "dependsOn":"enableSpectrum",
             "enabled":false,
             },        
+
+            {"id":"subBassFreq",
+            "name":"Sub bass knob frequency",
+            "value":70,
+            "type":"text",                            
+            "enabled":true,
+            },        
+
+            {"id":"bassFreq",
+            "name":"Bass knob frequency",
+            "value":200,
+            "type":"text",                            
+            "enabled":true,
+            },        
+
+            {"id":"midsFreq",
+            "name":"Mids knob frequency",
+            "value":1000,
+            "type":"text",                            
+            "enabled":true,
+            },        
+
+            {"id":"upperMidsFreq",
+            "name":"Upper mids knob frequency",
+            "value":3000,
+            "type":"text",                            
+            "enabled":true,
+            },        
+
+            {"id":"trebleFreq",
+            "name":"Treble frequency",
+            "value":8000,
+            "type":"text",                            
+            "enabled":true,
+            },        
+
+            
         ]
 
         tmpPref["equalizer"] = [
@@ -101,6 +138,7 @@ class preferences {
                 // console.log(section,item);
                 subTitleElement = document.createElement("div");
                 subTitleElement.innerText=item.name;
+                subTitleElement.className="preferenceName"
                 sectionElement.appendChild(subTitleElement);
                 
                 switch (item.type) {
@@ -122,6 +160,7 @@ class preferences {
                         subElement = document.createElement("input");
                         subElement.setAttribute("type","text")
                         subElement.value=item.value;
+                        subElement.style.width="50px";
                         break;
                     case "range":
                         subElement = document.createElement("input");
@@ -158,6 +197,7 @@ class preferences {
                     this.preferences.applySetting(section,this.id,value)                                         
                     this.preferences.saveSettings();
                     this.dispatchEvent(new Event("callback"));
+                    window.parent.activeSettings = window.preferences.getPreferences();
                 });
                 sectionElement.appendChild(subElement);
             }
@@ -211,7 +251,7 @@ class preferences {
                 returnObject[item.id]=item.value;
             }
         }
-        // console.log(returnObject);
+        // console.log("Preferences :",returnObject);
         return returnObject;
     }
 

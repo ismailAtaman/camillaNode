@@ -12,6 +12,12 @@ class camillaDSP {
     connected=false;
     spectrum_connected=false;
 
+    subBassFreq=50;
+    bassFre=200;
+    midsFreq=1000;
+    upperMidsFreq=3000;
+    trebleFreq=8000;
+
     DCProtectionFilter = {"__DCProtectionFilter":{"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}}};
     Limiter = {"__Limiter":{"type":"Limiter","parameters":{"clip_limit":-3}}};
 
@@ -237,11 +243,11 @@ class camillaDSP {
     async setTone(subBass, bass, mids, upperMids, treble) {
         await this.downloadConfig();
 
-        const subBassFilter = camillaDSP.createPeakFilterJSON(70,subBass,1.41);
-        const bassFilter = camillaDSP.createPeakFilterJSON(200,bass,1.41);
-        const midsFilter = camillaDSP.createPeakFilterJSON(1000,mids,1.41);
-        const upperMidsFilter = camillaDSP.createPeakFilterJSON(3000,upperMids,1.41);
-        const trebleFilter = camillaDSP.createPeakFilterJSON(8000,treble,1.41);
+        const subBassFilter = camillaDSP.createPeakFilterJSON(this.subBassFreq,subBass,1.41);
+        const bassFilter = camillaDSP.createPeakFilterJSON(this.bassFreq,bass,1.41);
+        const midsFilter = camillaDSP.createPeakFilterJSON(this.midsFreq,mids,1.41);
+        const upperMidsFilter = camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41);
+        const trebleFilter = camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41);
         
         this.config.filters["subBass"]=subBassFilter;
         this.config.filters["bass"]=bassFilter;

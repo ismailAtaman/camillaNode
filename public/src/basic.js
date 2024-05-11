@@ -5,12 +5,18 @@ async function basicLoad() {
     const basicControls = document.getElementById('basicControls');
     const ctx = document.getElementById('plotCanvas');    
     DSP = window.parent.DSP;            
+    DSP.subBassFreq= parseInt(window.parent.activeSettings.subBassFreq)
+    DSP.bassFreq= parseInt(window.parent.activeSettings.bassFreq)
+    DSP.midsFreq= parseInt(window.parent.activeSettings.midsFreq)
+    DSP.upperMidsFreq= parseInt(window.parent.activeSettings.upperMidsFreq)
+    DSP.trebleFreq= parseInt(window.parent.activeSettings.trebleFreq)
+
+    console.log(DSP.bassFreq,window.parent.activeSettings.bassFreq);
 
     // Create UI elements
     let vol = new EQKnob("Volume",31);        
     let balance = new EQKnob("Balance",181);
-    let crossfeed = new EQKnob("Crossfeed",31);
- 
+    let crossfeed = new EQKnob("Crossfeed",31); 
 
     crossfeed.knob.instance.offAtDefault=true;
     balance.knob.instance.offAtDefault=true;
