@@ -612,6 +612,7 @@ input[type="checkbox"]:disabled::before {
     transform: translate(-50%,-50%);
 }
 
+
 #manageConfigs {
     /* display: block;
     border: 1px solid white; */
@@ -634,6 +635,7 @@ input[type="checkbox"]:disabled::before {
 #configName {
     padding: 5px;
     width:80%;    
+    max-width: unset;
     font-size: 14px;
     border-radius: 5px;
     flex:1;
@@ -665,6 +667,10 @@ input[type="checkbox"]:disabled::before {
 #importWindow {
     transform: translate(-60%, -50%);
     width: 30vw;
+}
+
+#importWindow input {
+    max-width: unset;   
 }
 
 #importText {

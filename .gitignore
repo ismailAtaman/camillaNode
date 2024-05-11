@@ -1,5 +1,6 @@
-node_modules
+/node_modules
+/config
 *.zip
 .github
 *.md
-config
+sampleConfig.json

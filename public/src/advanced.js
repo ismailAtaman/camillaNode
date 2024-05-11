@@ -1,28 +1,29 @@
 
 
-function advancedOnLoad() {
-    window.parent.DSP.downloadConfig();
-    window.config = window.parent.DSP.config;
+async function advancedOnLoad() {
+    
 
     const filter = new filterClass();
     const advancedFilters = document.getElementById("advancedFilters");
     const pipelineManagement = document.getElementById("pipelineManagement");
     const channelMapping = document.getElementById("channelMapping");
+    const visualContainer = document.getElementById("visualContainer");
     
-
-    console.log("New filter "+advancedFilters.childNodes.length)
 
     advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
     advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
     advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
     advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));    
 
-    loadPipeline(pipelineManagement,window.config.pipeline)
-    loadMixers(channelMapping,window.config.mixers)
+    // loadPipeline(pipelineManagement,window.config.pipeline)
+    // loadMixers(channelMapping,window.config.mixers)
+    await window.parent.DSP.downloadConfig();
+    window.config = window.parent.DSP.config;
+    visualizeConfig(visualContainer,window.config)
 }
 
 function loadPipeline(element,pipeline) {
-    console.log(pipeline);
+    
     for (let pipe of pipeline) {        
         let pipeElement = document.createElement("div"); pipeElement.className="pipe";
         
@@ -43,7 +44,7 @@ function loadPipeline(element,pipeline) {
                 pipeElement.appendChild(channel);
 
                 let filterNames = pipe.names.sort();
-                console.log(filterNames);
+                // console.log(filterNames);
                 break;
         }
 
@@ -54,7 +55,7 @@ function loadPipeline(element,pipeline) {
 }
 
 function loadMixers(element, mixers) {
-    console.log(mixers);
+    // console.log(mixers);
 
     for (let mixerNo =0;mixerNo<Object.keys(mixers).length;mixerNo++) {
         const mixerElement = document.createElement("div");
@@ -79,7 +80,51 @@ function loadMixers(element, mixers) {
     }    
 }
 
+function visualizeConfig(element, config) {
+    element.innerHTML='';   
+    let position = {"left":20,"top":20}
+    
 
+    for (let i=0;i<config.devices.capture.channels;i++) {
+        let node = addNode(element,position)
+        node.innerText=config.devices.capture.device+"\nChannel "+i;
+        position.top = position.top + node.getBoundingClientRect().height + 20;
+    }
 
+    position.left = position.left + 150;
+    position.top = 20;
+    
 
+    for (let pipe of config.pipeline) {        
+        console.log(pipe);
+        switch (pipe.type) {
+            case "Mixer":
+                const mixer = config.mixers[pipe.name];
+                console.log("Mixer ",mixer);                
+                for (let i=0;i<mixer.channels.out;i++) {
+                    let node = addNode(element,position);
+                    position.top = position.top + node.getBoundingClientRect().height + 20;
+                    // mixer.mapping[i].
+
+                }
+                break;
+            case "Filter":
+                break;
+        }
+    }
+
+}
+
+function addNode(parent, position) {
+    let node = document.createElement('div');
+    node.className='visualNode';
+    node.style.left = position.left+'px';
+    node.style.top = position.top+'px';    
+    parent.appendChild(node);
+    return node;
+}
+
+function addLine(fromNode, toNode) {
+
+}
 

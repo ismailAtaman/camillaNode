@@ -357,6 +357,74 @@ class camillaDSP {
         this.config.pipeline=this.updatePipeline(this.config);
         return true;
     }
+
+    async linearizeConfig() {
+        // devices.capture.device 
+        // devices.capture.channels number of inputs
+        // check mixers in pipeline. 
+        //     find the mixer from name in mixers
+        //     check the mapping. there should be playback number of dest objects
+        //     check sources.
+        // 
+        // devices.playback.channels number of outputs
+        // devices.playback.device 
+
+        await this.downloadConfig();
+        let retObject={};
+        
+
+        const input = {"input":{            
+                "name":this.config.devices.capture.device,
+                "channels":this.config.devices.capture.channels,
+            }}
+        Object.assign(retObject,input);
+
+        for (let pipe of this.config.pipeline) {
+            
+        }
+
+        let mixers = Object.keys(this.config.mixers)
+        for (let i=0;i<mixers.length;i++) {
+            let currentMixer = this.config.mixers[mixers[i]];
+
+        }  
+
+
+        const output = {"output":{
+            "name":this.config.devices.playback.device,
+            "channels":this.config.devices.playback.channels,
+        }}
+        Object.assign(retObject,output);
+       
+        return retObject;
+    }
+
+
+}
+
+class configNode {    
+    previousNodes=[];
+    id=[];
+    name;
+    description;
+    type;    
+    channel;
+    params={};
+    nextNodes=[];   
+    
+
+    constructor() {
+        this.id=new Date().getTime();
+        return this;
+    }
+    
+    set(property,value) {
+        this[property]=value;
+    }
+
+    get(property) {
+        return this[property];
+    }
 }
 
 
