@@ -367,18 +367,3 @@ async function convertConfigs() {
     }
 
 }
-
-async function splitFilterToAllChannels() {    
-    let filters = DSP.splitFiltersToChannels(DSP.config.filters);
-    DSP.config.filters= filters;
-    DSP.config.pipeline = DSP.updatePipeline(DSP.config,true);
-    await DSP.uploadConfig()
-}
-
-async function mergeFilters() {
-    let filters = DSP.mergeFilters(DSP.config.filters);
-    DSP.config.filters= filters;
-    DSP.config.pipeline = DSP.updatePipeline(DSP.config);
-    await DSP.uploadConfig()
-
-}

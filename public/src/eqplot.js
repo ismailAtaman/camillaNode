@@ -362,7 +362,7 @@ function plot(filterObject, canvas, name) {
 			if (filterObject[filter].type!="Biquad") continue;
 			if (filterObject[filter].parameters.type!="Peaking" && filterObject[filter].parameters.type!="Highshelf" && filterObject[filter].parameters.type!="Lowshelf") continue;
 	
-				dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
+			dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
 			for (let i=0;i<dataMatrix.length;i++) {
 				totalArray[i][0]=dataMatrix[i][0]
 				totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        

@@ -2,8 +2,6 @@
 
 async function advancedOnLoad() {
     
-
-    
     const advancedFilters = document.getElementById("advancedFilters");
     const pipelineManagement = document.getElementById("pipelineManagement");
     const channelMapping = document.getElementById("channelMapping");
@@ -21,6 +19,7 @@ async function advancedOnLoad() {
     await window.parent.DSP.downloadConfig();
     const channelCount = await window.parent.DSP.getChannelCount();
     loadFilters(advancedFilters,window.parent.DSP.config,channelCount)
+    
 }
 
 function loadPipeline(element,pipeline) {
@@ -226,5 +225,25 @@ function addNode(parent, position, type) {
 
 function addLine(fromNode, toNode) {
 
+}
+
+
+async function splitFilterToAllChannels() {    
+    const DSP = window.parent.DSP;
+    let filters = DSP.splitFiltersToChannels(DSP.config.filters);
+    DSP.config.filters= filters;
+    DSP.config.pipeline = DSP.updatePipeline(DSP.config,true);
+    await DSP.uploadConfig()
+    advancedOnLoad();
+    
+}
+
+async function mergeFilters() {
+    const DSP = window.parent.DSP;
+    let filters = DSP.mergeFilters(DSP.config.filters);
+    DSP.config.filters= filters;
+    DSP.config.pipeline = DSP.updatePipeline(DSP.config);
+    await DSP.uploadConfig()
+    advancedOnLoad();
 }
 
