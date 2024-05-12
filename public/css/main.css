@@ -839,6 +839,8 @@ input[type="checkbox"]:disabled::before {
     overflow-x: scroll;
     margin-block-end: 10px;
     padding-bottom: 10px;
+    scrollbar-width: thick;
+    scrollbar-color: hsl(var(--bck-hue), 60%, 20%);   
 }
 
 .filterChannel::before {
@@ -849,7 +851,10 @@ input[type="checkbox"]:disabled::before {
     font-weight: 600;
     padding: 5px;     
     background-color: hsl(var(--bck-hue), 60%, 20%);   
+
 }
+
+
 
 .filterElement {            
     margin: 0px;    

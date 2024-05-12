@@ -115,16 +115,16 @@ async function loadData() {
     await DSP.downloadConfig()
     if (DSP.config.filters==undefined) DSP.config.filters={};
     
-    if (DSP.config.filters["subBass"]==undefined) {        
+    if (DSP.config.filters["subBass_channel_0"]==undefined) {        
         await DSP.setTone(0,0,0,0,0);        
         await DSP.downloadConfig();
     }            
     
-    subBass.knob.instance.setVal(DSP.config.filters["subBass"].parameters.gain*10+181);
-    bass.knob.instance.setVal(DSP.config.filters["bass"].parameters.gain*10+181);
-    mids.knob.instance.setVal(DSP.config.filters["mids"].parameters.gain*10+181);
-    upperMids.knob.instance.setVal(DSP.config.filters["upperMids"].parameters.gain*10+181);
-    treble.knob.instance.setVal(DSP.config.filters["treble"].parameters.gain*10+181);
+    subBass.knob.instance.setVal(DSP.config.filters["subBass_channel_0"].parameters.gain*10+181);
+    bass.knob.instance.setVal(DSP.config.filters["bass_channel_0"].parameters.gain*10+181);
+    mids.knob.instance.setVal(DSP.config.filters["mids_channel_0"].parameters.gain*10+181);
+    upperMids.knob.instance.setVal(DSP.config.filters["upperMids_channel_0"].parameters.gain*10+181);
+    treble.knob.instance.setVal(DSP.config.filters["treble_channel_0"].parameters.gain*10+181);
     
     plot(DSP.config.filters,ctx,DSP.config.title);
 }

@@ -249,13 +249,17 @@ class camillaDSP {
         const upperMidsFilter = camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41);
         const trebleFilter = camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41);
         
-        this.config.filters["subBass"]=subBassFilter;
-        this.config.filters["bass"]=bassFilter;
-        this.config.filters["mids"]=midsFilter;
-        this.config.filters["upperMids"]=upperMidsFilter;
-        this.config.filters["treble"]=trebleFilter;
+        const channelCount = this.getChannelCount();
+
+        for (let i=0;i<channelCount;i++) {
+            this.config.filters["subBass_channel_"+i]=subBassFilter;
+            this.config.filters["bass_channel_"+i]=bassFilter;
+            this.config.filters["mids_channel_"+i]=midsFilter;
+            this.config.filters["upperMids_channel_"+i]=upperMidsFilter;
+            this.config.filters["treble_channel_"+i]=trebleFilter;                
+        }
         
-        this.config.pipeline=this.updatePipeline(this.config);        
+        this.config.pipeline=this.updatePipeline(this.config,true);        
         
         await this.uploadConfig();
         return this.config;
@@ -291,12 +295,27 @@ class camillaDSP {
     
     updatePipeline(config) {
         let pipeline=[];        
+
         for (let mixer in config.mixers) {
             pipeline.push({"type":"Mixer","name":mixer});
         }
         
-        pipeline.push({"type":"Filter","channel":0,"names":Object.keys(config.filters)})
-        pipeline.push({"type":"Filter","channel":1,"names":Object.keys(config.filters)})
+        const channelCount = this.getChannelCount();
+
+        // Check if filters are seperated per channel 
+        if (Object.keys(this.config.filters).filter((e)=>e.includes("_channel_0")).length>0) {
+            // console.log("Seperate filters")
+            for (let i=0;i<channelCount;i++) {
+                let currentChannelFilters =Object.keys(this.config.filters).filter((e)=>e.includes("_channel_"+i));                
+                pipeline.push({"type":"Filter","channel":i,"names":currentChannelFilters});
+            }            
+        } else {            
+            for (let i=0;i<channelCount;i++) {
+                pipeline.push({"type":"Filter","channel":i,"names":Object.keys(config.filters)})
+            }            
+        }
+
+        // console.log(config.pipeline);
         return pipeline;
     }
 
@@ -412,8 +431,8 @@ class camillaDSP {
         return channels;        
     }
 
-    async getChannelCount() {
-        await this.downloadConfig();
+    getChannelCount() {
+    
         let inChannels = this.config.mixers[Object.keys(this.config.mixers)[0]].channels.in;
         let outChannels = this.config.mixers[Object.keys(this.config.mixers)[0]].channels.out;    
         return Math.max(this.config.devices.playback.channels,this.config.devices.capture.channels,inChannels,outChannels);
