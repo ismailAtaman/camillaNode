@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100%, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">        
+</head>
+
+<script type="module">
+    import preferences from '/src/preferences.js';
+    window.preferences = new preferences();    
+    document.addEventListener("DOMContentLoaded",preferencesOnLoad);
+</script>
+
+<script>
+    function preferencesOnLoad() {
+        preferences.createPreferencesElements(document.getElementById("preferences"))
+    }
+
+    function backgroundHueChange() {
+        preferences.applyBackgroundHue(window.parent.document,this.value)
+        preferences.applyBackgroundHue(document,this.value)        
+    }
+
+</script>
+
+<body>
+
+    <div id="sectionMainTitle"><img src="img/icon/preferences.png" class="icon">Preferences</div>
+    <div id="preferences">        
+    </div>
+
+    <input type="button" value="Reset" onclick="preferences.reset()">
+    
+</body>
+</html>

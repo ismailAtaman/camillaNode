@@ -91,9 +91,7 @@ function loadFilters(element,config,channelCount) {
     const filters = config.filters;
     const pipeline = config.pipeline;
 
-    const observer = new MutationObserver((mutations,observer)=>{
-        console.log(mutations,observer);
-    })
+
 
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
         let filterChannel = document.createElement("div"); 
@@ -107,7 +105,8 @@ function loadFilters(element,config,channelCount) {
         for (let filterName of channelPipeline[0].names) {            
             let filterElement = createFilter(filterName);
             filterChannel.appendChild(filterElement);
-            observer.observe(filterElement,{childList:true,subtree:true, attributes:true})
+            // console.log(filterElement.children["filterParams"])            
+            
         }
         element.appendChild(filterChannel);
         
@@ -116,6 +115,8 @@ function loadFilters(element,config,channelCount) {
     function createFilter(filterName) {
         const filter = new filterClass();
         let filterElement = filter.createElement(filterName);  
+        
+        
         filterElement.filter=filter;
         filterElement.id=filterName;
         filterElement.querySelector("#filterType").value =filters[filterName].type;
@@ -139,6 +140,7 @@ function loadFilters(element,config,channelCount) {
             }
 
         }
+        
         return filterElement;
     }
 } 

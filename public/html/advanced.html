@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100vw, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="src/advanced.js"></script>    
+</head>
+<script type="module">    
+    import filterClass from "/src/filter.js"
+    window.filterClass = filterClass;
+    document.addEventListener("DOMContentLoaded",advancedOnLoad)
+</script>
+
+<style>
+
+    
+</style>
+<body>
+    <div id="sectionMainTitle"><img src="img/icon/advanced.png" class="icon">Advanced</div>
+
+
+    <div class="group" id="pipelineVisual" label="Pipeline">
+        <div id="visualContainer">
+            <div class="line"></div>
+        </div>
+    </div> 
+   
+
+    <div class="group" id="channelMapping" label="Mixers">
+    </div>
+
+    
+    <div class="group" id="advancedFilters" label="Filters">
+    </div>
+
+    <div class="group" id="processors" label="Processor">
+    </div>    
+
+
+</body>
+</html>

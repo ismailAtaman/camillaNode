@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100vw, initial-scale=1.0">
+    <title>basic</title>
+
+    <link rel="stylesheet" href="css/main.css">    
+    <script src="src/main.js"></script>    
+    <script type="module" >
+        import EQKnob from '/src/knob.js';
+        import camillaDSP from "/src/camillaDSP.js";
+        import PEQLine from "/src/PEQLine.js";
+        import plot from '/src/eqplot.js';
+
+        window.EQKnob = EQKnob;
+        window.PEQLine=PEQLine;
+        window.plot=plot;
+
+        document.addEventListener("DOMContentLoaded",basicLoad);
+
+    </script>    
+    <script src="src/basic.js"></script>    
+</head>
+<body>    
+    <div id="sectionMainTitle"><img src="img/icon/basic.png" class="icon">Basic</div>
+    <script src="src/eqplot.js"></script>
+    <canvas id="plotCanvas" width="1024" height="500"></canvas>
+
+    <div class="group" id="basicControls" label="Basic Controls">
+    </div>    
+
+    <div class="group" id="toneControls" label="Tone Controls">
+
+    </div>
+</body>
+
+
+</html>

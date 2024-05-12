@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100vw, initial-scale=1.0">
+    <title>Connections</title>        
+    <script src="/src/main.js"></script>
+    
+    <link rel="stylesheet" href="css/connections.css">
+    <link rel="stylesheet" href="css/main.css">
+
+</head>
+
+<body>
+    <div id="sectionMainTitle"><img src="img/icon/connections.png" class="icon">Connections</div>
+    <script type="module" >
+        import camillaDSP from "/src/camillaDSP.js"        
+        window.camillaDSP = camillaDSP;
+        document.addEventListener("DOMContentLoaded",connectionsOnLoad)
+    </script>
+
+        
+    <script>
+        
+        function connectionsOnLoad() {
+            // Load saved details from local storage if they exist.
+            const server = window.localStorage.getItem("server")
+            const port  = window.localStorage.getItem("port")
+            const spectrumPort = window.localStorage.getItem("spectrumPort")
+            if (server!=undefined) {
+                document.getElementById("server").value = server;
+                document.getElementById("port").value=port;
+                document.getElementById("spectrumPort").value=spectrumPort;
+            } else {
+                document.getElementById("server").value = window.location.hostname;
+                document.getElementById("port").value=1234;
+                document.getElementById("spectrumPort")=4321;
+            }
+        }
+
+    </script>
+    <style>
+        span, #state {
+            text-align: left;
+        }
+    </style>
+    <div id="connectionsSection">
+        
+        <div><span>IP Address</span><input id="server" type="text" value="opizero2.local"></div>
+        <div><span>Audio Port</span><input id="port" type="text" value="1234"></div>
+        <div><span>Spectrum Port</span><input id="spectrumPort" type="text" value="4321"></div>
+        <div style="display: flex; justify-content: right; width: 277px"><button onclick="connect(camillaDSP)">Connect</button>        </div>
+    </div>
+    <br>
+    <div id="state"></div>
+
+
+
+
+    
+</body>
+</html>

@@ -22,47 +22,39 @@ let appConfig = JSON.parse(strAppConfig);
 PORT = appConfig.port;
 let currentConfigName="";
 
-
-
-
 //// Global settings
+app.use(express.static(__dirname+'/public/'));
 
-app.use(express.static('public'));
-app.set('view engine','ejs');
 
 //// Default gets
 app.get('/connections',(req,res)=>{
-    res.render('connections');     
+    res.sendFile(__dirname+'/public/html/connections.html');
 }) 
 
 app.get('/basic',(req,res)=>{
-    res.render('basic');     
+    res.sendFile(__dirname+'/public/html/basic.html');
 }) 
 
 app.get('/',(req,res)=>{
     // res.render('equalizer');     
-    res.render("main")
+    res.sendFile(__dirname+'/public/html/main.html');
 }) 
-
 
 
 app.get('/equalizer',(req,res)=>{
-    res.render('equalizer');     
+    res.sendFile(__dirname+'/public/html/equalizer.html');
 }) 
 
 app.get('/advanced',(req,res)=>{
-    res.render('advanced');     
+    res.sendFile(__dirname+'/public/html/advanced.html');
 }) 
 
 app.get('/room',(req,res)=>{
-    res.render('room');     
+    res.sendFile(__dirname+'/public/html/room.html'); 
 }) 
 
-
-
-
 app.get('/preferences',(req,res)=>{
-    res.render('preferences');     
+    res.sendFile(__dirname+'/public/html/preferences.html');
 }) 
 
 
