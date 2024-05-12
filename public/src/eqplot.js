@@ -331,7 +331,7 @@ function createGrid(canvas) {
 }
 
 
-function plot(filterObject,canvas, name) {
+function plot(filterObject, canvas, name) {
 	const ctx = canvas;        
 	const context = ctx.getContext('2d');             
 
@@ -342,29 +342,40 @@ function plot(filterObject,canvas, name) {
 	// Create the grid
 	createGrid(ctx); 
 
-	// Create a QUADLEN length array filled with zero
-	let totalArray = new Array(QUADLEN).fill(0).map(() => new Array(QUADLEN).fill(0));
-	let dataMatrix=[];	
-	
-	for (let filter of Object.keys(filterObject)) {  
-		// if (filterObject[filter].type=="Gain") continue;
-		if (filterObject[filter].type!="Biquad") continue;
-		if (filterObject[filter].parameters.type!="Peaking" && filterObject[filter].parameters.type!="Highshelf" && filterObject[filter].parameters.type!="Lowshelf") continue;
-
-
-		dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
-		for (let i=0;i<dataMatrix.length;i++) {
-			totalArray[i][0]=dataMatrix[i][0]
-			totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
+	// Create a QUADLEN length array filled with zero	
+		
+	if (Object.keys(filterObject).filter((e)=>e.includes("_channel_0")).length>0) {		
+		const colors = ["red", "white", "purple","green","gold","aqua","yellow","lime","teal","fuchsia"]
+		for (let i=0;i<10;i++) {
+			if (Object.keys(filterObject).filter((e)=>e.includes("_channel_"+i)).length>0) plotFilters(Object.keys(filterObject).filter((e)=>e.includes("_channel_0")),ctx,colors[i]); else break;
 		}
-		
-		// plotArray(ctx,dataMatrix,"#"+color.toString(16),0.3);
-		
-		plotArray(ctx,dataMatrix,"#CCFFBB",0.3);
-		
+	} else {
+		plotFilters(Object.keys(filterObject),ctx,"#FFF");
 	}
 	
-	let t= plotArray(ctx, totalArray,"#FFF",3);	
+	function plotFilters(filters, ctx, mainColor) {
+		let totalArray = new Array(QUADLEN).fill(0).map(() => new Array(QUADLEN).fill(0));
+		let dataMatrix=[];	
+
+		for (let filter of filters) {  
+			// if (filterObject[filter].type=="Gain") continue;
+			if (filterObject[filter].type!="Biquad") continue;
+			if (filterObject[filter].parameters.type!="Peaking" && filterObject[filter].parameters.type!="Highshelf" && filterObject[filter].parameters.type!="Lowshelf") continue;
+	
+				dataMatrix = calculateFilterDataMatrix(filterObject[filter].parameters.type, filterObject[filter].parameters.freq, filterObject[filter].parameters.gain, filterObject[filter].parameters.q);                        
+			for (let i=0;i<dataMatrix.length;i++) {
+				totalArray[i][0]=dataMatrix[i][0]
+				totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
+			}
+			
+			// plotArray(ctx,dataMatrix,"#"+color.toString(16),0.3);
+			
+			plotArray(ctx,dataMatrix,"#CCFFBB",0.3);		
+		}
+
+		let t= plotArray(ctx, totalArray,mainColor,3);			
+	}
+
 
 	// Centre and print the config name 
 	if (name!=undefined) {
@@ -376,7 +387,7 @@ function plot(filterObject,canvas, name) {
 		context.fillText(nameText,nameLeft,40);            
 	}
 
-	return Math.round(Math.max(...totalArray[1]));
+	// return Math.round(Math.max(...totalArray[1]));
 
 }
 

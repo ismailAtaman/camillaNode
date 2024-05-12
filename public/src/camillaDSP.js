@@ -211,7 +211,49 @@ class camillaDSP {
 
     /********************************** end of basic *************************************************************/
 
-    async uploadConfig() {        
+    splitFiltersToChannels(filters) {
+        let tmpFilters={}
+        let channelCount = this.getChannelCount();
+        for (let c=0;c<channelCount;c++) {
+            for (let f of Object.keys(filters)) {                        
+                tmpFilters[f+"_channel_"+c]=filters[f];
+            }
+        }
+        return tmpFilters;
+    }
+
+    mergeFilters(filters) {                
+        // simple version : take common filters and add filters for channel_0 for all channels
+        
+        let tmpFilters={};
+        let commonFilters = Object.keys(filters).filter(function(e){ return !e.includes("_channel_") });
+        let channelFilters = Object.keys(filters).filter(function(e){ return e.includes("_channel_0") });
+        for (let f of Object.keys(filters)) {                        
+            if (commonFilters.includes(f)) tmpFilters[f]=filters[f];
+            if (channelFilters.includes(f)) {
+                let filterName = f.split("_c")[0];
+                tmpFilters[filterName]=filters[f];
+                // console.log(f,filterName)
+            }
+            // console.log("Common check > ",f,commonFilters.includes(f));
+        }
+        console.log(tmpFilters)
+        return tmpFilters;
+    }
+
+    isSingleChannel() {
+        let pipelineFilters = this.config.pipeline.filter(function(e){return e.type=="Filter"});
+        let sameFilters = true;
+        for (let i=0;i<pipelineFilters.length-1;i++) {
+            if (pipelineFilters[i].names.length != pipelineFilters[i+1].names.length) { sameFilters=false; break;}
+            for (let name of pipelineFilters[i].names) {                    
+                if (pipelineFilters[i+1].names.filter((e)=>{return (e==name)}).length==0) {sameFilters=false; break;}
+            }
+        }
+        return sameFilters;
+    }
+
+    async uploadConfig() {              
         return this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
             if (debugLevel=='high') console.log("Config uploaded successfully.",config);
             return true;
@@ -249,18 +291,26 @@ class camillaDSP {
         const upperMidsFilter = camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41);
         const trebleFilter = camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41);
         
-        const channelCount = this.getChannelCount();
+        // // Multi channel
+        // const channelCount = this.getChannelCount();
 
-        for (let i=0;i<channelCount;i++) {
-            this.config.filters["subBass_channel_"+i]=subBassFilter;
-            this.config.filters["bass_channel_"+i]=bassFilter;
-            this.config.filters["mids_channel_"+i]=midsFilter;
-            this.config.filters["upperMids_channel_"+i]=upperMidsFilter;
-            this.config.filters["treble_channel_"+i]=trebleFilter;                
-        }
+        // for (let i=0;i<channelCount;i++) {
+        //     this.config.filters["subBass_channel_"+i]=subBassFilter;
+        //     this.config.filters["bass_channel_"+i]=bassFilter;
+        //     this.config.filters["mids_channel_"+i]=midsFilter;
+        //     this.config.filters["upperMids_channel_"+i]=upperMidsFilter;
+        //     this.config.filters["treble_channel_"+i]=trebleFilter;                
+        // }
         
-        this.config.pipeline=this.updatePipeline(this.config,true);        
+        // this.config.pipeline=this.updatePipeline(this.config,true);        
         
+        this.config.filters["subBass"]=subBassFilter;
+        this.config.filters["bass"]=bassFilter;
+        this.config.filters["mids"]=midsFilter;
+        this.config.filters["upperMids"]=upperMidsFilter;
+        this.config.filters["treble"]=trebleFilter;                
+        this.config.pipeline=this.updatePipeline(this.config);        
+
         await this.uploadConfig();
         return this.config;
     }
@@ -377,9 +427,9 @@ class camillaDSP {
         // console.log("Clear Filters",this.config.filters);
     }
 
-    addFilters(filters) {
+    addFilters(filters) {       
         Object.assign(this.config.filters,filters);
-        this.config.pipeline=this.updatePipeline(this.config);
+        this.config.pipeline=this.updatePipeline(this.config,true);
         return true;
     }
 
