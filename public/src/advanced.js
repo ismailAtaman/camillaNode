@@ -16,11 +16,11 @@ async function advancedOnLoad() {
     // advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));    
 
     // loadPipeline(pipelineManagement,window.config.pipeline)
-    // loadMixers(channelMapping,window.config.mixers)
-    await window.parent.DSP.downloadConfig();
-    
+    // loadMixers(channelMapping,window.config.mixers)    
     await visualizeConfig(visualContainer,window.parent.DSP)
-    loadFilters(advancedFilters,window.parent.DSP.config.filters)
+    await window.parent.DSP.downloadConfig();
+    const channelCount = await window.parent.DSP.getChannelCount();
+    loadFilters(advancedFilters,window.parent.DSP.config,channelCount)
 }
 
 function loadPipeline(element,pipeline) {
@@ -81,18 +81,20 @@ function loadMixers(element, mixers) {
     }    
 }
 
-function loadFilters(element,filters) {
+function loadFiltersEx(element,filters) {
     element.innerHTML='';
     
     const filter = new filterClass();
     for (let filterName of Object.keys(filters)) {
-        let filterElement = filter.createElement(filterName);        
-        filterElement.children["filterType"].value=filters[filterName].type;
-        filterElement.children["filterType"].dispatchEvent(new Event("change"));
-        if (filterElement.children["filterSubType"]) {
+        let filterElement = filter.createElement(filterName);  
+        filterElement.querySelector("#filterType").value =filters[filterName].type;
 
-            filterElement.children["filterSubType"].value=filters[filterName].parameters.type;
-            filterElement.children["filterSubType"].dispatchEvent(new Event("change"));
+        // filterElement.children['filterBasic'].children["filterType"].value=filters[filterName].type;
+        filterElement.children['filterBasic'].children["filterType"].dispatchEvent(new Event("change"));
+        if (filterElement.children['filterBasic'].children["filterSubType"]) {
+
+            filterElement.children['filterBasic'].children["filterSubType"].value=filters[filterName].parameters.type;
+            filterElement.children['filterBasic'].children["filterSubType"].dispatchEvent(new Event("change"));
 
             let filterSubType = filters[filterName].parameters.type
             if (filterSubType=="Peaking" || filterSubType == "Lowshelf" || filterSubType == "Highshelf") {
@@ -110,6 +112,55 @@ function loadFilters(element,filters) {
     }
 } 
 
+function loadFilters(element,config,channelCount) {
+    element.innerHTML='';        
+    const filters = config.filters;
+    const pipeline = config.pipeline;
+
+    for (let channelNo=0;channelNo<channelCount;channelNo++) {
+        let filterChannel = document.createElement("div"); 
+        filterChannel.className='filterChannel'; 
+        filterChannel.setAttribute("label","Channel "+channelNo)
+        let hueFilter = "hue-rotate("+ (45* channelNo) + "deg);"        
+        filterChannel.style.filter = hueFilter        
+
+        let channelPipeline = pipeline.filter(function(p){ return (p.type=="Filter" && p.channel==channelNo) });        
+
+        for (let filterName of channelPipeline[0].names) {            
+            filterChannel.appendChild(createFilter(filterName));
+        }
+        element.appendChild(filterChannel);
+    }
+
+    function createFilter(filterName) {
+        const filter = new filterClass();
+        let filterElement = filter.createElement(filterName);  
+        filterElement.querySelector("#filterType").value =filters[filterName].type;
+
+        // filterElement.children['filterBasic'].children["filterType"].value=filters[filterName].type;
+        filterElement.children['filterBasic'].children["filterType"].dispatchEvent(new Event("change"));
+        if (filterElement.children['filterBasic'].children["filterSubType"]) {
+
+            filterElement.children['filterBasic'].children["filterSubType"].value=filters[filterName].parameters.type;
+            filterElement.children['filterBasic'].children["filterSubType"].dispatchEvent(new Event("change"));
+
+            let filterSubType = filters[filterName].parameters.type
+            if (filterSubType=="Peaking" || filterSubType == "Lowshelf" || filterSubType == "Highshelf") {
+                filterElement.children["filterParams"].children["frequency"].value=filters[filterName].parameters.freq;
+                filterElement.children["filterParams"].children["gain"].value=filters[filterName].parameters.gain;
+                filterElement.children["filterParams"].children["q"].value=filters[filterName].parameters.q;
+            }
+            if (filterSubType=="Highpass" || filterSubType == "Lowpass" || filterSubType == "Allpass" || filterSubType == "Bandpass") {
+                filterElement.children["filterParams"].children["frequency"].value=filters[filterName].parameters.freq;                
+                filterElement.children["filterParams"].children["q"].value=filters[filterName].parameters.q;
+            }
+
+        }
+        return filterElement;
+    }
+} 
+
+
 async function visualizeConfig(element, DSP) {
     
     element.innerHTML='';   
@@ -126,7 +177,7 @@ async function visualizeConfig(element, DSP) {
     
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
         for (let component of channels[channelNo]) {
-            console.log(component)
+            // console.log(component)
             let type = component.type;
             let node = addNode(element,position,type);
             

@@ -365,8 +365,6 @@ class camillaDSP {
     }
 
     async linearizeConfig() {    
-        let retObject={};
-
         // Breakdown config into channel pipelines
         await this.downloadConfig();
 
@@ -412,6 +410,14 @@ class camillaDSP {
 
         console.log("Linearized channels : ",channels);
         return channels;        
+    }
+
+    async getChannelCount() {
+        await this.downloadConfig();
+        let inChannels = this.config.mixers[Object.keys(this.config.mixers)[0]].channels.in;
+        let outChannels = this.config.mixers[Object.keys(this.config.mixers)[0]].channels.out;    
+        return Math.max(this.config.devices.playback.channels,this.config.devices.capture.channels,inChannels,outChannels);
+
     }
 }
 

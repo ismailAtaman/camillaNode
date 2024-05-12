@@ -10,20 +10,24 @@ class filter {
     createElement(name) {
         this.name=name;
         const filterElement = document.createElement('div');
-        filterElement.filter=this; filterElement.className="filterElement"
+        filterElement.filter=this; filterElement.className="filterElement";
+
+        const filterBasic = document.createElement('div'); 
+        // filterBasic.style="grid-column : 1 / span 2;"; 
+        filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
 
 
         let nameSpan = document.createElement('span');
         nameSpan.innerText='Name :'
-        filterElement.appendChild(nameSpan);
+        filterBasic.appendChild(nameSpan);
 
         const filterName = document.createElement('div');
         filterName.contentEditable=true; filterName.className="filterName"; filterName.innerText=this.name;
-        filterElement.appendChild(filterName);
+        filterBasic.appendChild(filterName);
         
         let typeSpan = document.createElement('span');
         typeSpan.innerText='Type :'
-        filterElement.appendChild(typeSpan);
+        filterBasic.appendChild(typeSpan);
 
         const filterType = document.createElement('select');
         filterType.className="filterType"; filterType.setAttribute("id","filterType");       
@@ -34,10 +38,11 @@ class filter {
         }
         filterType.addEventListener("change",(e)=>{     
             let target = e.target;            
-            updateSubTypes(target.parentElement.filter,target.parentElement,target);
-            updateParams(target.parentElement.filter,target,target.parentElement.children["filterSubType"])
+            updateSubTypes(this,target.parentElement,target);
+            updateParams(this,target,target.parentElement.children["filterSubType"])
         })
-        filterElement.appendChild(filterType);
+        filterBasic.appendChild(filterType);        
+        filterElement.appendChild(filterBasic);
 
         updateSubTypes(this,filterElement,filterType);
 
@@ -73,7 +78,7 @@ class filter {
             let subTypeVal;
             if (subType!=undefined) subTypeVal=subType.value;
 
-            let existingElement = type.parentElement.children["filterParams"];
+            let existingElement = type.parentElement.parentElement.children["filterParams"];
             if (existingElement!=undefined) existingElement.remove();
             
             const filterParams=document.createElement('div');
@@ -105,7 +110,7 @@ class filter {
                 }
                 filterParams.appendChild(elem);
             }
-            type.parentElement.appendChild(filterParams);
+            type.parentElement.parentElement.appendChild(filterParams);
 
         }
 

@@ -272,7 +272,8 @@ canvas {
     color: white;  
     border-radius: 10px 10px 0 0 ;    
     padding-left: 10px;
-    padding-block: 5px;    
+    padding-block: 5px;        
+    
 }
 
 
@@ -823,32 +824,69 @@ input[type="checkbox"]:disabled::before {
     overflow: hidden;
 }
 
+/************************************************* Advanced / Filters **********************************************/
+
 #advancedFilters {
-    display: grid;
-    grid-template-columns: 1fr;            
-    gap:5px;        
+    display: block;
 }
 
-.filterElement {
-    display: flex;        
-    position: relative;
-    height: 50px;     
+.filterChannel {
+    display: grid;
+    grid-template-rows: 1fr;            
+    grid-auto-flow: column;    
+    gap: 5px;        
+    width: inherit;
+    overflow-x: scroll;
+    margin-block-end: 10px;
+    padding-bottom: 10px;
+}
+
+.filterChannel::before {
+    content: attr(label);
+    writing-mode: vertical-lr;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 5px;     
+    background-color: hsl(var(--bck-hue), 60%, 20%);   
+}
+
+.filterElement {            
     margin: 0px;    
     padding: 0px;
     padding-left: 10px;
-    align-items: center;
-    border-bottom: 1px dashed hsl(var(--bck-hue), 40%, 40%);    
-    width: calc( 100% - 10px)
-    
+    width: 480px;
+    align-items: center;    
+    user-select: none;
+    border:1px solid hsl(var(--bck-hue), 20%, 40%);    
+    border-radius: 5px;
 }
 
 .filterElement:last-of-type {
     border-bottom: none;
 }
 
+.filterElement:hover {
+    filter: brightness(1.3);
+}
+
+.filterBasic {
+    display: flex;
+    height: 35px;
+    padding-block: 5px;
+    align-items: center;
+    margin-left: -10px;
+}
+
+.filterBasic >  select, input, span {
+    margin-inline: 5px;
+    margin-block: 5px;        
+}
+
 .filterName {    
-    background-color: white;
+    background-color: hsl(var(--bck-hue), 50%, 80%);   
     color: black;
+    font-size: 14px;
     height: 22px;
     width: 120px;
     border-radius: 5px;  
@@ -856,38 +894,39 @@ input[type="checkbox"]:disabled::before {
 }
 
 .filterElement >  select, input, span {
-    margin-inline: 10px;
-    margin-block: 5px;    
-    
+    margin-inline: 5px;
+    margin-block: 5px;        
 }
 
-.filterElement > select {
+.filterBasic > select {
     max-width: 120px;
     background-color: hsl(var(--bck-hue), 50%, 80%);
+    height: 25px;
 }
 
 .filterParams {
     display: flex;         
     align-items: center;
     background-color: hsl(var(--bck-hue), 20%, 20%);    
-    height: 40px;
-    border-radius: 7px;        
-    padding-right: 5px;    
-    left: 500px;    
+    height: 35px;        
+    margin-left: -10px;
+    padding-right: 5px;        
 }
 
 .filterParams > div, input {
     margin-left: 5px;
     margin-block: 5px;
     height: 22px;
-    max-width: 70px;        
+    max-width: 40px;        
 }
 
 .filterParams span {
-    font-size: 14px;
-    margin-left: 5px;
+    font-size: 13px;    
     max-width: 120px;
 }
+
+/********************************************************************************************************/
+
 
 #connectionsSection #server {
     max-width: unset;
@@ -930,6 +969,10 @@ input[type="checkbox"]:disabled::before {
     margin:0px;        
     font-size: 15px;
     text-wrap :wrap;
+}
+
+.visualNode:hover {
+    filter:brightness(1.2)
 }
 
 .inputNode, .outputNode  {
