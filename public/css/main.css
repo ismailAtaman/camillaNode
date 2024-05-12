@@ -278,7 +278,8 @@ canvas {
 
 
 input {
-    border-radius: 5
+    border-radius: 5;
+    max-width: none;
 }
 
 select {
@@ -828,6 +829,7 @@ input[type="checkbox"]:disabled::before {
 /************************************************* Advanced / Filters **********************************************/
 
 #advancedFilters {
+    position: relative;
     display: block;    
     font-size: 13px;
 }
@@ -839,23 +841,25 @@ input[type="checkbox"]:disabled::before {
     gap: 5px;        
     width: inherit;
     overflow-x: scroll;
-    margin-block-end: 10px;
+    margin-block-end: 10px;    
     padding-bottom: 10px;
     scrollbar-width: thick;
     scrollbar-color: hsl(var(--bck-hue), 60%, 20%);   
 }
 
 .filterChannel::before {
+    position: fixed;
     content: attr(label);
     writing-mode: vertical-lr;
     text-align: center;
     font-size: 15px;
     font-weight: 600;
     padding: 5px;     
+    height: 85px;
+    width: 20px;
     background-color: hsl(var(--bck-hue), 60%, 20%);  
+    z-index: 1;
 }
-
-
 
 .filterElement {            
     margin: 0px;    
@@ -866,6 +870,10 @@ input[type="checkbox"]:disabled::before {
     user-select: none;
     border:1px solid hsl(var(--bck-hue), 20%, 40%);    
     border-radius: 5px;
+}
+
+.filterElement:first-of-type {
+    margin-left: 40px;
 }
 
 .filterElement:last-of-type {
