@@ -15,6 +15,8 @@
 <script>
     function preferencesOnLoad() {
         preferences.createPreferencesElements(document.getElementById("preferences"))
+        document.getElementById("defaultPage").value=window.parent.activeSettings.defaultPage;
+
     }
 
     function backgroundHueChange() {

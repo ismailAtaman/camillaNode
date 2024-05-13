@@ -476,8 +476,7 @@ class camillaDSP {
             channels[i].push({"type":"output","device":this.config.devices.playback});
         }
 
-
-        console.log("Linearized channels : ",channels);
+        // console.log("Linearized channels : ",channels);
         return channels;        
     }
 

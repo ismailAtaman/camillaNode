@@ -240,6 +240,7 @@ class preferences {
     }
 
     applyBackgroundHue(document,hue) {
+        if (document==null) return;
         document.documentElement.style.setProperty('--bck-hue',parseInt(hue));
         document.documentElement.style.setProperty('--hue-rotate',parseInt(hue)-230+"deg");                        
     }

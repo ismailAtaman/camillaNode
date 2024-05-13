@@ -848,14 +848,16 @@ input[type="checkbox"]:disabled::before {
 }
 
 .filterChannel::before {
-    position: fixed;
+    position: absolute;
+    left: 0px;
+    top: inherit;
     content: attr(label);
     writing-mode: vertical-lr;
     text-align: center;
     font-size: 15px;
     font-weight: 600;
     padding: 5px;     
-    height: 85px;
+    height: 75px;
     width: 20px;
     background-color: hsl(var(--bck-hue), 60%, 20%);  
     z-index: 1;
@@ -939,6 +941,35 @@ input[type="checkbox"]:disabled::before {
     max-width: 120px;
 }
 
+ .mixer {
+    margin-top: 10px;    
+    justify-content: left;
+    align-items: center;    
+    border: 1px solid hsl(var(--bck-hue), 10%, 50%);
+    border-radius: 7px;
+    background-color: hsl(var(--bck-hue), 40%, 20%);
+    margin-bottom: 5px;
+    margin-inline: 5px;
+}
+
+.mixerTitle {
+    display: inline-block;
+    height: 20px;
+    width: calc( 100% - 10px );
+    margin: 0px;    
+    padding: 5px;
+    text-align: left;  
+    border-radius: 7px;  
+    background-color: hsl(calc( 30 + var(--bck-hue)), 35%, 15%);
+    
+}
+
+.mixerSource {
+    display: flex;    
+    align-items: center;
+    background-color: hsl(calc( 30 + var(--bck-hue)), 30%, 20%);
+    
+}
 /********************************************************************************************************/
 
 
@@ -981,9 +1012,10 @@ input[type="checkbox"]:disabled::before {
     user-select: none;
     text-align: center;
     margin:0px;        
-    font-size: 13px;
+    font-size: 15px;
     text-wrap :wrap;
 }
+
 
 .visualNode:hover {
     filter:brightness(1.2)

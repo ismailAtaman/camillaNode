@@ -17,11 +17,14 @@ async function advancedOnLoad() {
     // loadMixers(channelMapping,window.config.mixers)    
     await visualizeConfig(visualContainer,window.parent.DSP)
     visualContainer.addEventListener("wheel",function(e){
-        this.scrollLeft += e.deltaY/2;            
+        this.scrollLeft += e.deltaY/2;
+        e.preventDefault();
     });
 
-
     await window.parent.DSP.downloadConfig();
+    loadMixers(channelMapping,window.parent.DSP.config.mixers);
+
+
     const channelCount = await window.parent.DSP.getChannelCount();
     loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
 
@@ -61,29 +64,59 @@ function loadPipeline(element,pipeline) {
 }
 
 function loadMixers(element, mixers) {
-    // console.log(mixers);
-
-    for (let mixerNo =0;mixerNo<Object.keys(mixers).length;mixerNo++) {
-        const mixerElement = document.createElement("div");
-        const mixer = mixers[Object.keys(mixers)[mixerNo]];        
-
-        let mixerNameSpan = document.createElement("span"); mixerNameSpan.innerText="Name :";element.appendChild(mixerNameSpan);
-        let mixerName = document.createElement("div"); mixerName.innerText=Object.keys(mixers)[mixerNo]; mixerElement.appendChild(mixerName);
-               
-        let mixerDescSpan = document.createElement("span"); mixerDescSpan.innerText="Description :";element.appendChild(mixerDescSpan);
-        let mixerDesc = document.createElement("div"); mixerDesc.innerText=mixer.description; mixerElement.appendChild(mixerDesc);
-               
-
-
-        
-        let inChannels ; 
-        let outChannels;
+    //  console.log(mixers);
     
-        let mapping; // element
-        //loop mixers.mapping       
 
-        element.appendChild(mixerElement)        
-    }    
+    let inCount = Object.values(mixers)[0].channels.in;
+    let outCount = Object.values(mixers)[0].channels.out;
+
+    const mixerInOut = document.createElement('div'); 
+    mixerInOut.id = 'mixerInOut'; 
+    mixerInOut.innerHTML = "<span> Capture Channel Count :</span><span>"+inCount+"</span>"; 
+    mixerInOut.innerHTML += "<span> Playback Channel Count :</span><span>"+outCount+"</span>"; 
+    // element.appendChild(mixerInOut);
+
+    const channels = window.channels;    
+    for (let cNo =0;cNo<channels.length;cNo++) {
+        let mixerSources = document.createElement('div'); 
+        mixerSources.className="mixer";
+        let mixerSourceSpan = document.createElement("span")
+        mixerSourceSpan.innerText="Channel "+cNo+" Sources"; mixerSourceSpan.className='mixerTitle';
+
+        mixerSources.appendChild(mixerSourceSpan);
+
+        const sources = channels[cNo].filter(function(e){return e.type=="mixer"})[0].sources;
+        console.log(cNo,sources);
+
+        for (let source of sources) {
+            let sourceElement = document.createElement("div"); sourceElement.className="mixerSource"
+            let channelSpan = document.createElement("span");channelSpan.innerText="Channel "+source.channel; 
+            let channelText = document.createElement("div");channelText.contentEditable=true;             
+            sourceElement.appendChild(channelSpan); sourceElement.appendChild(channelText);
+
+            let gainSpan = document.createElement("span"); gainSpan.innerText="Gain :";
+            let gainText = document.createElement("input"); gainText.type = "text";
+            gainText.value = source.gain+source.scale;
+            sourceElement.appendChild(gainSpan); sourceElement.appendChild(gainText);
+
+            let invertedSpan = document.createElement("span"); invertedSpan.innerText="Inverted :";
+            let invertedCheckbox = document.createElement("input"); invertedCheckbox.type="checkbox"
+            invertedCheckbox.checked = source.inverted;
+            sourceElement.appendChild(invertedSpan); sourceElement.appendChild(invertedCheckbox);
+            
+            let mutedSpan = document.createElement("span"); mutedSpan.innerText="Muted :";
+            let mutedCheckbox = document.createElement("input"); mutedCheckbox.type="checkbox"
+            mutedCheckbox.checked = source.mute;
+            sourceElement.appendChild(mutedSpan); sourceElement.appendChild(mutedCheckbox);
+
+            
+            mixerSources.appendChild(sourceElement)
+        }  
+        element.appendChild(mixerSources);              
+        // console.log( sources);
+    }
+    return
+    
 }
 
 function loadFilters(element,config,channelCount) {
@@ -99,6 +132,7 @@ function loadFilters(element,config,channelCount) {
         filterChannel.setAttribute("label","Channel "+channelNo)
         filterChannel.addEventListener("wheel",function(e){
             this.scrollLeft += e.deltaY/2;            
+            e.preventDefault();
         })
         
         let channelPipeline = pipeline.filter(function(p){ return (p.type=="Filter" && p.channel==channelNo) });        
@@ -150,6 +184,7 @@ async function visualizeConfig(element, DSP) {
     
     element.innerHTML='';   
     const channels = await DSP.linearizeConfig();
+    window.channels = channels;
     const channelCount = channels.length;
     const nodeWidth = 100;
     const nodeHeight = 110;    
@@ -242,3 +277,6 @@ async function mergeFilters() {
     advancedOnLoad();
 }
 
+
+// ADCB : 30195 / 1250 EXPENSE  5.5%
+// 30084 / 29971 
