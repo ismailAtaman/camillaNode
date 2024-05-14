@@ -1,6 +1,6 @@
 devices:
   samplerate: 48000
-  chunksize: 4096
+  chunksize: 2048
   enable_rate_adjust: true
   capture:
     type: Alsa

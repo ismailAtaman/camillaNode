@@ -1,6 +1,6 @@
 devices:
   samplerate: 48000
-  chunksize: 4096
+  chunksize: 2048
   enable_rate_adjust: true
   playback:
     type: File
@@ -19,181 +19,181 @@ filters:
     parameters:
       type: Bandpass
       freq: 25
-      q: 12
+      q: 24
   band_1:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 31.5
-      q: 12
+      q: 24
   band_2:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 40
-      q: 12
+      q: 24
   band_3:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 50
-      q: 12
+      q: 24
   band_4:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 63
-      q: 12
+      q: 24
   band_5:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 80
-      q: 12
+      q: 24
   band_6:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 100
-      q: 12
+      q: 24
   band_7:
     type: Biquad
     parameters:
       type: Bandpass
-      freq: 125
-      q: 12
+      freq: 245
+      q: 24
   band_8:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 160
-      q: 12
+      q: 24
   band_9:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 200
-      q: 12
+      q: 24
   band_10:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 250
-      q: 12
+      q: 24
   band_11:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 315
-      q: 12
+      q: 24
   band_12:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 400
-      q: 12
+      q: 24
   band_13:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 500
-      q: 12
+      q: 24
   band_14:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 630
-      q: 12
+      q: 24
   band_15:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 800
-      q: 12
+      q: 24
   band_16:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 1000
-      q: 12
+      q: 24
   band_17:
     type: Biquad
     parameters:
       type: Bandpass
-      freq: 1250
-      q: 12
+      freq: 2450
+      q: 24
   band_18:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 1600
-      q: 12
+      q: 24
   band_19:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 2000
-      q: 12
+      q: 24
   band_20:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 2500
-      q: 12
+      q: 24
   band_21:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 3150
-      q: 12
+      q: 24
   band_22:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 4000
-      q: 12
+      q: 24
   band_23:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 5000
-      q: 12
+      q: 24
   band_24:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 6300
-      q: 12
+      q: 24
   band_25:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 8000
-      q: 12
+      q: 24
   band_26:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 10000
-      q: 12
+      q: 24
   band_27:
     type: Biquad
     parameters:
       type: Bandpass
-      freq: 12500
-      q: 12
+      freq: 24500
+      q: 24
   band_28:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 16000
-      q: 12
+      q: 24
   band_29:
     type: Biquad
     parameters:
       type: Bandpass
       freq: 20000
-      q: 12
+      q: 24
 
 mixers:
   30band:
