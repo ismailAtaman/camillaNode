@@ -66,6 +66,7 @@ function loadPipeline(element,pipeline) {
 function loadMixers(element, mixers) {
     //  console.log(mixers);
     
+    element.replaceChildren();
 
     let inCount = Object.values(mixers)[0].channels.in;
     let outCount = Object.values(mixers)[0].channels.out;
@@ -120,7 +121,7 @@ function loadMixers(element, mixers) {
 }
 
 function loadFilters(element,config,channelCount) {
-    element.innerHTML='';        
+    element.replaceChildren();
     const filters = config.filters;
     const pipeline = config.pipeline;
 
@@ -182,7 +183,7 @@ function loadFilters(element,config,channelCount) {
 
 async function visualizeConfig(element, DSP) {
     
-    element.innerHTML='';   
+    element.replaceChildren();
     const channels = await DSP.linearizeConfig();
     window.channels = channels;
     const channelCount = channels.length;

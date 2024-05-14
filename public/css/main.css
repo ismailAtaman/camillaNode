@@ -867,7 +867,7 @@ input[type="checkbox"]:disabled::before {
     margin: 0px;    
     padding: 0px;
     padding-left: 10px;
-    width: 480px;
+    width: fit-content;
     align-items: center;    
     user-select: none;
     border:1px solid hsl(var(--bck-hue), 20%, 40%);    

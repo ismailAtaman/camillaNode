@@ -1,9 +1,26 @@
+const Types = {
+    Gain : "Gain",
+    Volume: "Volume",
+    Loudness: "Loudness",
+    Delay:"Delay",
+    Conv:"Conv",
+    Biquad:"Biquad",
+    Dither:"Dither",
+    Limiter:"Limiter"
+}
+
+
 class filter {
+
     type;
     paremeters={}
     name;
+    description;
+    DSP;
+    
 
-    constructor() {                
+    constructor(DSPRef) {                
+        this.DSP = DSPRef;
         return this;    
     }
 
@@ -31,7 +48,7 @@ class filter {
 
         const filterType = document.createElement('select');
         filterType.className="filterType"; filterType.setAttribute("id","filterType");       
-        for (let type of this.getFilterTypes()) {
+        for (let type of Object.keys(Types)) {
             let opt = document.createElement("option");
             opt.setAttribute("value",type); opt.innerText=type;
             filterType.appendChild(opt);
@@ -73,8 +90,8 @@ class filter {
         const filterSubType = filterElement.children["filterSubType"]; 
         updateParams(this,filterType,filterSubType)
 
-        function updateParams(filter,type,subType) {            
-            let typeVal = type.value;
+        function updateParams(filterA,type,subType) {            
+            let typeVal = Types[type.value];            
             let subTypeVal;
             if (subType!=undefined) subTypeVal=subType.value;
 
@@ -84,6 +101,7 @@ class filter {
             const filterParams=document.createElement('div');
             filterParams.setAttribute("id","filterParams"); filterParams.className="filterParams";
             let elem;
+            console.log("Types ",typeVal,subTypeVal)
             for (let param of filter.getFilterParams(typeVal,subTypeVal)) { 
                 let title=document.createElement("span"); title.innerText=Object.keys(param)[0]+" :";
                 filterParams.appendChild(title);
@@ -127,33 +145,52 @@ class filter {
 
     getFilterSubTypes(filterType) {        
         switch (filterType) {
-            case "Biquad":
-                return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "Allpass", "Bandpass", "LinkwitzTransform"]                  
-            case "Conv":
+            case Types.Biquad:
+                return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "HighpassFO", "LowpassFO", "HighshelfFO", "LowshelfFO", "Notch", "Allpass", "Bandpass", "AllpassFO", "Tilt", "LinkwitzTransform"]                  
+            case Types.Conv:
                 return ["Raw","Wav","Values"];
             default:
                 return [];
         }        
     }
 
-    getFilterParams(filterType, filterSubType) {
+    static getFilterParams(filterType, filterSubType) {
         switch (filterType) {
-            case "Gain":
+            case Types.Gain:
                 return [{"Gain":"num"},{"Inverted":"bool"},{"Mute":"bool"},{"Scale":["dB","linear"]}];
-            case "Delay":
+
+            case Types.Volume:
+                return [{"Ramp Time (ms)":"num"},{"Fader":["Aux1","Aux2","Aux3","Aux4"]}];
+
+            case Types.Loudness:
+                return [{"Fader":["Main","Aux1","Aux2","Aux3","Aux4"]},{"Ref Level":"num"},{"High Boost":"num"},{"Low Boost":"num"},{"Attenuate Mid":"bool"}];
+
+            case Types.Delay:
                 return [{"Delay":"num"},{"Unit":["ms","mm","samples"]},{"Subsample":"bool"}];
-            case "Conv":                
+
+            case Types.Conv:         
+
                 if (filterSubType=="Raw") return [{"Filename":"text"},{"Skip bytes lines":"num"},{"Read bytes lines":"num"}];
                 if (filterSubType=="Wav") return [{"Filename":"text"},{"channel":"num"}];
                 if (filterSubType=="Values") return [{"values":"array"}];
-            case "Biquad":
+
+            case Types.Biquad:
                 if (filterSubType=="Free") return [{"a1":"num"},{"a2":"num"},{"b0":"num"},{"b1":"num"},{"b2":"num"}];
                 if (filterSubType=="Highpass" || filterSubType=="Lowpass" || filterSubType=="Bandpass" || filterSubType=="Allpass") return [{"Frequency":"num"},{"Q":"num"}];
                 if (filterSubType=="Peaking" || filterSubType=="Highshelf" || filterSubType=="Lowshelf") return [{"Frequency":"num"},{"Gain":"num"},{"Q":"num"}];
                 if (filterSubType=="LinkwitzTransform") return [{"Actual F":"num"},{"Actual Q":"num"},{"Target F":"num"},{"Target Q":"num"}];
             
+            case Types.Dither:
+                return [{"Type":["None","Flat","Highpass","Fweigthed441","Shibata48"]},{"Bits":["16"]}] ;
+
+            case Types.Limiter:
+                return [{"Soft Clip":"bool"},{"Clip Limit":"num"}];
+
+            default:
+                console.error("Undefined filter type : ",filterType)
+                return [];        
         }
-    }
-    
+    }    
 }
+
 export default filter;
