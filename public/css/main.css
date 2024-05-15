@@ -859,6 +859,7 @@ input[type="checkbox"]:disabled::before {
     padding: 5px;     
     height: 75px;
     width: 20px;
+    margin-right: 10px;
     background-color: hsl(var(--bck-hue), 60%, 20%);  
     z-index: 1;
 }
@@ -879,7 +880,7 @@ input[type="checkbox"]:disabled::before {
 }
 
 .filterElement:last-of-type {
-    border-bottom: none;
+    margin-right: 20px;
 }
 
 .filterElement:hover {
@@ -989,6 +990,10 @@ input[type="checkbox"]:disabled::before {
     filter:brightness(1.25) saturate(1.25);
 }
 
+.pipelineElement:last-of-type {
+    margin-right: 60px;
+}
+
 #pipelineContainer{
     position: relative;
     display: block;
@@ -998,7 +1003,7 @@ input[type="checkbox"]:disabled::before {
 }
 
 .inputNode, .outputNode  {
-    background-color: hsl(calc( 10 + var(--bck-hue)), 20%, 30%);
+    background-color: hsl(calc( 10 + var(--bck-hue)), 50%, 40%);
 }
 
 .mixerNode {
