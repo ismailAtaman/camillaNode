@@ -18,7 +18,7 @@ class camillaDSP {
     upperMidsFreq=3000;
     trebleFreq=8000;
 
-    DCProtectionFilter = {"__DCProtectionFilter":{"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}}};
+    DCProtectionFilter = {"__DCProFilter":{"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}}};
     Limiter = {"__Limiter":{"type":"Limiter","parameters":{"clip_limit":-3}}};
 
     constructor() { 

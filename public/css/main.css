@@ -904,7 +904,7 @@ input[type="checkbox"]:disabled::before {
     color: black;
     font-size: 13px;
     height: 22px;
-    width: 160px;
+    min-width: 120px;
     border-radius: 5px;  
     padding-left: 5px;  
 }
@@ -941,6 +941,74 @@ input[type="checkbox"]:disabled::before {
     max-width: 120px;
 }
 
+
+.pipelineChannel {
+    display: grid;
+    grid-template-rows: 1fr;            
+    grid-auto-flow: column;
+    gap: 5px;        
+    width: inherit;
+    overflow-x: scroll;
+    margin-block-end: 10px;    
+    margin-left: 40px;
+    margin-right: 40px;
+    padding-bottom: 10px;
+    scrollbar-width: thick;
+    scrollbar-color: hsl(var(--bck-hue), 60%, 20%);   
+
+}
+
+.pipelineChannel::before {
+    position: absolute;
+    left: 0px;
+    top: inherit;
+    content: attr(label);
+    writing-mode: vertical-lr;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 5px;       
+    height: 100px;  
+    width: 20px;
+    background-color: hsl( calc( 20 + var(--bck-hue)), 50%, 30%);  
+    z-index: 1;
+}
+
+.pipelineElement {            
+    margin: 0px;    
+    padding: 0px;
+    padding-left: 10px;
+    width: 100px;
+    align-items: center;    
+    user-select: none;
+    border:1px solid hsl(var(--bck-hue), 20%, 40%);    
+    border-radius: 5px;
+}
+
+.pipelineElement:hover {
+    filter:brightness(1.25) saturate(1.25);
+}
+
+#pipelineContainer{
+    position: relative;
+    display: block;
+    width: 100%;
+    overflow-x: hidden;
+    padding-right: 0px;
+}
+
+.inputNode, .outputNode  {
+    background-color: hsl(calc( 10 + var(--bck-hue)), 20%, 30%);
+}
+
+.mixerNode {
+    background-color: hsl(calc( 10 + var(--bck-hue)), 40%, 30%);
+}
+
+.filterNode {
+    background-color: hsl(calc( 10 + var(--bck-hue)), 30%, 30%);
+}
+
  .mixer {
     margin-top: 10px;    
     justify-content: left;
@@ -950,6 +1018,7 @@ input[type="checkbox"]:disabled::before {
     background-color: hsl(var(--bck-hue), 40%, 20%);
     margin-bottom: 5px;
     margin-inline: 5px;
+    width: calc( 50% - 10px );
 }
 
 .mixerTitle {
@@ -959,16 +1028,19 @@ input[type="checkbox"]:disabled::before {
     margin: 0px;    
     padding: 5px;
     text-align: left;  
-    border-radius: 7px;  
-    background-color: hsl(calc( 30 + var(--bck-hue)), 35%, 15%);
-    
+    border-radius: 7px 7px 0px 0px;  
+    background-color: hsl(calc( 15 + var(--bck-hue)), 40%, 15%);    
 }
 
 .mixerSource {
-    display: flex;    
+    display: flex;        
     align-items: center;
-    background-color: hsl(calc( 30 + var(--bck-hue)), 30%, 20%);
-    
+    background-color: hsl(calc( 15 + var(--bck-hue)), 40%, 20%);
+    border-radius: 0px 0px 7px 7px;    
+}
+
+.mixerSource span {
+    margin-inline: 10px;
 }
 /********************************************************************************************************/
 
@@ -989,46 +1061,4 @@ input[type="checkbox"]:disabled::before {
 }
 
 
-#visualContainer{
-    position: relative;
-    display: block;
-    width: 100%;
-    overflow-x: scroll;
-    padding-right: 0px;
-}
 
-.visualNode {        
-    position: absolute;
-    display: block;
-    left:50px;
-    top:50px;        
-    width: 100px;
-    height: 110px;
-    border:1px solid white;
-    background-color: green;
-    border-radius: 5px;
-    padding: 5px;
-    cursor:grab;
-    user-select: none;
-    text-align: center;
-    margin:0px;        
-    font-size: 15px;
-    text-wrap :wrap;
-}
-
-
-.visualNode:hover {
-    filter:brightness(1.2)
-}
-
-.inputNode, .outputNode  {
-    background-color: hsl(calc( 20 + var(--bck-hue)), 20%, 30%);
-}
-
-.mixerNode {
-    background-color: hsl(calc( 30 + var(--bck-hue)), 30%, 20%);
-}
-
-.filterNode {
-    background-color: hsl(calc( 40 + var(--bck-hue)), 30%, 30%);
-}

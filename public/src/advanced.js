@@ -5,7 +5,7 @@ async function advancedOnLoad() {
     const advancedFilters = document.getElementById("advancedFilters");
     const pipelineManagement = document.getElementById("pipelineManagement");
     const channelMapping = document.getElementById("channelMapping");
-    const visualContainer = document.getElementById("visualContainer");
+    const pipelineContainer = document.getElementById("pipelineContainer");
     
 
     // advancedFilters.appendChild(filter.createElement("New filter "+advancedFilters.childNodes.length));
@@ -15,11 +15,8 @@ async function advancedOnLoad() {
 
     // loadPipeline(pipelineManagement,window.config.pipeline)
     // loadMixers(channelMapping,window.config.mixers)    
-    await visualizeConfig(visualContainer,window.parent.DSP)
-    visualContainer.addEventListener("wheel",function(e){
-        this.scrollLeft += e.deltaY/2;
-        e.preventDefault();
-    });
+    await visualizeConfig(pipelineContainer,window.parent.DSP)
+
 
     await window.parent.DSP.downloadConfig();
     loadMixers(channelMapping,window.parent.DSP.config.mixers);
@@ -188,18 +185,24 @@ async function visualizeConfig(element, DSP) {
     const channelCount = channels.length;
     const nodeWidth = 100;
     const nodeHeight = 110;    
-    const channelDistance = 20;
+    const channelDistance = 5;
     const margin = 10;
     
     // Resize element based on # of channels 
-    element.style.height = channelCount * (nodeHeight + 2 * margin ) + (channelCount - 1) * channelDistance+'px';    
-    let position = {"left":margin,"top":margin}  
+    // element.style.height = channelCount * (nodeHeight + 2 * margin ) + (channelCount - 1) * channelDistance+'px';    
     
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
+        let channelElement = document.createElement("div"); channelElement.className="pipelineChannel"; 
+        channelElement.setAttribute("channel",channelNo); channelElement.setAttribute("label","Channel "+channelNo);
+        channelElement.addEventListener("wheel",function(e){
+            this.scrollLeft += e.deltaY/2;
+            e.preventDefault();
+        });
+        element.appendChild(channelElement);
         for (let component of channels[channelNo]) {
             // console.log(component)
             let type = component.type;
-            let node = addNode(element,position,type);
+            let node = addNode(channelElement,type);
             
             if (type=="input" || type=="output") {
                 node.innerText = type.toUpperCase() +"\n"+ component.device.device+"\n"+ component.device.format;
@@ -232,22 +235,15 @@ async function visualizeConfig(element, DSP) {
                     }
 
                 })
-            }
-            
-
-            position.left = position.left + nodeWidth + margin * 2;                        
-        }
-        position.left=margin;
-        position.top = position.top + nodeHeight + margin * 2;
+            }                                         
+        }        
     }
     
 }
 
-function addNode(parent, position, type) {
+function addNode(parent, type) {
     let node = document.createElement('div');
-    node.className='visualNode';
-    node.style.left = position.left+'px';
-    node.style.top = position.top+'px';
+    node.className='pipelineElement';    
     node.classList.add(type+"Node");    
     parent.appendChild(node);
     return node;
