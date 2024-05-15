@@ -126,7 +126,6 @@ function loadFilters(element,config,channelCount) {
     const pipeline = config.pipeline;
 
 
-
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
         let filterChannel = document.createElement("div"); 
         filterChannel.className='filterChannel'; 
@@ -148,7 +147,7 @@ function loadFilters(element,config,channelCount) {
     }
 
     function createFilter(filterName) {
-        const filter = new filterClass();
+        const filter = new filterClass(window.parent.DSP);
         let filterElement = filter.createElement(filterName);  
         
         
@@ -265,8 +264,7 @@ async function splitFilterToAllChannels() {
     DSP.config.filters= filters;
     DSP.config.pipeline = DSP.updatePipeline(DSP.config,true);
     await DSP.uploadConfig()
-    advancedOnLoad();
-    
+    advancedOnLoad();    
 }
 
 async function mergeFilters() {

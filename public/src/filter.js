@@ -17,17 +17,19 @@ class filter {
     name;
     description;
     DSP;
+    filterElement;
     
 
     constructor(DSPRef) {                
         this.DSP = DSPRef;
+        // console.log(this.DSP);
         return this;    
     }
 
     createElement(name) {
         this.name=name;
         const filterElement = document.createElement('div');
-        filterElement.filter=this; filterElement.className="filterElement";
+        filterElement.filter=this; filterElement.className="filterElement"; filterElement.setAttribute("configName",name);
 
         const filterBasic = document.createElement('div'); 
         // filterBasic.style="grid-column : 1 / span 2;"; 
@@ -38,8 +40,8 @@ class filter {
         nameSpan.innerText='Name :'
         filterBasic.appendChild(nameSpan);
 
-        const filterName = document.createElement('div');
-        filterName.contentEditable=true; filterName.className="filterName"; filterName.innerText=this.name;
+        const filterName = document.createElement('input');
+        filterName.className="filterName"; filterName.value=this.name; filterName.id="filterName";
         filterBasic.appendChild(filterName);
         
         let typeSpan = document.createElement('span');
@@ -101,7 +103,7 @@ class filter {
             const filterParams=document.createElement('div');
             filterParams.setAttribute("id","filterParams"); filterParams.className="filterParams";
             let elem;
-            console.log("Types ",typeVal,subTypeVal)
+            // console.log("Types ",typeVal,subTypeVal)
             for (let param of filter.getFilterParams(typeVal,subTypeVal)) { 
                 let title=document.createElement("span"); title.innerText=Object.keys(param)[0]+" :";
                 filterParams.appendChild(title);
@@ -120,6 +122,7 @@ class filter {
                         break;
                     default:
                         elem = document.createElement("select"); 
+                        elem.id = Object.keys(param)[0];
                         for (let opt of Object.values(param)[0]) {                            
                             let o = document.createElement("option");
                             o.innerText=opt;o.setAttribute("value",opt);    
@@ -128,14 +131,48 @@ class filter {
                 }
                 filterParams.appendChild(elem);
             }
+            
             type.parentElement.parentElement.appendChild(filterParams);
-
         }
 
         // const filterType = document.createElement('div');
 
         filterElement.filter=this;
         this.filterElement=filterElement;
+
+        assignObserver(filterElement);
+
+        async function eventListener(e) {                        
+            // Below line ensures each event runs once (so far)
+            if (e.currentTarget.className!='filterElement') return;
+
+            let filterElement;
+            if (e.target.className=='filterElement') filterElement=e.target;
+            if (e.target.parentElement.className=='filterElement') filterElement=e.target.parentElement;
+            if (e.target.parentElement.parentElement.className=='filterElement') filterElement=e.target.parentElement.parentElement;
+
+            // console.log("Listener for ",e.target," : " ,filter.getParams(filterElement));
+            
+            let configName = filterElement.getAttribute("configName");
+            let filterJson = filterElement.filter.createFilterJson(filter.getParams(filterElement));
+            console.log(configName,filterJson)
+
+            delete filterElement.filter.DSP.config.filters[mids];
+            Object.assign(filterElement.filter.DSP.config.filters,filterJson);
+            await filterElement.filter.DSP.uploadConfig()
+
+            filterElement.setAttribute("configName",Object.keys(filterJson)[0]);
+
+
+        }
+
+        function assignObserver(element) {                               
+            for (let e of element.children) {
+                if (e.children.length>0) assignObserver(e); else e.addEventListener("change",eventListener);
+            }
+            element.addEventListener("change",eventListener);
+        }
+
         return filterElement;
     }
 
@@ -154,13 +191,71 @@ class filter {
         }        
     }
 
+    static getParams(element) {
+        let filterObject = {};
+        convertNodeToObject(element, filterObject)
+        // console.log(filterObject);        
+        
+        function convertNodeToObject(node, returnObject) {            
+            let val;       
+            if (node.id==undefined) return;
+            switch (node.tagName) {
+                case "SPAN":
+                    break;
+                case "DIV":
+                    val = node.innerText;                    
+                case "INPUT":                                      
+                    if (node.type=="checkbox") val = node.checked; else val = node.value;
+                    break;
+                case "SELECT":                    
+                    val = node.value;
+                    break;
+                case "OPTION":
+                    break;
+                default:
+                    console.error("filter.getParams error. Tag yype not defined. ",node.tagName);  
+                    break;
+            }            
+            
+            returnObject[node.id] = val;            
+            if (val== undefined) delete returnObject[node.id];
+            if (!isNaN(parseFloat(val))) returnObject[node.id]= parseFloat(val);            
+
+            for (let child of node.children) convertNodeToObject(child,returnObject);            
+        }
+        return filterObject;
+            
+        
+    }
+
+    createFilterJson(filterParams) {
+        let filterJson = {}       
+        
+        console.log(filterParams);
+        let parameters={}
+        for (let paramName of Object.keys(filterParams)) {                        
+            if (paramName=="filterName" || paramName=="filterType") continue;
+            
+            let paramVal= filterParams[paramName];
+            let paramText = paramName.toLowerCase().replace(" ","_");
+
+            if (paramText=="frequency") paramText="freq";
+            if (paramText=="filtersubtype") paramText="type";
+            parameters[paramText]=paramVal;
+        }
+
+
+        filterJson[filterParams.filterName]={"type":filterParams.filterType,"parameters":parameters}
+        return filterJson;
+    }
+
     static getFilterParams(filterType, filterSubType) {
         switch (filterType) {
             case Types.Gain:
                 return [{"Gain":"num"},{"Inverted":"bool"},{"Mute":"bool"},{"Scale":["dB","linear"]}];
 
             case Types.Volume:
-                return [{"Ramp Time (ms)":"num"},{"Fader":["Aux1","Aux2","Aux3","Aux4"]}];
+                return [{"Ramp Time":"num"},{"Fader":["Aux1","Aux2","Aux3","Aux4"]}];
 
             case Types.Loudness:
                 return [{"Fader":["Main","Aux1","Aux2","Aux3","Aux4"]},{"Ref Level":"num"},{"High Boost":"num"},{"Low Boost":"num"},{"Attenuate Mid":"bool"}];
