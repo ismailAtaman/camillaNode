@@ -947,6 +947,7 @@ input[type="checkbox"]:disabled::before {
     display: grid;
     grid-template-rows: 1fr;            
     grid-auto-flow: column;
+    justify-content: left;
     gap: 5px;        
     width: inherit;
     overflow-x: scroll;
@@ -1065,5 +1066,10 @@ input[type="checkbox"]:disabled::before {
     margin-top: 10px;
 }
 
-
+#pipeContextMenu {
+    
+    width: 200px;
+    border-radius: 7px;
+    border: 1px solid white;
+}
 

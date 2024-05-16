@@ -55,6 +55,7 @@ function loadPipeline(element,pipeline) {
         }
 
 
+
         element.appendChild(pipeElement);
     }
 
@@ -245,6 +246,11 @@ function addNode(parent, type) {
     let node = document.createElement('div');
     node.className='pipelineElement';    
     node.classList.add(type+"Node");    
+    node.addEventListener("contextmenu",function(e){
+
+        e.preventDefault();        
+    })
+
     parent.appendChild(node);
     return node;
 }

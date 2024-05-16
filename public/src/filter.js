@@ -286,6 +286,10 @@ class filter {
                 return [];        
         }
     }    
+
+    removeFilter(filterName) {
+        delete this.DSP.config.filter[filterName];
+    }
 }
 
 export default filter;
