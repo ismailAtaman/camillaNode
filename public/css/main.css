@@ -1066,10 +1066,19 @@ input[type="checkbox"]:disabled::before {
     margin-top: 10px;
 }
 
-#pipeContextMenu {
-    
-    width: 200px;
+#pipeContextMenu {    
+    position: absolute;
+    display: none;
+    left: 100px;
+    top: 100px;    
+    width: 150px;
     border-radius: 7px;
-    border: 1px solid white;
+    background-color: hsl(var(--bck-hue), 30%, 20%); ;
+    border: 1px solid hsl(var(--bck-hue), 20%, 10%); 
+}
+
+#pipeContextMenu .navigate {
+    font-size: 14px;    
+    height: 18px;
 }
 

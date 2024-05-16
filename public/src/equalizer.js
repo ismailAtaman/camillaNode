@@ -253,7 +253,7 @@ async function initSpectrum(){
     const spec = document.getElementById("spectrum");   
     const barCount=freq.length-1;
     const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
-    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px")
+    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
     
 
     let bar,box;
@@ -280,6 +280,8 @@ async function initSpectrum(){
     setInterval(async function(){
         const spec = document.getElementById("spectrum");
         let r = await DSP.getSpectrumData();                
+
+        console.log(r);
         
         let i=0, height, boxCount, count;
         spec.childNodes.forEach(e=>{

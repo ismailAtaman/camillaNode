@@ -1,5 +1,7 @@
 
 
+let selectedNode = undefined;
+
 async function advancedOnLoad() {
     
     const advancedFilters = document.getElementById("advancedFilters");
@@ -15,7 +17,7 @@ async function advancedOnLoad() {
 
     // loadPipeline(pipelineManagement,window.config.pipeline)
     // loadMixers(channelMapping,window.config.mixers)    
-    await visualizeConfig(pipelineContainer,window.parent.DSP)
+    await loadPipeline(pipelineContainer,window.parent.DSP)
 
 
     await window.parent.DSP.downloadConfig();
@@ -25,10 +27,14 @@ async function advancedOnLoad() {
     const channelCount = await window.parent.DSP.getChannelCount();
     loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
 
+    document.addEventListener('click',function() {
+        document.getElementById('pipeContextMenu').style.display='none';        
+    })
+
     
 }
 
-function loadPipeline(element,pipeline) {
+function loadPipelineEx(element,pipeline) {
     
     for (let pipe of pipeline) {        
         let pipeElement = document.createElement("div"); pipeElement.className="pipe";
@@ -85,7 +91,7 @@ function loadMixers(element, mixers) {
         mixerSources.appendChild(mixerSourceSpan);
 
         const sources = channels[cNo].filter(function(e){return e.type=="mixer"})[0].sources;
-        console.log(cNo,sources);
+        // console.log(cNo,sources);
 
         for (let source of sources) {
             let sourceElement = document.createElement("div"); sourceElement.className="mixerSource"
@@ -178,7 +184,7 @@ function loadFilters(element,config,channelCount) {
 } 
 
 
-async function visualizeConfig(element, DSP) {
+async function loadPipeline(element, DSP) {
     
     element.replaceChildren();
     const channels = await DSP.linearizeConfig();
@@ -200,6 +206,7 @@ async function visualizeConfig(element, DSP) {
             e.preventDefault();
         });
         element.appendChild(channelElement);
+
         for (let component of channels[channelNo]) {
             // console.log(component)
             let type = component.type;
@@ -219,7 +226,8 @@ async function visualizeConfig(element, DSP) {
 
             if (type=="filter") {
                 let filterName = Object.keys(component)[1];
-                node.innerText =  filterName;                
+                node.innerText =  filterName;              
+                node.setAttribute("id",filterName);
                 if (component[filterName].type=="Biquad") {                    
                     node.innerText = node.innerText + "\n"+component[filterName].type+"\n" + component[filterName].parameters.type+"\n"+ component[filterName].parameters.freq + "Hz"
                     if (component[filterName].parameters.gain!=undefined) node.innerText = node.innerText+ "\n"+component[filterName].parameters.gain+'dB';
@@ -234,8 +242,9 @@ async function visualizeConfig(element, DSP) {
                         // console.log(filterChannel.children[filterName].getBoundingClientRect().left);
                         if (filterChannel.children[filterName]!=undefined) filterChannel.scrollLeft += filterChannel.children[filterName].getBoundingClientRect().left;                        
                     }
-
                 })
+
+
             }                                         
         }        
     }
@@ -246,11 +255,15 @@ function addNode(parent, type) {
     let node = document.createElement('div');
     node.className='pipelineElement';    
     node.classList.add(type+"Node");    
-    node.addEventListener("contextmenu",function(e){
+    node.setAttribute("nodeType",type)
 
-        e.preventDefault();        
+    
+    node.addEventListener('contextmenu',function(e){
+        e.preventDefault();
+        const contextMenu = document.getElementById("pipeContextMenu");        
+        contextMenu.style="left: "+parseInt(e.clientX-5)+"px; top:"+parseInt(e.clientY-5)+"px; display: block;'";
+        selectedNode=this;
     })
-
     parent.appendChild(node);
     return node;
 }
@@ -258,6 +271,43 @@ function addNode(parent, type) {
 function addLine(fromNode, toNode) {
 
 }
+
+async function deleteNode() {    
+    let nodeType = selectedNode.getAttribute("nodeType");
+    if (nodeType=="output" || nodeType=="input") {
+        alert("Input and output nodes can not be deleted.");
+        
+    } else if (nodeType=="filter") {
+        let filterName = selectedNode.id;
+        if (confirm("Are you sure you would like like to delete filter '"+filterName+"'?")) {
+            delete window.parent.DSP.config.filters[filterName];
+            window.parent.DSP.config.pipeline = window.parent.DSP.updatePipeline(window.parent.DSP.config);
+            await window.parent.DSP.uploadConfig();
+
+            let channels = document.getElementsByClassName("pipelineChannel");
+            for (let channel of channels) {
+                channel.removeChild(channel.children[filterName]);
+            }
+        };              
+    }
+    document.getElementById("pipeContextMenu").style.display='none';        
+}
+
+async function addNodeManual() {
+    let filterName = "Filter_"+new Date().getTime().toString().substring(8);
+    
+
+
+    let channels = document.getElementsByClassName("pipelineChannel");
+    for (let channel of channels) {
+        
+        let node = addNode(channel,"filter");
+        node.innerText=filterName;
+
+    }
+    
+    // window.location.reload();
+}    
 
 
 async function splitFilterToAllChannels() {    
