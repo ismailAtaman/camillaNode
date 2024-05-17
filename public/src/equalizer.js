@@ -278,19 +278,25 @@ function sortByFreq(parent) {
 
     let elementArray=[];
     parent.childNodes.forEach(element => {                
-        if (element.className=="peqline") {                    
-            elementArray.push(element);                        
-        }
-        //parent.removeChild(element)
+        element.childNodes.forEach(peqElement=> {
+            if (peqElement.className=="peqElement") {                    
+                elementArray.push(peqElement);                                                    
+            }                
+        })
+        element.innerHTML='';
     });
 
+    console.log(elementArray);
+
     function compareLines(a,b) {    
-        return parseInt(a.instance.getParams().freq) - parseInt(b.instance.getParams().freq);                
+        return parseInt(a.filter.parameters.freq) - parseInt(b.filter.parameters.freq);                
     }
 
-    elementArray.sort(compareLines);            
-    for (let element of elementArray) {                
-        parent.appendChild(element);
+    elementArray=elementArray.sort(compareLines);            
+    for (let element of elementArray) {                        
+        parent.childNodes.forEach(channel=>{
+            channel.appendChild(element);
+        })  
     }            
 }
 
