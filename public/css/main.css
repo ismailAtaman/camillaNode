@@ -539,10 +539,12 @@ select {
 .peqParams {
     display: flex;         
     align-items: center;
-    background: linear-gradient(90deg, hsl(var(--bck-hue), 50%, 20%),hsl(var(--bck-hue), 45%, 10%));        
-    margin-left: -10px;
+    background: linear-gradient(0deg, hsl(var(--bck-hue), 50%, 20%),hsl(var(--bck-hue), 45%, 10%));        
+    margin-left: -10px;    
     padding-inline: 5px;            
+    padding-right: 30px;
     border-radius: var(--peq-param-border-radius);
+ 
 }
 
 .peqParams > div, input {
