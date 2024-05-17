@@ -1,9 +1,5 @@
 
 
-
-"use strict"
-
-
 const QUADLEN = 1024;
 
 function calculateFilterDataMatrix(type, freq, gain, qfact) {	
@@ -330,7 +326,6 @@ function createGrid(canvas) {
 	
 }
 
-
 function plot(filterObject, canvas, name) {
 	const ctx = canvas;        
 	const context = ctx.getContext('2d');             
@@ -390,6 +385,5 @@ function plot(filterObject, canvas, name) {
 	// return Math.round(Math.max(...totalArray[1]));
 
 }
-
 
 export default plot;
