@@ -93,7 +93,8 @@ class filter {
                     elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0; elem.id=Object.keys(param)[0].toLowerCase();
                     elem.addEventListener("wheel",function(e){
                         let dir = e.deltaY> 0 ? 1:-1;
-                        let val = parseFloat(this.value) * 0.1;
+                        let val 
+                        if (dir>0) val = parseFloat(this.value) * 0.1; else val = Math.round(parseFloat(this.value) / 11);
                         if (val<1) val=1;
                         val = Math.round(val);                        
                         this.value = parseFloat(this.value) + dir * val;
