@@ -845,6 +845,7 @@ input[type="checkbox"]:disabled::before {
     padding-bottom: 10px;
     scrollbar-width: thick;
     scrollbar-color: hsl(var(--bck-hue), 60%, 20%);   
+    justify-content: left;
 }
 
 .filterChannel::before {

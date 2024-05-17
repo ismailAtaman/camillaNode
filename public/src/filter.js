@@ -157,7 +157,7 @@ class filter {
             let filterJson = filterElement.filter.createFilterJson(filter.getParams(filterElement));
             console.log(configName,filterJson)
 
-            delete filterElement.filter.DSP.config.filters[mids];
+            delete filterElement.filter.DSP.config.filters[configName];
             Object.assign(filterElement.filter.DSP.config.filters,filterJson);
             await filterElement.filter.DSP.uploadConfig()
 
