@@ -467,9 +467,11 @@ function showManageConfigs() {
 
     // let configsAray = configsObject.loadConfigsRemote(activePage);                       
     // console.log(configsAray);
+    document.getElementById("configName").value='';
     loadConfigs(activePage,configList);
     document.getElementById("configName").addEventListener('keyup',function(e){                
         if (e.key=="Enter") saveConfigurationClick();
+        loadConfigs(activePage,configList,this.value);
     })
     mod.showModal();            
 }
@@ -615,12 +617,20 @@ async function deleteConfigurationClick() {
     }
 }
 
-async function loadConfigs(activePage,configList) {
+async function loadConfigs(activePage,configList,filter) {
     let configsArray = await configsObject.loadConfigsRemote(activePage,true);                        
     // console.log(configsArray);
     configList.innerHTML='';
-    document.getElementById("configName").value='';
+    //document.getElementById("configName").value='';
     let configItemElement;
+
+    if (filter!=undefined) {
+        configsArray = configsArray.filter(function(config){
+            // console.log("filter : ",filter)
+            return config.name.toLowerCase().includes(filter.toLowerCase());
+        })
+    }
+
     configsArray.forEach(e=>{
         configItemElement=document.createElement('div');
         configItemElement.className='config';
