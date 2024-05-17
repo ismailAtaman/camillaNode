@@ -6,7 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 
 :root {
-    --bck-hue: 140;
+    --bck-hue: 160;
     --bck-sat: 30%;
     --bck-light : 20%;
     --bck-color: hsl(var(--bck-hue),var(--bck-sat),var(--bck-light));   
