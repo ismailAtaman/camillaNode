@@ -122,6 +122,20 @@ class preferences {
             "enabled":true,
             },        
 
+            {"id":"peqDualChannel",
+            "name":"Seperate filters for Right and Left channels",
+            "value":false,
+            "type":"boolean",                        
+            "enabled":true,
+            },        
+
+            {"id":"peqSingleLine",
+            "name":"Show PEQ filters in a single line in single channel mode",
+            "value":true,
+            "type":"boolean",                        
+            "enabled":true,
+            },        
+
         ]  
         return tmpPref;
     }

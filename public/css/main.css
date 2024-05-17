@@ -23,7 +23,8 @@
     --levelbar-width: 31px;
 
     --peq-columns: 1fr;
-    --peq-before-grid-column: 1 / span 1;
+    --peq-before-grid-column: 1 / span 2;
+    --peq-channel-before-display: none;
 
     background-color:hsl(var(--bck-hue), var(--bck-sat), var(--bck-light));
 
@@ -282,7 +283,7 @@ dialog .navigate {
     display: inline-block;
     line-height: 2;    
     height: 30px;
-    width: 100px;
+    /* width: 100px; */
     font-size: 14px;
     background-color: hsl(var(--bck-hue), var(--bck-sat), 40%);    
     padding: 5px;
@@ -490,7 +491,7 @@ select {
 #PEQ {
     display: grid;
     grid-template-columns: var(--peq-columns); 
-    gap: 10px;    
+    gap: 5px;    
 }
 
 #PEQ::before {
@@ -503,18 +504,20 @@ select {
     gap: 10px;
     justify-content: left;
     margin-inline: 10px;
+    overflow-y: scroll;
 }
 
-/* .peqChannel::before {
+.peqChannel::before {
     content: attr(label);
-    display: block;      
-    font-size: 1.2rem;        
-    background-color: hsl(var(--bck-hue), 45%, 10%);
+    display: var(--peq-channel-before-display);      
+    font-size: 1.1rem;        
+    background-color: hsl(var(--bck-hue), 50%, 25%);
     color: white;  
     border-radius: 10px 10px 0 0 ;    
     padding-left: 10px;
     padding-block: 5px;    
-} */
+    
+} 
 
 .peqElement {            
     margin: 0px;    
@@ -522,31 +525,35 @@ select {
     padding-left: 10px;    
     align-items: center;    
     user-select: none;
-    border:1px solid hsl(var(--bck-hue), 20%, 20%);        
+    border:1px solid hsl(var(--bck-hue), 20%, 30%);        
     border-radius: 7px;        
 }
 
 
 .peqElement:hover {        
     filter: saturate(1.15) brightness(1.15);
-    box-shadow: 0px 0px 30px 0px #111;
+    box-shadow: 0px 0px 20px 2px #111;
 }
 
 .peqParams {
     display: flex;         
     align-items: center;
-    background-color: hsl(var(--bck-hue), 50%, 20%);    
-    height: 40px;        
+    background: linear-gradient(90deg, hsl(var(--bck-hue), 50%, 20%),hsl(var(--bck-hue), 45%, 10%));        
     margin-left: -10px;
-    padding-inline: 5px;        
-    border-radius: 0px 0px 7px 7px;
+    padding-inline: 5px;            
 }
 
 .peqParams > div, input {
     margin-left: 5px;
-    margin-block: 5px;    
-    height: 22px;    
+    margin-block: 5px;
+    padding-inline: 5px;    
+    height: 25px;    
     width: fit-content;
+    border-radius: 5px;
+}
+
+.peqParams > div, input:hover {
+    background-color: hsl(var(--bck-hue), 50%, 80%);
 }
 
 .peqParams > span {
@@ -628,7 +635,7 @@ select {
     width: 30vw;
 }
 
-#importWindow input {
+#importWindow >input {
     max-width: unset;   
 }
 
@@ -724,7 +731,7 @@ select {
 .preferenceSection {
     position: relative;
     display: grid;
-    grid-template-columns: 300px auto;
+    grid-template-columns: 500px auto;
     gap: 15px;
     margin-bottom: 50px;
     width: 100%;
@@ -749,11 +756,11 @@ select {
 }
 
 .preferenceSection input[type="range"] {
-    max-width: 200px;
+    max-width: 250px;
 }
 
 .preferenceName {
-    margin-block: 3px;
+    margin-block: 3px;    
     /* border: 1px solid red; */
 }
 
@@ -763,6 +770,7 @@ select {
     border: 0px solid white;
     border-radius: 5px;
     height: 10px; 
+    width: 300px;
 }
 
 

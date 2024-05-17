@@ -108,18 +108,35 @@ function updateElementWidth() {
 
 async function loadFiltersFromConfig() {                        
     PEQ.innerHTML='';
+    
+    
+
+    if (window.parent.activeSettings.peqDualChannel) {        
+        await splitChannels();                
+
+        window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
+        window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
+        window.document.documentElement.style.setProperty("--peq-channel-before-display","block");
+    }
+    
     await DSP.downloadConfig();    
 
     const channelCount = DSP.getChannelCount();
-    for (let channelNo=0;channelNo<channelCount;channelNo++) {
+    for (let channelNo=0;channelNo<2;channelNo++) {
+
         let peqChannel = document.createElement('div');
         peqChannel.className="peqChannel"; peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);
 
-        for (let filter of Object.keys(DSP.filters)) {
+        let filterList;
+        if (window.parent.activeSettings.peqDualChannel) filterList=DSP.getChannelFiltersList(channelNo); else filterList=Object.keys(DSP.filters);
+
+        console.log("filter list ",filterList);
+
+        for (let filter of filterList) {
             let currentFilter = DSP.filters[filter];
             if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;
 
-            currentFilter.createElement(true);
+            currentFilter.createElement(true);            
 
             let peqElement = document.createElement('div');
             peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
@@ -139,19 +156,32 @@ async function loadFiltersFromConfig() {
             filterBasic.appendChild(subTypeSpan);
             filterBasic.appendChild(currentFilter.elementCollection.filterSubType);       
 
-            let filterParams = document.createElement('div'); 
-            filterParams.id = "filterParams"; filterParams.className='filterParams';
+            let peqParams = document.createElement('div');             
+            peqParams.id = "peqParams"; peqParams.className='peqParams';
+
             
+            if (window.parent.activeSettings.peqSingleLine) {
+                peqParams.style = "border-radius: 0px;"
+                peqElement.style = "display:flex; height: 40px;"
+                filterBasic.style = 'margin-right: 20px'
+            } else {
+                peqParams.style = "border-radius: 0px 0px 7px 7px;"
+            }
+
             peqElement.appendChild(filterBasic);
             peqElement.appendChild(currentFilter.elementCollection.peqParams);
+
+            
 
             peqChannel.appendChild(peqElement);
         }
 
         PEQ.appendChild(peqChannel);
+        
 
-        // siungle channel
-        if (channelNo>=0) break;
+
+        if (channelNo>=0 && !window.parent.activeSettings.peqDualChannel) break;
+
 
     }
     
@@ -184,6 +214,13 @@ async function loadFiltersFromConfig() {
 
     document.loading=false;
 }
+
+async function splitChannels() {
+    DSP.config.filters= DSP.splitFiltersToChannels(DSP.config.filters);                
+    DSP.config.pipeline = DSP.updatePipeline(DSP.config);        
+    await DSP.uploadConfig();
+}
+
 
 function plotConfig() {
     const canvas = document.getElementById("plotCanvas");            
@@ -283,10 +320,10 @@ function peqlineAdd(peqline) {
 
 async function clearPEQ() {        
     setPreamp(0);
-    await DSP.clearFilters();        
+    await DSP.clearFilters(true);        
     await DSP.uploadConfig();
     document.getElementById('PEQ').innerHTML='';
-    peqlineUpdate();
+    // peqlineUpdate();
  
 }
 

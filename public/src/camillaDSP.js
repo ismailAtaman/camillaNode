@@ -214,18 +214,28 @@ class camillaDSP {
     }
 
     async downloadConfig() {
-        this.config = await this.sendDSPMessage("GetConfigJson");        
-        for (let f of Object.keys(this.config.filters)) {
-            
-            let newFilter = new filter(f,this.config.filters[f]);
-            newFilter.DSP=this;
-            this.filters[f]=newFilter;
-           
-        }
-
-        this.pipeline=this.config.pipeline;
-        console.log(this.filters)
+        this.config = await this.sendDSPMessage("GetConfigJson");     
+        // console.log("Filters :",this.config.filters)   
+        this.createFilters();
+        
+        // console.log(this.filters)
     }
+
+    createFilters() {
+        this.filters={};
+        let channelCount=this.getChannelCount();
+        for (let c=0;c<channelCount;c++) {
+            let filterList = this.getChannelFiltersList(c);
+            for (let f of filterList) {            
+                let newFilter = new filter(f,this.config.filters[f]);
+                newFilter.DSP=this;
+                newFilter.channel=c;
+                this.filters[f]=newFilter;           
+            }
+        }        
+        this.pipeline=this.config.pipeline;
+    }
+
 
     getDefaultConfig(config, override) {
             if (override==undefined) override=false;               
@@ -252,7 +262,7 @@ class camillaDSP {
         let channelCount = this.getChannelCount();
         for (let c=0;c<channelCount;c++) {
             for (let f of Object.keys(filters)) {                        
-                tmpFilters[f+"_channel_"+c]=filters[f];
+                tmpFilters[f+"__c"+c]=filters[f];
             }
         }
         return tmpFilters;
@@ -365,7 +375,7 @@ class camillaDSP {
         return {"type":"Biquad","parameters":{"type":"Peaking","freq":freq,"gain":gain,"q":q}};                
     }        
     
-    updatePipeline(config) {
+    updatePipeline(config, multiChannel) {
         let pipeline=[];        
 
         for (let mixer in config.mixers) {
@@ -375,10 +385,10 @@ class camillaDSP {
         const channelCount = this.getChannelCount();
 
         // Check if filters are seperated per channel 
-        if (Object.keys(this.config.filters).filter((e)=>e.includes("_channel_0")).length>0) {
+        if (Object.keys(this.config.filters).filter((e)=>e.includes("__c0")).length>0) {
             // console.log("Seperate filters")
             for (let i=0;i<channelCount;i++) {
-                let currentChannelFilters =Object.keys(this.config.filters).filter((e)=>e.includes("_channel_"+i));                
+                let currentChannelFilters =Object.keys(this.config.filters).filter((e)=>e.includes("__c"+i));                
                 pipeline.push({"type":"Filter","channel":i,"names":currentChannelFilters});
             }            
         } else {            
@@ -437,7 +447,7 @@ class camillaDSP {
     async clearFilters(clearAll) {        
         await this.downloadConfig();        
 
-        if (clearAll) { this.config.filters={}; return; }       
+        if (clearAll) { this.config.filters={}; this.config.pipeline=this.updatePipeline(this.config); return; }       
         
         let tmpFilters = {};
         for (let filterName of Object.keys(this.config.filters)) {            
@@ -509,6 +519,11 @@ class camillaDSP {
         let outChannels = this.config.mixers[Object.keys(this.config.mixers)[0]].channels.out;    
         return Math.max(this.config.devices.playback.channels,this.config.devices.capture.channels,inChannels,outChannels);
 
+    }
+
+    getChannelFiltersList(channelNo) {
+        let pipe =  this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];        
+        if (pipe!=undefined) return pipe.names; else return [];
     }
 }
 

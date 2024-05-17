@@ -15,6 +15,7 @@ class filter {
     description;
     type;    
     parameters={}    
+    channel;
     DSP;
     filterElement;
     elementCollection={};
@@ -47,17 +48,13 @@ class filter {
             opt.setAttribute("value",type); opt.innerText=type;
             filterType.appendChild(opt);
         }
+
         filterType.value=this.type;
 
-        filterType.addEventListener("change",(e)=>{                 
-            this.updateSubTypes();
-            this.updateParams()
-        })
-
-        this.elementCollection.filterType=filterType;            
-        
         this.updateSubTypes(basic);
         this.updateParams();        
+
+        this.elementCollection.filterType=filterType;
     }
 
     updateSubTypes(basic) {
@@ -71,8 +68,10 @@ class filter {
             if (basic && !basicTypes.includes(subType)) continue;
             let opt = document.createElement("option");
             opt.setAttribute("value",subType); opt.innerText=subType;
-            filterSubType.appendChild(opt);                             
+            filterSubType.appendChild(opt);
         }
+        
+        if (this.parameters.type!=undefined) filterSubType.value=this.parameters.type;
         // console.log("Filter Sub Type :",filterSubType)
         this.elementCollection.filterSubType=filterSubType;        
     }
@@ -114,7 +113,7 @@ class filter {
 
             if (paramText=="frequency") paramText="freq";
             if (paramText=="filtersubtype") paramText="type";
-            elem.value=this.parameters[paramText];
+            elem.value=this.parameters[paramText];            
 
             peqParams.appendChild(elem);
         }
