@@ -33,11 +33,13 @@ class filter {
         if (basic==undefined) basic=false;
 
         const filterName = document.createElement('input');        
-        filterName.className="filterName"; filterName.value=this.name; // filterName.id="filterName";
+        filterName.className="filterName"; filterName.value=this.name; filterName.id="filterName";
+        filterName.addEventListener("change",this.updateEventHandler);
         this.elementCollection.filterName=filterName;        
 
         const filterDesc = document.createElement('input');
         filterDesc.className="filterDesc"; filterDesc.value=this.description; 
+        filterDesc.addEventListener("change",this.updateEventHandler);
         this.elementCollection.filterDesc=filterDesc;        
 
         const filterType = document.createElement('select');
@@ -50,6 +52,7 @@ class filter {
         }
 
         filterType.value=this.type;
+        filterType.addEventListener("change",this.updateEventHandler);
 
         this.updateSubTypes(basic);
         this.updateParams();        
@@ -70,7 +73,7 @@ class filter {
             opt.setAttribute("value",subType); opt.innerText=subType;
             filterSubType.appendChild(opt);
         }
-        
+        filterSubType.addEventListener("change",this.updateEventHandler);
         if (this.parameters.type!=undefined) filterSubType.value=this.parameters.type;
         // console.log("Filter Sub Type :",filterSubType)
         this.elementCollection.filterSubType=filterSubType;        
@@ -88,6 +91,16 @@ class filter {
             switch (Object.values(param)[0]) {
                 case "num":
                     elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0; elem.id=Object.keys(param)[0].toLowerCase();
+                    elem.addEventListener("wheel",function(e){
+                        let dir = e.deltaY> 0 ? 1:-1;
+                        let val = parseFloat(this.value) * 0.1;
+                        if (val<1) val=1;
+                        val = Math.round(val);                        
+                        this.value = parseFloat(this.value) + dir * val;
+                        e.preventDefault();
+                        this.dispatchEvent(new Event("change"));
+                    })
+                    elem.addEventListener("dblclick",e=>{e.target.value=0;e.target.dispatchEvent(new Event("change"));});
                     break;
                 case "bool":
                     elem = document.createElement("input"); elem.setAttribute("type","checkbox");elem.id=Object.keys(param)[0].toLowerCase();
@@ -114,11 +127,60 @@ class filter {
             if (paramText=="frequency") paramText="freq";
             if (paramText=="filtersubtype") paramText="type";
             elem.value=this.parameters[paramText];            
+            elem.addEventListener("change",this.updateEventHandler);
 
             peqParams.appendChild(elem);
         }
         // console.log("Filter Params :",filterParams)
         this.elementCollection.peqParams=peqParams;
+    }
+
+    async updateEventHandler(e) {
+        let peqElement;
+        if (e.target.className=='peqElement') peqElement=e.target;
+        if (e.target.parentElement.className=='peqElement') peqElement=e.target.parentElement;
+        if (e.target.parentElement.parentElement.className=='peqElement') peqElement=e.target.parentElement.parentElement;
+
+        let id = e.target.id;
+        let value = e.target.value;
+
+        if (value.length==0) { 
+            value=0;
+            e.target.value=0;
+
+        }
+
+        console.log("peq element ",id,value,peqElement.filter.type)
+        switch (id) {
+            case "filterName":
+                peqElement.filter.name = value;
+                break;
+            case "filterDesc":
+                peqElement.filter.description = value;
+                break;
+            case "type":
+                peqElement.filter.type = value
+                break;
+            default:
+                let val;
+                if (id=="frequency") id="freq";
+                if (id=="filtersubtype") id="type";                
+                if (!isNaN(parseFloat(value))) val = parseFloat(value); else val = value;
+                peqElement.filter.parameters[id]= val;
+        }
+
+        let configName = peqElement.getAttribute("configName");
+        let filterJson = peqElement.filter.createFilterJson(peqElement.filter.name,peqElement.filter.type,peqElement.filter.parameters);
+        console.log(configName,filterJson)
+
+        delete peqElement.filter.DSP.config.filters[configName];
+        Object.assign(peqElement.filter.DSP.config.filters,filterJson);
+        await peqElement.filter.DSP.uploadConfig()
+
+        peqElement.setAttribute("configName",Object.keys(filterJson)[0]);
+        peqElement.dispatchEvent(new Event("updated"));
+
+
     }
 
     createElementEx(name) {
@@ -323,7 +385,7 @@ class filter {
         
     }
 
-    createFilterJson(filterParams) {
+    createFilterJson(filterName,filterType,filterParams) {
         let filterJson = {}       
         
         console.log(filterParams);
@@ -340,7 +402,7 @@ class filter {
         }
 
 
-        filterJson[filterParams.filterName]={"type":filterParams.filterType,"parameters":parameters}
+        filterJson[filterName]={"type":filterType,"parameters":parameters}
         return filterJson;
     }
 

@@ -171,12 +171,12 @@ async function loadFiltersFromConfig() {
             filterBasic.appendChild(currentFilter.elementCollection.filterSubType);       
 
             let peqParams = document.createElement('div');             
-            peqParams.id = "peqParams"; peqParams.className='peqParams';
-
-            
+            peqParams.id = "peqParams"; peqParams.className='peqParams';          
             
             peqElement.appendChild(filterBasic);
             peqElement.appendChild(currentFilter.elementCollection.peqParams);
+
+            peqElement.addEventListener("updated",plotConfig)
 
             if (window.parent.activeSettings.peqSingleLine) {        
                 peqElement.style = "display:flex; height: 40px;"
