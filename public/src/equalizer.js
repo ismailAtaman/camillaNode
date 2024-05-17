@@ -280,13 +280,11 @@ async function initSpectrum(){
     setInterval(async function(){
         const spec = document.getElementById("spectrum");
         let r = await DSP.getSpectrumData();                
-
-        console.log(r);
         
         let i=0, height, boxCount, count;
         spec.childNodes.forEach(e=>{
             if (e.tagName=="DIV") {                         
-                height = 200 + (2.2*Math.round(r[i]));  
+                height = 200 + (2*Math.round(r[i]));  
                 if (height<0) height=0;
                 if (height>200) height=0;     
                 boxCount= Math.round(height/8)-1;                                
