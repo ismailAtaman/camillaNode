@@ -22,6 +22,9 @@
 
     --levelbar-width: 31px;
 
+    --peq-columns: 1fr;
+    --peq-before-grid-column: 1 / span 1;
+
     background-color:hsl(var(--bck-hue), var(--bck-sat), var(--bck-light));
 
     font-family: "Abel", sans-serif;
@@ -53,6 +56,67 @@ body {
     color: white;
     
 } 
+
+input[type="checkbox"] {    
+    position: relative;
+    appearance: none;
+    width: 35px;    
+    height: 20px;    
+    border-radius: 5px;
+    background-color: hsl(var(--bck-hue), 10%, 50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0px;     
+    padding: 0px;    
+    transition: all 300ms linear;
+}
+
+
+input[type="checkbox"]:checked {
+    background-color: hsl(var(--bck-hue), 50%, 80%);
+    transition: all 300ms linear;
+}
+
+
+input[type="checkbox"]::before {    
+    content: " ";
+    position: absolute;
+    left: 1px;    
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background-color: hsl(var(--bck-hue), 20%, 20%);
+    transition: all 300ms linear;
+}
+
+input[type="checkbox"]:checked::before {
+    content: " ";
+    position: absolute;
+    left: 1px;    
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background-color: hsl(var(--bck-hue), 60%, 50%);
+    transition: all 300ms linear;
+    transform: translateX(15px);
+}
+    
+
+input[type="checkbox"]:disabled {
+    background-color: darkgray;
+}
+
+input[type="checkbox"]:disabled::before {
+    content: " ";
+    position: absolute;
+    left: 1px;    
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background-color: gray;
+}
+
 
 #logo {        
     filter: hue-rotate(var(--hue-rotate));
@@ -272,8 +336,7 @@ canvas {
     color: white;  
     border-radius: 10px 10px 0 0 ;    
     padding-left: 10px;
-    padding-block: 5px;        
-    
+    padding-block: 5px;            
 }
 
 
@@ -387,33 +450,6 @@ select {
     margin-bottom: 25px;
 }
 
-.slider {    
-    position: relative;
-    width:var(--slider-width);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background-color: hsl(var(--bck-hue),var(--bck-sat),70%);
-    top:50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.peqParam {    
-    display: flex;       
-    justify-content: center;
-    margin-top: 10px;
-    appearance: none;
-    width: var(--param-width);            
-    font-size: 13px;
-    cursor: pointer;
-    border: none; 
-    background-color: #DDD;
-    color: black;
-    border-radius: 2px;
-    padding:0px;
-    padding-block: 2px;        
-    text-align: center;
-}
 
 #indicators {
     display: flex;
@@ -450,160 +486,78 @@ select {
     color: #dd490e;
 }
 
-/********************************************** PEQLINE *************************************************************************/
-.peqline {
-    display: flex;
-    justify-content: left;    
-    align-items: center;
-    overflow-y: hidden;
-    margin-left: 10px;
-    margin-right: 5px;
-    padding-block: 5px;
-    font-size: 15px;           
+/********************************************** PEQ  *************************************************************************/
+#PEQ {
+    display: grid;
+    grid-template-columns: var(--peq-columns); 
+    gap: 10px;    
 }
 
-.peqline:first-of-type {
-    margin-top: 10px;
+#PEQ::before {
+    grid-column: var(--peq-before-grid-column);
 }
 
-
-.peqline input, select, span {
-    height: 20px;
-    max-width: none;
-    text-align: center;
-}
-
-.peqline input:hover, input:focus, select:hover {
-    background-color: hsl(var(--bck-hue), 50%, 70%)
-}
-
-.peqline input[type="text"] {    
-    margin-right: 10px;
-    appearance: none;    
-    border: none;
-    border-radius: 3px;    
-}
-
-input[type="checkbox"] {    
-    position: relative;
-    appearance: none;
-    width: 35px;    
-    height: 20px;    
-    border-radius: 5px;
-    background-color: hsl(var(--bck-hue), 10%, 50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0px;     
-    padding: 0px;    
-    transition: all 300ms linear;
-}
-
-
-input[type="checkbox"]:checked {
-    background-color: hsl(var(--bck-hue), 50%, 80%);
-    transition: all 300ms linear;
-}
-
-
-input[type="checkbox"]::before {    
-    content: " ";
-    position: absolute;
-    left: 1px;    
-    width: 18px;
-    height: 18px;
-    border-radius: 5px;
-    background-color: hsl(var(--bck-hue), 20%, 20%);
-    transition: all 300ms linear;
-}
-
-input[type="checkbox"]:checked::before {
-    content: " ";
-    position: absolute;
-    left: 1px;    
-    width: 18px;
-    height: 18px;
-    border-radius: 5px;
-    background-color: hsl(var(--bck-hue), 60%, 50%);
-    transition: all 300ms linear;
-    transform: translateX(15px);
-}
-    
-
-input[type="checkbox"]:disabled {
-    background-color: darkgray;
-}
-
-input[type="checkbox"]:disabled::before {
-    content: " ";
-    position: absolute;
-    left: 1px;    
-    width: 18px;
-    height: 18px;
-    border-radius: 5px;
-    background-color: gray;
-}
-
-.peqline select {
-    width: 40px;
-    text-align: center;
-    appearance: none;
-    border: none;
-    border-radius: 3px;
-    margin-right: 15px;
-}
-.peqline span {
-    width: 4.5rem;
+.peqChannel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    justify-content: left;
     margin-inline: 10px;
+}
+
+/* .peqChannel::before {
+    content: attr(label);
+    display: block;      
+    font-size: 1.2rem;        
+    background-color: hsl(var(--bck-hue), 45%, 10%);
+    color: white;  
+    border-radius: 10px 10px 0 0 ;    
+    padding-left: 10px;
+    padding-block: 5px;    
+} */
+
+.peqElement {            
+    margin: 0px;    
+    padding: 0px;
+    padding-left: 10px;    
+    align-items: center;    
     user-select: none;
-    text-align: end;
-}
-
-.peqline input[type="button"] {
-    appearance: none;
-    border: none;
-    width: 20px;
-    border-radius: 3px;
-    margin-inline: 5px;
-    font-weight: bold;
-    text-align: center;
-}
-
-#freq {
-    width: 8em ;
-}
-
-#gain {
-    width: 4em ;
-}
-
-#qfact {
-    width: 4em ;
-}
-
-.peqbutton {
-    content: ' ';
-    display: inline-block;    
-    filter: invert(.5);
-    width: 20px; 
-    height: 20px;  
-    padding-left: 20px;  
-    cursor: pointer;
-}
-
-.peqbutton:hover {
-    filter: invert(1);
-}
-
-.add {
-    background: no-repeat center url("/img/icon/add.png");
-}
-
-.remove {
-    background: no-repeat center url("/img/icon/remove.png");    
+    border:1px solid hsl(var(--bck-hue), 20%, 20%);        
+    border-radius: 7px;        
 }
 
 
+.peqElement:hover {        
+    filter: saturate(1.15) brightness(1.15);
+    box-shadow: 0px 0px 30px 0px #111;
+}
+
+.peqParams {
+    display: flex;         
+    align-items: center;
+    background-color: hsl(var(--bck-hue), 50%, 20%);    
+    height: 40px;        
+    margin-left: -10px;
+    padding-inline: 5px;        
+    border-radius: 0px 0px 7px 7px;
+}
+
+.peqParams > div, input {
+    margin-left: 5px;
+    margin-block: 5px;    
+    height: 22px;    
+    width: fit-content;
+}
+
+.peqParams > span {
+    font-size: 15px;    
+    max-width: 120px;
+    margin-right: 10px;
+}
+
+#filterType, #filterSubType {
+    width: 100px;
+}
 
 
 /************************************************* DIALOGUES *********************************************************************/
@@ -888,8 +842,6 @@ input[type="checkbox"]:disabled::before {
 .filterElement:hover {    
     filter: saturate(1.2) brightness(1.2);
     box-shadow: 0px 0px 20px 0px black;
-
-    
 }
 
 .filterBasic {

@@ -108,30 +108,78 @@ function updateElementWidth() {
 
 async function loadFiltersFromConfig() {                        
     PEQ.innerHTML='';
-    await DSP.downloadConfig()
-        
-    let line;
-    if (DSP.config.filters!=null) {
-        for (let filterName of Object.keys(DSP.config.filters)) {                               
-            // console.log(">>> Loading from config",filterName, config.filters[filterName]);
-            if (filterName,filterName.startsWith("__")) continue;
-            switch (DSP.config.filters[filterName].type) {
-                case "Gain" :
-                    let preampGain = DSP.config.filters[filterName].parameters.gain; 
-                    preamp.knob.instance.setVal(preampGain* 10 +181);                        
-                    setPreamp(preampGain);
-                    break;
-                case "Biquad" :                    
-                    let filterType= DSP.config.filters[filterName].parameters.type;                    
-                    if (filterType=="Peaking" || filterType=="Highshelf" || filterType=="Lowshelf") {
-                        line = addLine(PEQ,filterName);                    
-                        line.instance.JSONtoValues(DSP.config.filters[filterName]);                        
-                    }
-            }
-        }            
-        // sortByFreq(PEQ);        
-        // console.log("Max Level ",max)            
+    await DSP.downloadConfig();    
+
+    const channelCount = DSP.getChannelCount();
+    for (let channelNo=0;channelNo<channelCount;channelNo++) {
+        let peqChannel = document.createElement('div');
+        peqChannel.className="peqChannel"; peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);
+
+        for (let filter of Object.keys(DSP.filters)) {
+            let currentFilter = DSP.filters[filter];
+            if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;
+
+            currentFilter.createElement(true);
+
+            let peqElement = document.createElement('div');
+            peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
+    
+            let filterBasic = document.createElement('div'); 
+            filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
+
+            let nameSpan = document.createElement('span'); nameSpan.innerText='Name :'
+            filterBasic.appendChild(nameSpan);
+            filterBasic.appendChild(currentFilter.elementCollection.filterName);    
+            
+            let typeSpan = document.createElement('span'); typeSpan.innerText='Filter Type :'
+            filterBasic.appendChild(typeSpan);
+            filterBasic.appendChild(currentFilter.elementCollection.filterType);                
+
+            let subTypeSpan = document.createElement('span'); subTypeSpan.innerText='Filter Sub Type :'
+            filterBasic.appendChild(subTypeSpan);
+            filterBasic.appendChild(currentFilter.elementCollection.filterSubType);       
+
+            let filterParams = document.createElement('div'); 
+            filterParams.id = "filterParams"; filterParams.className='filterParams';
+            
+            peqElement.appendChild(filterBasic);
+            peqElement.appendChild(currentFilter.elementCollection.peqParams);
+
+            peqChannel.appendChild(peqElement);
+        }
+
+        PEQ.appendChild(peqChannel);
+
+        // siungle channel
+        if (channelNo>=0) break;
+
     }
+    
+    
+
+        
+    // let line;
+    // if (DSP.config.filters!=null) {
+    //     for (let filterName of Object.keys(DSP.config.filters)) {                               
+    //         // console.log(">>> Loading from config",filterName, config.filters[filterName]);
+    //         if (filterName,filterName.startsWith("__")) continue;
+    //         switch (DSP.config.filters[filterName].type) {
+    //             case "Gain" :
+    //                 let preampGain = DSP.config.filters[filterName].parameters.gain; 
+    //                 preamp.knob.instance.setVal(preampGain* 10 +181);                        
+    //                 setPreamp(preampGain);
+    //                 break;
+    //             case "Biquad" :                    
+    //                 let filterType= DSP.config.filters[filterName].parameters.type;                    
+    //                 if (filterType=="Peaking" || filterType=="Highshelf" || filterType=="Lowshelf") {
+    //                     line = addLine(PEQ,filterName);                    
+    //                     line.instance.JSONtoValues(DSP.config.filters[filterName]);                        
+    //                 }
+    //         }
+    //     }            
+    //     // sortByFreq(PEQ);        
+    //     // console.log("Max Level ",max)            
+    // }
     
 
     document.loading=false;

@@ -11,28 +11,123 @@ const Types = {
 
 
 class filter {
-
-    type;
-    paremeters={}
     name;
     description;
+    type;    
+    parameters={}    
     DSP;
     filterElement;
+    elementCollection={};
     
 
-    constructor(DSPRef) {                
-        this.DSP = DSPRef;
-        // console.log(this.DSP);
-        return this;    
+    constructor(name,filter) {                
+        this.name=name;
+        this.description=filter.description;        
+        this.type=filter.type;
+        this.parameters=filter.parameters;         
+        this.createElement()
     }
 
-    createElement(name) {
+    createElement(basic) {
+        if (basic==undefined) basic=false;
+
+        const filterName = document.createElement('input');        
+        filterName.className="filterName"; filterName.value=this.name; // filterName.id="filterName";
+        this.elementCollection.filterName=filterName;        
+
+        const filterDesc = document.createElement('input');
+        filterDesc.className="filterDesc"; filterDesc.value=this.description; 
+        this.elementCollection.filterDesc=filterDesc;        
+
+        const filterType = document.createElement('select');
+        filterType.className="filterType"; filterType.setAttribute("id","filterType");       
+        for (let type of Object.keys(Types)) {
+            if (basic && (type!="Biquad")) continue;
+            let opt = document.createElement("option");
+            opt.setAttribute("value",type); opt.innerText=type;
+            filterType.appendChild(opt);
+        }
+        filterType.value=this.type;
+
+        filterType.addEventListener("change",(e)=>{                 
+            this.updateSubTypes();
+            this.updateParams()
+        })
+
+        this.elementCollection.filterType=filterType;            
+        
+        this.updateSubTypes(basic);
+        this.updateParams();        
+    }
+
+    updateSubTypes(basic) {
+        if (basic==undefined) basic=false;
+
+        let basicTypes = ["Highshelf","Lowshelf","Peaking"]
+
+        const filterSubType = document.createElement("select");
+        filterSubType.className="filterType"; filterSubType.setAttribute("id","filterSubType");
+        for (let subType of this.getFilterSubTypes(this.type)) {                        
+            if (basic && !basicTypes.includes(subType)) continue;
+            let opt = document.createElement("option");
+            opt.setAttribute("value",subType); opt.innerText=subType;
+            filterSubType.appendChild(opt);                             
+        }
+        // console.log("Filter Sub Type :",filterSubType)
+        this.elementCollection.filterSubType=filterSubType;        
+    }
+
+    updateParams() {
+
+        const peqParams=document.createElement('div');
+        peqParams.setAttribute("id","peqParams"); peqParams.className="peqParams";
+        let elem;
+        
+        for (let param of filter.filterParamsTemplate(this.type,this.parameters.type)) { 
+            let title=document.createElement("span"); title.innerText=Object.keys(param)[0]+" :";
+            peqParams.appendChild(title);
+            switch (Object.values(param)[0]) {
+                case "num":
+                    elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0; elem.id=Object.keys(param)[0].toLowerCase();
+                    break;
+                case "bool":
+                    elem = document.createElement("input"); elem.setAttribute("type","checkbox");elem.id=Object.keys(param)[0].toLowerCase();
+                    break;
+                case "text":
+                    elem = document.createElement("input"); elem.setAttribute("type","text");elem.value="";elem.id=Object.keys(param)[0].toLowerCase();
+                    break;
+                case "array":
+                    elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0;elem.id=Object.keys(param)[0].toLowerCase();
+                    break;
+                default:
+                    elem = document.createElement("select"); 
+                    elem.id = Object.keys(param)[0];
+                    for (let opt of Object.values(param)[0]) {                            
+                        let o = document.createElement("option");
+                        o.innerText=opt;o.setAttribute("value",opt);    
+                        elem.appendChild(o);
+                    }
+            }
+            // Fix name from clean text to param name 
+            
+            let paramText = Object.keys(param)[0].toLowerCase().replace(" ","_");
+
+            if (paramText=="frequency") paramText="freq";
+            if (paramText=="filtersubtype") paramText="type";
+            elem.value=this.parameters[paramText];
+
+            peqParams.appendChild(elem);
+        }
+        // console.log("Filter Params :",filterParams)
+        this.elementCollection.peqParams=peqParams;
+    }
+
+    createElementEx(name) {
         this.name=name;
         const filterElement = document.createElement('div');
         filterElement.filter=this; filterElement.className="filterElement"; filterElement.setAttribute("configName",name);
 
         const filterBasic = document.createElement('div'); 
-        // filterBasic.style="grid-column : 1 / span 2;"; 
         filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
 
 
@@ -176,6 +271,7 @@ class filter {
         return filterElement;
     }
 
+
     getFilterTypes() {
         return ["Gain","Biquad","Conv","Delay"];
     }
@@ -249,7 +345,7 @@ class filter {
         return filterJson;
     }
 
-    static getFilterParams(filterType, filterSubType) {
+    static filterParamsTemplate(filterType, filterSubType) {
         switch (filterType) {
             case Types.Gain:
                 return [{"Gain":"num"},{"Inverted":"bool"},{"Mute":"bool"},{"Scale":["dB","linear"]}];
@@ -290,6 +386,8 @@ class filter {
     removeFilter(filterName) {
         delete this.DSP.config.filter[filterName];
     }
+
+
 }
 
 export default filter;
