@@ -445,7 +445,8 @@ class filter {
     }    
 
     removeFilter(filterName) {
-        delete this.DSP.config.filter[filterName];
+        delete this.DSP.config.filter[filterName];        
+        this.DSP.createFilters();
     }
 
 
