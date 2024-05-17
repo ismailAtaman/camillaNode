@@ -253,7 +253,7 @@ class camillaDSP {
         return sameFilters;
     }
 
-    async uploadConfig() {              
+    async uploadConfig() {                      
         return this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
             if (debugLevel=='high') console.log("Config uploaded successfully.",config);
             return true;

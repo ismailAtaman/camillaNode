@@ -139,9 +139,7 @@ async function loadFiltersFromConfig() {
 
 function plotConfig() {
     const canvas = document.getElementById("plotCanvas");            
-    let max = Math.round(plot(DSP.config.filters,canvas,DSP.config.title));        
-    // if (window.parent.activeSettings.autoPreampGain) setPreamp(-max);
-    // console.log("Preamp : ",-max);
+    plot(DSP.config.filters,canvas,DSP.config.title);            
 }
 
 async function setPreamp(gain) {
@@ -200,7 +198,7 @@ async function peqlineUpdate() {
     await DSP.clearFilters();
     DSP.addFilters(filters);
     
-    plot(DSP.config.filters,ctx,DSP.config.title);                      
+    plotConfig();                      
 
     await DSP.uploadConfig()    
     // console.log("peqlineupdate")            

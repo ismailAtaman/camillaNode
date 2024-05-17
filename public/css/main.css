@@ -283,10 +283,12 @@ input {
 }
 
 select {
-    width: var(--param-width);
+    width: var(--param-width);    
     border: none;
     appearance: none;
     border-radius: 5px;
+    padding: 3px;
+    height: 22px;
 }
 
 
@@ -788,8 +790,7 @@ input[type="checkbox"]:disabled::before {
 
 .preferenceSection input[type="text"], select {
     display: relative;
-    max-width: 100px;
-    height: 18px;
+    max-width: 100px;    
     text-align: left;
 }
 
@@ -872,7 +873,7 @@ input[type="checkbox"]:disabled::before {
     width: max-content;
     align-items: center;    
     user-select: none;
-    border:1px solid hsl(var(--bck-hue), 20%, 40%);    
+    border:1px solid hsl(var(--bck-hue), 20%, 40%);        
     border-radius: 7px;    
 }
 
@@ -884,8 +885,11 @@ input[type="checkbox"]:disabled::before {
     margin-right: 20px;
 }
 
-.filterElement:hover {
-    filter: brightness(1.3);
+.filterElement:hover {    
+    filter: saturate(1.2) brightness(1.2);
+    box-shadow: 0px 0px 20px 0px black;
+
+    
 }
 
 .filterBasic {
@@ -991,6 +995,7 @@ input[type="checkbox"]:disabled::before {
 
 .pipelineElement:hover {
     filter:brightness(1.25) saturate(1.25);
+    box-shadow: 0px 0px 20px 0px black;
 }
 
 .pipelineElement:last-of-type {

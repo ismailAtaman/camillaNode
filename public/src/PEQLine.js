@@ -8,10 +8,11 @@ class PEQLine {
         const peqline = document.createElement('div')
         const enabled = document.createElement('input')
         const type = document.createElement('select')
+        
         const LS = document.createElement('option')
         const PK = document.createElement('option')
         const HS = document.createElement('option')
-        const PRE = document.createElement('option')
+        
         const freq = document.createElement('input')
         const gain = document.createElement('input')
         const qfact = document.createElement('input')
@@ -27,7 +28,7 @@ class PEQLine {
         LS.value="Lowshelf";LS.innerText="LS";
         PK.value="Peaking";PK.innerText="PK";PK.selected=true;
         HS.value="Highshelf";HS.innerText="HS";
-        PRE.value="Gain";PRE.innerText="PRE";        
+        
         type.id="type";
         freq.type="text";freq.id="freq"; freq.setAttribute('value',1000);
         gain.type="text";gain.id="gain"; gain.setAttribute("value",0)
@@ -35,7 +36,7 @@ class PEQLine {
         addLineAfter.className='peqbutton';removeLine.className='peqbutton';addLineAfter.classList.add('add');removeLine.classList.add('remove')        
         spanType.innerText="Type :"; spanFreq.innerText="Frequency :";spanGain.innerText="Gain :",spanQfact.innerText="Q :";
 
-        type.appendChild(PRE);
+        
         type.appendChild(LS);type.appendChild(PK);type.appendChild(HS);
         peqline.appendChild(enabled);
         peqline.appendChild(spanType); peqline.appendChild(type);
@@ -231,7 +232,7 @@ class PEQLine {
         } else {                        
             this.peqline.children["type"].value  = parameters.type;
             this.peqline.children["freq"].value  = parameters.freq;        
-            this.peqline.children["gain"].value  = parameters.gain;
+            // this.peqline.children["gain"].value  = parameters.gain;
             this.peqline.children["qfact"].value = parameters.q;
         }
     }

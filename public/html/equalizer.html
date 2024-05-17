@@ -25,13 +25,12 @@
         window.plot = plot;               
     </script>
 
-    <!-- <input type="button" onclick="DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));" value="Show Config"> -->
-    
-    <!-- <input type="button" onclick="DSP.mergeFilters(DSP.config.filters)" value="Convert Configs"> -->
+    <input type="button" onclick="DSP.sendDSPMessage('GetConfigJson').then(r=>console.log(r));" value="Show Config">    
+    <input type="button" onclick="DSP.mergeFilters(DSP.config.filters)" value="Convert Configs">
 
     <div id="spectrum" class="group">
     </div>
-    <script src="/src/eqplot.js"></script>
+    
     <canvas id="plotCanvas" width="1024" height="500"></canvas>
     
     <div class="group" id="basicControls" label="Basic Controls"></div> 

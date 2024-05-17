@@ -369,6 +369,7 @@ function plot(filterObject, canvas, name) {
 		}
 
 		let t= plotArray(ctx, totalArray,mainColor,3);			
+		
 	}
 
 
@@ -383,6 +384,7 @@ function plot(filterObject, canvas, name) {
 	}
 
 	// return Math.round(Math.max(...totalArray[1]));
+	console.log("Plot completed.")
 
 }
 
