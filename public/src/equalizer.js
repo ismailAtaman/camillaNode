@@ -91,7 +91,14 @@ async function equalizerOnLoad() {
     // change loading to false after 50ms to avoud update running multiple times during loading.            
     setInterval(function(){document.loading=false},50);            
 
-    initSpectrum();    
+    const spec = document.getElementById("spectrum");   
+
+    if(window.parent.activeSettings.showEqualizerSpectrum) {        
+        spec.style.display="grid";
+        initSpectrum();    
+    } else {
+        spec.style.display="none";
+    }
 }
 
 function updateElementWidth() {
@@ -107,12 +114,12 @@ function updateElementWidth() {
 
 
 async function loadFiltersFromConfig() {                        
-    PEQ.innerHTML='';
-    
-    
+    PEQ.innerHTML='';    
+    const channelCount = DSP.getChannelCount();
 
     if (window.parent.activeSettings.peqDualChannel) {        
-        await splitChannels();                
+        console.log("Single channel :",DSP.isSingleChannel());
+        if (DSP.isSingleChannel()) await splitChannels();                
 
         window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
@@ -121,11 +128,18 @@ async function loadFiltersFromConfig() {
     
     await DSP.downloadConfig();    
 
-    const channelCount = DSP.getChannelCount();
+    if (window.parent.activeSettings.peqSingleLine) {        
+        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 7px 7px 0px");
+    } else {        
+        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 0px 7px 7px");
+    }
+
+    
     for (let channelNo=0;channelNo<2;channelNo++) {
 
         let peqChannel = document.createElement('div');
-        peqChannel.className="peqChannel"; peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);
+        peqChannel.className="peqChannel"; peqChannel.id="peqChannel"+channelNo;
+        peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);
 
         let filterList;
         if (window.parent.activeSettings.peqDualChannel) filterList=DSP.getChannelFiltersList(channelNo); else filterList=Object.keys(DSP.filters);
@@ -160,18 +174,14 @@ async function loadFiltersFromConfig() {
             peqParams.id = "peqParams"; peqParams.className='peqParams';
 
             
-            if (window.parent.activeSettings.peqSingleLine) {
-                peqParams.style = "border-radius: 0px;"
-                peqElement.style = "display:flex; height: 40px;"
-                filterBasic.style = 'margin-right: 20px'
-            } else {
-                peqParams.style = "border-radius: 0px 0px 7px 7px;"
-            }
-
+            
             peqElement.appendChild(filterBasic);
             peqElement.appendChild(currentFilter.elementCollection.peqParams);
 
-            
+            if (window.parent.activeSettings.peqSingleLine) {        
+                peqElement.style = "display:flex; height: 40px;"
+                filterBasic.style = 'margin-right: 20px'
+            }
 
             peqChannel.appendChild(peqElement);
         }
@@ -216,8 +226,19 @@ async function loadFiltersFromConfig() {
 }
 
 async function splitChannels() {
-    DSP.config.filters= DSP.splitFiltersToChannels(DSP.config.filters);                
-    DSP.config.pipeline = DSP.updatePipeline(DSP.config);        
+    DSP.config.filters= DSP.splitFiltersToChannels(DSP.config.filters);                 
+
+    // Update pipeline
+    let pipeline=[];
+    for (let mixer in DSP.config.mixers) {
+        pipeline.push({"type":"Mixer","name":mixer});
+    }
+
+    pipeline.push({"type":"Filter","channel":0,"names":Object.keys(DSP.config.filters).filter(e=>e.includes("__c0"))})
+    pipeline.push({"type":"Filter","channel":1,"names":Object.keys(DSP.config.filters).filter(e=>e.includes("__c1"))})
+
+    DSP.config.pipeline=pipeline;
+
     await DSP.uploadConfig();
 }
 

@@ -80,6 +80,15 @@ async function basicLoad() {
     updateElementWidth();
 
     window.addEventListener("resize",updateElementWidth);
+
+    const spec = document.getElementById("spectrum");   
+
+    if(window.parent.activeSettings.showBasicSpectrum) {        
+        spec.style.display="grid";
+        initSpectrum();    
+    } else {
+        spec.style.display="none";
+    }
 }
 
 function updateElementWidth() {
@@ -151,4 +160,64 @@ async function setTone() {
     let config = await DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
     const canvas = document.getElementById('plotCanvas');        
     plot(config.filters,canvas,config.title);  
+}
+
+
+const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
+'315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
+'3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
+
+
+async function initSpectrum(){          
+    // Create bars and boxes
+    const spec = document.getElementById("spectrum");   
+    const barCount=freq.length-1;
+    const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
+    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");    
+
+    let bar,box;
+    spec.innerHTML='';
+    for (i=0;i<=barCount;i++){
+        bar = document.createElement("div");
+        bar.className='levelbar';        
+        bar.setAttribute('freq',freq[i]);        
+        
+        let hue=parseInt(window.parent.document.documentElement.style.getPropertyValue('--bck-hue'));
+        for (j=1;j<40;j++) {
+            box = document.createElement('div');
+            box.className='levelbox';                    
+            box.style="background-color: hsl("+hue+", 30%, 50%);"        
+            hue=hue-10;
+            bar.appendChild(box);
+        }
+
+        spec.appendChild(bar);
+    }
+
+    // Get the data and update the analyser
+    
+    setInterval(async function(){
+        const spec = document.getElementById("spectrum");
+        let r = await DSP.getSpectrumData();                
+        
+        let i=0, height, boxCount, count;
+        spec.childNodes.forEach(e=>{
+            if (e.tagName=="DIV") {                         
+                height = 200 + (2*Math.round(r[i]));  
+                if (height<0) height=0;
+                if (height>200) height=0;     
+                boxCount= Math.round(height/8)-1;                                
+                count=0;
+                e.childNodes.forEach(e=>{
+                    if (e.tagName=="DIV") {
+                        if (count>boxCount) e.style.opacity=0; else e.style.opacity=1;
+                        count++
+                    }
+                })
+                i=i+2;
+            }                     
+        })       
+                
+
+    },100)
 }

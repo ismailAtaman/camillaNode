@@ -107,9 +107,9 @@ class preferences {
         ]
 
         tmpPref["equalizer"] = [
-            {"id":"showBasicSpectrum",
-            "name":"Show spectrum analyzer in Basic section",
-            "value":false,
+            {"id":"showEqualizerSpectrum",
+            "name":"Show spectrum analyzer in Equalizer section",
+            "value":true,
             "type":"boolean",            
             "dependsOn":"enableSpectrum",    
             "enabled":false,

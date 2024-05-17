@@ -25,6 +25,7 @@
     --peq-columns: 1fr;
     --peq-before-grid-column: 1 / span 2;
     --peq-channel-before-display: none;
+    --peq-param-border-radius: 0px 0px 7px 7px;
 
     background-color:hsl(var(--bck-hue), var(--bck-sat), var(--bck-light));
 
@@ -504,7 +505,7 @@ select {
     gap: 10px;
     justify-content: left;
     margin-inline: 10px;
-    overflow-y: scroll;
+    overflow-y: none;
 }
 
 .peqChannel::before {
@@ -541,6 +542,7 @@ select {
     background: linear-gradient(90deg, hsl(var(--bck-hue), 50%, 20%),hsl(var(--bck-hue), 45%, 10%));        
     margin-left: -10px;
     padding-inline: 5px;            
+    border-radius: var(--peq-param-border-radius);
 }
 
 .peqParams > div, input {

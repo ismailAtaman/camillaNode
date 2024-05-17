@@ -375,27 +375,21 @@ class camillaDSP {
         return {"type":"Biquad","parameters":{"type":"Peaking","freq":freq,"gain":gain,"q":q}};                
     }        
     
-    updatePipeline(config, multiChannel) {
-        let pipeline=[];        
+    updatePipeline(config) {
+
+        if (this.isSingleChannel==false) {
+            console.error("Multi-channel mode can not use updatePipeline function.")
+        }
+        let pipeline=[];                
 
         for (let mixer in config.mixers) {
             pipeline.push({"type":"Mixer","name":mixer});
         }
-        
-        const channelCount = this.getChannelCount();
-
-        // Check if filters are seperated per channel 
-        if (Object.keys(this.config.filters).filter((e)=>e.includes("__c0")).length>0) {
-            // console.log("Seperate filters")
-            for (let i=0;i<channelCount;i++) {
-                let currentChannelFilters =Object.keys(this.config.filters).filter((e)=>e.includes("__c"+i));                
-                pipeline.push({"type":"Filter","channel":i,"names":currentChannelFilters});
-            }            
-        } else {            
-            for (let i=0;i<channelCount;i++) {
-                pipeline.push({"type":"Filter","channel":i,"names":Object.keys(config.filters)})
-            }            
-        }
+         
+        const channelCount = this.getChannelCount();         
+        for (let i=0;i<channelCount;i++) {
+            pipeline.push({"type":"Filter","channel":i,"names":Object.keys(config.filters)})
+        }                    
 
         // console.log(config.pipeline);
         return pipeline;
