@@ -117,7 +117,7 @@ async function loadData() {
     if (DSP.config.filters["subBass"]==undefined) {        
         await DSP.setTone(0,0,0,0,0);        
         await DSP.downloadConfig();
-        console.log("Basic filters created at default values.")
+        // console.log("Basic filters created at default values.")
     }            
     
     subBass.knob.instance.setVal(DSP.config.filters["subBass"].parameters.gain*10+181);
@@ -126,8 +126,6 @@ async function loadData() {
     upperMids.knob.instance.setVal(DSP.config.filters["upperMids"].parameters.gain*10+181);
     treble.knob.instance.setVal(DSP.config.filters["treble"].parameters.gain*10+181);
     
-    console.log("starting plot");
-
     plot(DSP.config.filters,ctx,DSP.config.title);
 }
 

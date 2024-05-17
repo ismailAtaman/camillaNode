@@ -310,8 +310,7 @@ class camillaDSP {
         this.config.filters["upperMids"]=upperMidsFilter;
         this.config.filters["treble"]=trebleFilter;                
         this.config.pipeline=this.updatePipeline(this.config);        
-
-        console.log("Set tone config filters :",this.config.filters)
+        
         await this.uploadConfig();
         return this.config;
     }
