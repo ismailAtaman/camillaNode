@@ -92,6 +92,7 @@ class filter {
             if (e.target.className=='peqElement') peqElement=e.target;
             if (e.target.parentElement.className=='peqElement') peqElement=e.target.parentElement;
             if (e.target.parentElement.parentElement.className=='peqElement') peqElement=e.target.parentElement.parentElement;
+            if (e.target.parentElement.parentElement.parentElement.className=='peqElement') peqElement=e.target.parentElement.parentElement.parentElement;
             peqElement.dispatchEvent(new Event("removeFilter"));
         })
 
