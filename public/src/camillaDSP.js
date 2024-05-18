@@ -419,7 +419,7 @@ class camillaDSP {
         // let localFilters = [];
         // Object.keys(this.config.filters).forEach(f=>{localFilters.push(this.config.filters[f])})
 
-        let filterKeys=Object.keys(this.config.filters);
+        let filterKeys=this.getFilterListByFreq();                
         for (let filter of filterKeys) {
             console.log(this.config.filters[filter].type)
             if (this.config.filters[filter].type=="Gain") {
@@ -438,6 +438,20 @@ class camillaDSP {
         return configText.toString().replaceAll(',','');
     }
  
+    getFilterListByFreq() {        
+        // create an arry
+        let filterArray =[];
+        for (let filterName of Object.keys(this.config.filters)) filterArray.push({"name":filterName,"freq":this.config.filters[filterName].parameters.freq});        
+
+        // sort
+        filterArray = filterArray.sort((a,b)=>a.freq > b.freq).map(e=>e.name);        
+        // console.log("Sorted filters ",filterArray)
+        return filterArray;
+        
+        
+    }
+
+
     async clearFilters(clearAll) {        
         await this.downloadConfig();        
 
