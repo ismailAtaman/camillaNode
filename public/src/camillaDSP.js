@@ -33,7 +33,7 @@ class camillaDSP {
             {"dest":1,"sources":[{"channel":1,"gain":0,"inverted":false,"mute":false,"scale":"dB"},{"channel":0,"gain":0,"inverted":false,"mute":true,"scale":"dB"}],"mute":false}
             ]
         }
-    };  
+    };      
 
 
     constructor() { 
@@ -216,26 +216,42 @@ class camillaDSP {
     async downloadConfig() {
         this.config = await this.sendDSPMessage("GetConfigJson");     
         // console.log("Filters :",this.config.filters)   
-        this.createFilters();
+        this.loadFilters();
         
         // console.log(this.filters)
     }
 
-    createFilters() {
+    loadFilters() {
         this.filters={};
         let channelCount=this.getChannelCount();
-        for (let c=0;c<channelCount;c++) {
-            let filterList = this.getChannelFiltersList(c);
-            for (let f of filterList) {            
-                let newFilter = new filter(f,this.config.filters[f]);
-                newFilter.DSP=this;
-                newFilter.channel=c;
-                this.filters[f]=newFilter;           
-            }
+        for (let channelNo=0;channelNo<channelCount;channelNo++) {
+            let filterList = this.getChannelFiltersList(channelNo);
+            for (let filterName of filterList) this.createFilter(filterName,channelNo)                        
         }        
+
         this.pipeline=this.config.pipeline;
     }
 
+    createFilter(filterName,channelNo) {
+        let newFilter = new filter(filterName,this.config.filters[filterName]);
+        newFilter.DSP=this;
+        newFilter.channel=channelNo;                
+        this.filters[filterName]=newFilter;          
+        return newFilter;
+    }
+
+    createNewFilter(filterObject,channelNo) {        
+        this.addFilter(filterObject,channelNo);
+        let filterName = Object.keys(filterObject)[0];
+        return this.createFilter(filterName,channelNo);
+    }
+
+    getDefaultFilter() {
+        let filterName ="F_"+new Date().getTime().toString().substring(7)
+        let filter = {}
+        filter[filterName] = {"type":"Biquad","parameters":{"type":"Peaking","freq":3146,"gain":0,"q":1.41}};
+        return filter;
+    }
 
     getDefaultConfig(config, override) {
             if (override==undefined) override=false;               
@@ -451,7 +467,6 @@ class camillaDSP {
         
     }
 
-
     async clearFilters(clearAll) {        
         await this.downloadConfig();        
 
@@ -467,10 +482,26 @@ class camillaDSP {
         // console.log("Clear Filters",this.config.filters);
     }
 
-    addFilters(filters) {       
-        Object.assign(this.config.filters,filters);
-        this.config.pipeline=this.updatePipeline(this.config,true);
+    addFilter(filter,channelNo) {       
+        // Add to filters
+        // console.log("Adding filter ",filter)
+        Object.assign(this.config.filters,filter);
+
+        // Add to pipeline
+        this.addFilterToChannelPipeline(filter,channelNo)        
         return true;
+    }
+
+    addFilterToChannelPipeline(filter,channelNo) {
+        let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
+        let pipeIndex = this.config.pipeline.indexOf(pipe);    
+        let filterName = Object.keys(filter)[0]
+        // console.log("Old names  ",pipe.names, " Adding ", filterName);
+        
+        pipe.names.push(filterName);
+        this.config.pipeline[pipeIndex] = pipe;
+        // console.log("Updated names : ",this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0].names)
+
     }
 
     async linearizeConfig() {    
@@ -530,7 +561,7 @@ class camillaDSP {
     }
 
     getChannelFiltersList(channelNo) {
-        let pipe =  this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];        
+        let pipe =  this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
         if (pipe!=undefined) return pipe.names; else return [];
     }
 }

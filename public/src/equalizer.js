@@ -127,13 +127,6 @@ async function loadFiltersFromConfig() {
     }
     
     await DSP.downloadConfig();    
-
-    if (window.parent.activeSettings.peqSingleLine) {        
-        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 7px 7px 0px");
-    } else {        
-        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 0px 7px 7px");
-    }
-
     
     for (let channelNo=0;channelNo<2;channelNo++) {
 
@@ -149,40 +142,7 @@ async function loadFiltersFromConfig() {
         for (let filter of filterList) {
             let currentFilter = DSP.filters[filter];
             if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;
-
-            currentFilter.createElement(true);            
-
-            let peqElement = document.createElement('div');
-            peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
-                
-            let filterBasic = document.createElement('div'); 
-            filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
-
-            // let nameSpan = document.createElement('span'); nameSpan.innerText='Name :'
-            // filterBasic.appendChild(nameSpan);
-            // filterBasic.appendChild(currentFilter.elementCollection.filterName);    
-            
-            let typeSpan = document.createElement('span'); typeSpan.innerText='Filter Type :'
-            filterBasic.appendChild(typeSpan);
-            filterBasic.appendChild(currentFilter.elementCollection.filterType);                
-
-            let subTypeSpan = document.createElement('span'); subTypeSpan.innerText='Filter Sub Type :'
-            filterBasic.appendChild(subTypeSpan);
-            filterBasic.appendChild(currentFilter.elementCollection.filterSubType);       
-
-            let peqParams = document.createElement('div');             
-            peqParams.id = "peqParams"; peqParams.className='peqParams';          
-            
-            peqElement.appendChild(filterBasic);
-            peqElement.appendChild(currentFilter.elementCollection.peqParams);
-
-            peqElement.addEventListener("updated",plotConfig)
-
-            if (window.parent.activeSettings.peqSingleLine) {        
-                peqElement.style = "display:flex; height: 40px;"
-                filterBasic.style = 'margin-right: 20px'
-            }
-
+            let peqElement = createFilterElement(currentFilter);
             peqChannel.appendChild(peqElement);
         }
 
@@ -192,6 +152,54 @@ async function loadFiltersFromConfig() {
 
     sortAll();
     document.loading=false;
+}
+
+function createFilterElement(currentFilter) {
+    currentFilter.createElement(true);            
+
+    let peqElement = document.createElement('div');
+    peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
+        
+    let filterBasic = document.createElement('div'); 
+    filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
+
+    // let nameSpan = document.createElement('span'); nameSpan.innerText='Name :'
+    // filterBasic.appendChild(nameSpan);
+    // filterBasic.appendChild(currentFilter.elementCollection.filterName);    
+    
+    let typeSpan = document.createElement('span'); typeSpan.innerText='Filter Type :'
+    filterBasic.appendChild(typeSpan);
+    filterBasic.appendChild(currentFilter.elementCollection.filterType);                
+
+    let subTypeSpan = document.createElement('span'); subTypeSpan.innerText='Filter Sub Type :'
+    filterBasic.appendChild(subTypeSpan);
+    filterBasic.appendChild(currentFilter.elementCollection.filterSubType);       
+
+    let peqParams = document.createElement('div');             
+    peqParams.id = "peqParams"; peqParams.className='peqParams';          
+    
+    peqElement.appendChild(filterBasic);
+    peqElement.appendChild(currentFilter.elementCollection.peqParams);
+    
+
+    peqElement.addEventListener("updated",plotConfig)
+    peqElement.addEventListener("addNewFilter",e=>addNewFilter(e))
+
+    if (window.parent.activeSettings.peqSingleLine) {        
+        peqElement.style = "display:flex; height: 40px;"
+        filterBasic.style = 'margin-right: 20px'
+        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 7px 7px 0px");
+        
+
+        peqElement.appendChild(currentFilter.elementCollection.addButton);
+        peqElement.appendChild(currentFilter.elementCollection.removeButton);
+    } else {
+        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 0px 7px 7px");
+
+        filterBasic.appendChild(currentFilter.elementCollection.addButton);
+        filterBasic.appendChild(currentFilter.elementCollection.removeButton);
+    }
+    return peqElement;
 }
 
 async function splitChannels() {
@@ -382,8 +390,36 @@ async function initSpectrum(){
     },100)
 }
 
-function addNewLine() {
-    peqlineAdd();
+async function addNewFilter(e) {    
+    // Create a filter object based on default filter 
+    let filter = DSP.getDefaultFilter();
+    let freq = 3146;
+
+    if (e.target.nextSibling!=null) {
+        freq = Math.round((e.target.filter.parameters.freq+e.target.nextSibling.filter.parameters.freq)/2);
+    } else {
+        freq = Math.round((e.target.filter.parameters.freq+20000)/2);
+    }
+
+    // Set frequency to average of where filter is being insterted
+    filter[Object.keys(filter)[0]].parameters.freq=freq;
+
+    console.log("New Filter :", filter);    
+    let channelCount = DSP.getChannelCount();
+    for (let channel=0;channel<channelCount;channel++) {
+        // Create a new filter in config    
+        let newFilter = DSP.createNewFilter(filter,channel);
+        await DSP.uploadConfig();
+
+        // Load the created filter to the channel
+        let peqChannel= document.getElementById("peqChannel"+channel);
+
+        if (peqChannel!=null) {
+            let peqElement = createFilterElement(newFilter);
+            // Insert after current element which is to say before its next sibling        
+            if (e.target.nextSibling!=null) peqChannel.insertBefore(peqElement,e.target.nextSibling); else peqChannel.appendChild(peqElement);
+        }
+    }
 }
 
 function resetPEQ() {

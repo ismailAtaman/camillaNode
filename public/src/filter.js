@@ -20,8 +20,10 @@ class filter {
     filterElement;
     elementCollection={};
     
+    
 
     constructor(name,filter) {                
+        if (name==undefined) name=new Date().getTime().toString().substring(8);
         this.name=name;
         this.description=filter.description;        
         this.type=filter.type;
@@ -53,11 +55,48 @@ class filter {
 
         filterType.value=this.type;
         filterType.addEventListener("change",this.updateEventHandler);
+        this.elementCollection.filterType=filterType;
 
         this.updateSubTypes(basic);
         this.updateParams();        
 
-        this.elementCollection.filterType=filterType;
+        // Add buttons 
+        const addButton = document.createElement('div'); 
+        addButton.className="peqNavigate"; addButton.setAttribute("target","");
+        addButton.style = "width: max-content; margin-left: 20px;";
+
+        const addButtonImg = document.createElement('img');
+        addButtonImg.src = "/img/icon/add.png"; addButtonImg .className='icon';        
+        
+        addButton.appendChild(addButtonImg)
+        addButton.addEventListener('click',function(e){ 
+            let peqElement;
+            if (e.target.className=='peqElement') peqElement=e.target;
+            if (e.target.parentElement.className=='peqElement') peqElement=e.target.parentElement;
+            if (e.target.parentElement.parentElement.className=='peqElement') peqElement=e.target.parentElement.parentElement;
+            peqElement.dispatchEvent(new Event("addNewFilter"));
+        })
+        this.elementCollection.addButton = addButton;
+
+
+        const removeButton = document.createElement('div'); 
+        removeButton.className="peqNavigate"; removeButton.setAttribute("target","");
+        removeButton.style = "width: max-content;"
+
+        const removeButtonImg = document.createElement('img');
+        removeButtonImg.src = "/img/icon/remove.png"; removeButtonImg .className='icon';        
+        
+        removeButton.appendChild(removeButtonImg)
+        removeButton.addEventListener('click',function(e){ 
+            let peqElement;
+            if (e.target.className=='peqElement') peqElement=e.target;
+            if (e.target.parentElement.className=='peqElement') peqElement=e.target.parentElement;
+            if (e.target.parentElement.parentElement.className=='peqElement') peqElement=e.target.parentElement.parentElement;
+            peqElement.dispatchEvent(new Event("removeFilter"));
+        })
+
+        this.elementCollection.removeButton = removeButton;
+        
     }
 
     updateSubTypes(basic) {

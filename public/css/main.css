@@ -570,6 +570,33 @@ select {
     width: 100px;
 }
 
+.peqNavigate {   
+    display: flex;
+    height: 25px;     
+    font-size: 15px;
+    padding:10px;    
+    cursor:pointer;    
+    transition: all linear 250ms;        
+    align-items: center;
+    padding-bottom: 15px;    
+    user-select: none;
+}
+
+.peqNavigate:hover {        
+    color: hsl(calc( 180 + var(--bck-hue)), 75%, 65%);     
+}
+
+.peqNavigate img {        
+    height: 25px;
+    filter:invert(0.75);    
+    transition: all linear 300ms;    
+    padding-right: 5px;    
+}
+
+.peqNavigate:hover img {         
+    filter:invert(1) brightness(1.2);  
+}
+
 
 /************************************************* DIALOGUES *********************************************************************/
 
