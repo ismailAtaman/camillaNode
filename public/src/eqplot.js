@@ -337,17 +337,8 @@ function plot(filterObject, canvas, name) {
 	// Create the grid
 	createGrid(ctx); 
 
-	// Create a QUADLEN length array filled with zero	
-		
-	if (Object.keys(filterObject).filter((e)=>e.includes("_channel_0")).length>0) {		
-		const colors = ["red", "white", "purple","green","gold","aqua","yellow","lime","teal","fuchsia"]
-		for (let i=0;i<10;i++) {
-			if (Object.keys(filterObject).filter((e)=>e.includes("_channel_"+i)).length>0) plotFilters(Object.keys(filterObject).filter((e)=>e.includes("_channel_0")),ctx,colors[i]); else break;
-		}
-	} else {
-		plotFilters(Object.keys(filterObject),ctx,"#FFF");
-	}
-	
+	canvas.totalArray = plotFilters(Object.keys(filterObject),ctx,"#FFF");
+
 	function plotFilters(filters, ctx, mainColor) {
 		let totalArray = new Array(QUADLEN).fill(0).map(() => new Array(QUADLEN).fill(0));
 		let dataMatrix=[];	
@@ -367,9 +358,8 @@ function plot(filterObject, canvas, name) {
 			
 			plotArray(ctx,dataMatrix,"#CCFFBB",0.3);		
 		}
-
-		let t= plotArray(ctx, totalArray,mainColor,3);			
-		
+		let t= plotArray(ctx, totalArray,mainColor,3);					
+		return totalArray;
 	}
 
 
@@ -383,8 +373,10 @@ function plot(filterObject, canvas, name) {
 		context.fillText(nameText,nameLeft,40);            
 	}
 
-	// return Math.round(Math.max(...totalArray[1]));
-	console.log("Plot completed.")
+	let max = Math.round(Math.max(...canvas.totalArray[1]));
+	console.log("Max ",max);
+	return max
+	// console.log("Plot completed.")
 
 }
 

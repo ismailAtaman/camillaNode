@@ -482,12 +482,31 @@ class camillaDSP {
         // console.log("Clear Filters",this.config.filters);
     }
 
-    addFilter(filter,channelNo) {       
-        // Add to filters
-        // console.log("Adding filter ",filter)
-        Object.assign(this.config.filters,filter);
+    addFilters(filterList,channel) {
+        console.log(filterList);
+        if (channel==undefined) {
+            let channelCount=this.getChannelCount();
+            for (let channel=0;channel<channelCount;channel++) {
+                let filterNameList = Object.keys(filterList);
+                for (let filterName of filterNameList) {
+                    let filter = {}
+                    filter[filterName]=filterList[filterName];
+                    // console.log(" >> ",filter ,channel)                    
+                    this.addFilter(filter,channel);
+                }
+            }
+        } else {
+            let filterNameList = Object.keys(filterList);
+            for (let filterName of filterNameList) {
+                let filter = {}
+                filter[filterName]=filterList[filterName];                
+                this.addFilter(filter,channel);
+            }
+        }
+    }
 
-        // Add to pipeline
+    addFilter(filter,channelNo) {            
+        Object.assign(this.config.filters,filter);        
         this.addFilterToChannelPipeline(filter,channelNo)        
         return true;
     }
@@ -495,13 +514,41 @@ class camillaDSP {
     addFilterToChannelPipeline(filter,channelNo) {
         let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
         let pipeIndex = this.config.pipeline.indexOf(pipe);    
-        let filterName = Object.keys(filter)[0]
-        // console.log("Old names  ",pipe.names, " Adding ", filterName);
-        
+        let filterName = Object.keys(filter)[0]        
         pipe.names.push(filterName);
-        this.config.pipeline[pipeIndex] = pipe;
-        // console.log("Updated names : ",this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0].names)
+        this.config.pipeline[pipeIndex] = pipe;        
+    }
 
+    
+    removeFilterFromChannelPipeline(filterName,channelNo) {
+        // removed FilterName filter from channelNo channel pipeline. If filter is no pipeline, removes filter
+        let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
+        let pipeIndex = this.config.pipeline.indexOf(pipe);              
+        
+        let elementIndex = pipe.names.indexOf(filterName); 
+        if (elementIndex==-1) {
+            console.error("Filter to be removed not found in channel pipeline.",filterName,channelNo)
+            return;
+        }
+
+        pipe.names.splice(elementIndex,1);        
+        this.config.pipeline[pipeIndex] = pipe;        
+
+        if (!this.isFilterInPipeline(filterName)) {
+            console.log(">>> Filter '", filterName,"' does not exists in any pipeline. Deleting filter.")
+            delete this.config.filters[filterName];
+        } 
+    }
+
+    isFilterInPipeline(filter) {
+        let channelCount = this.getChannelCount();
+        let filterName=typeof(filter)=="Object"?Object.keys(filter)[0]:filter;
+        for (let channel=0;channel<channelCount;channel++) {
+            let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channel)})[0];
+            if (pipe.names.includes(filterName)) return true;
+        }
+
+        return false;
     }
 
     async linearizeConfig() {    

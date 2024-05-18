@@ -579,11 +579,10 @@ async function openConfigurationClick() {
         case "equalizer":                
             await DSP.downloadConfig();                    
             DSP.config.mixers=data.mixers;
-            DSP.clearFilters();
-            // console.log(DSP.config);                    
+            DSP.clearFilters();            
             DSP.config.title=configName.value;                     
             DSP.addFilters(data.filters);
-            await DSP.uploadConfig(DSP.config);                                        
+            await DSP.uploadConfig();                                        
             await window.mainframe.contentWindow.loadFiltersFromConfig.apply();
             window.mainframe.contentWindow.plotConfig.apply();              
             break;

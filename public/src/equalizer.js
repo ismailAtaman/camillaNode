@@ -114,8 +114,8 @@ function updateElementWidth() {
 
 
 async function loadFiltersFromConfig() {                        
-    PEQ.innerHTML='';    
-    const channelCount = DSP.getChannelCount();
+    PEQ.innerHTML='';        
+    await DSP.downloadConfig();    
 
     if (window.parent.activeSettings.peqDualChannel) {        
         console.log("Single channel :",DSP.isSingleChannel());
@@ -125,9 +125,7 @@ async function loadFiltersFromConfig() {
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
         window.document.documentElement.style.setProperty("--peq-channel-before-display","block");
     }
-    
-    await DSP.downloadConfig();    
-    
+        
     for (let channelNo=0;channelNo<2;channelNo++) {
 
         let peqChannel = document.createElement('div');
@@ -137,10 +135,16 @@ async function loadFiltersFromConfig() {
         let filterList;
         if (window.parent.activeSettings.peqDualChannel) filterList=DSP.getChannelFiltersList(channelNo); else filterList=Object.keys(DSP.filters);
 
-        console.log("filter list ",filterList);
+        // console.log("filter list ",filterList);
 
         for (let filter of filterList) {
             let currentFilter = DSP.filters[filter];
+            if (currentFilter.type=="Gain") {
+                let gain =Math.round(currentFilter.parameters.gain);
+                setPreamp(gain);                 
+                preamp.setVal(gain * 10 + 181);
+            }
+
             if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;
             let peqElement = createFilterElement(currentFilter);
             peqChannel.appendChild(peqElement);
@@ -184,6 +188,7 @@ function createFilterElement(currentFilter) {
 
     peqElement.addEventListener("updated",plotConfig)
     peqElement.addEventListener("addNewFilter",e=>addNewFilter(e))
+    peqElement.addEventListener("removeFilter",e=>removeFilter(e))    
 
     if (window.parent.activeSettings.peqSingleLine) {        
         peqElement.style = "display:flex; height: 40px;"
@@ -263,7 +268,7 @@ function sortByFreq(parent) {
         element.innerHTML='';
     });
 
-    console.log(elementArray);
+    // console.log(elementArray);
 
     function compareLines(a,b) {    
         return parseInt(a.filter.parameters.freq) - parseInt(b.filter.parameters.freq);                
@@ -275,22 +280,6 @@ function sortByFreq(parent) {
             channel.appendChild(element);
         })  
     }            
-}
-
-async function peqlineUpdate() {                        
-    if (document.loading) return;
-    const ctx = document.getElementById("plotCanvas")
-    let filters = generateFiltersObject();
-    // console.log(filters)
-    
-    await DSP.downloadConfig();
-    await DSP.clearFilters();
-    DSP.addFilters(filters);
-    
-    plotConfig();                      
-
-    await DSP.uploadConfig()    
-    // console.log("peqlineupdate")            
 }
 
 function generateFiltersObject() {
@@ -308,25 +297,13 @@ function generateFiltersObject() {
     }
     return filters;
 }
-
-function peqlineRemove(peqline) {            
-    if (document.loading) return;
-    const PEQ = document.getElementById('PEQ');
-    PEQ.removeChild(peqline);
-    peqline=null;
-    peqlineUpdate();
-}
-
-function peqlineAdd(peqline) {
-    const PEQ = document.getElementById('PEQ');
-    addLine(PEQ,"NewFilter"+PEQ.children.length+1,peqline)
-}
-
 async function clearPEQ() {        
     setPreamp(0);
     await DSP.clearFilters(true);        
+    DSP.config.title=" ";
     await DSP.uploadConfig();
     document.getElementById('PEQ').innerHTML='';
+    plotConfig();
     // peqlineUpdate();
  
 }
@@ -403,7 +380,7 @@ async function addNewFilter(e) {
         peqChannel= document.getElementById("peqChannel0")
     }  else {
         peqChannel= e.target.parentElement;
-        parseInt(peqChannel.getAttribute("channelno"));
+        channel = parseInt(peqChannel.getAttribute("channelno"));
 
 
         currentElementFreq = e.target.filter.parameters.freq;        
@@ -437,12 +414,30 @@ async function addNewFilter(e) {
     
 }
 
+async function removeFilter(e) {
+    let peqChannel= e.target.parentElement;
+    let channel = parseInt(peqChannel.getAttribute("channelno"));
+    let filterName = e.target.getAttribute("configname");
+
+    console.log("Removed "+filterName);
+
+    // Remove from current channel. if Dual Channel EQ is off remove from other channel as well
+    DSP.removeFilterFromChannelPipeline(filterName,channel);
+    if (window.parent.activeSettings.peqDualChannel==false) DSP.removeFilterFromChannelPipeline(filterName,1-parseInt(channel));    
+
+    await DSP.uploadConfig();
+
+    peqChannel.removeChild(e.target);
+    plotConfig();
+}
+
 function resetPEQ() {
-    const PEQ = document.getElementById('PEQ');
-    for (let peqLine of PEQ.childNodes) {
-        peqLine.instance.reset();
+    console.log("Reset needs to be re-implemented")
+    // const PEQ = document.getElementById('PEQ');
+    // for (let peqLine of PEQ.childNodes) {
+    //     peqLine.instance.reset();
         
-    }
+    // }
 }
 
 async function convertConfigs() {

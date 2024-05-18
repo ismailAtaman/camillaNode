@@ -190,7 +190,7 @@ class filter {
 
         }
 
-        console.log("peq element ",id,value,peqElement.filter.type)
+        // console.log("peq element ",id,value,peqElement.filter.type)
         switch (id) {
             case "filterName":
                 peqElement.filter.name = value;
@@ -211,7 +211,7 @@ class filter {
 
         let configName = peqElement.getAttribute("configName");
         let filterJson = peqElement.filter.createFilterJson(peqElement.filter.name,peqElement.filter.type,peqElement.filter.parameters);
-        console.log(configName,filterJson)
+        // console.log(configName,filterJson)
 
         delete peqElement.filter.DSP.config.filters[configName];
         Object.assign(peqElement.filter.DSP.config.filters,filterJson);
@@ -428,7 +428,7 @@ class filter {
     createFilterJson(filterName,filterType,filterParams) {
         let filterJson = {}       
         
-        console.log(filterParams);
+        // console.log(filterParams);
         let parameters={}
         for (let paramName of Object.keys(filterParams)) {                        
             if (paramName=="filterName" || paramName=="filterType") continue;
