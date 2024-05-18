@@ -394,32 +394,47 @@ async function addNewFilter(e) {
     // Create a filter object based on default filter 
     let filter = DSP.getDefaultFilter();
     let freq = 3146;
+    let currentElementFreq = 3146;
+    let peqChannel= undefined;
+    let channel = 0;
 
-    if (e.target.nextSibling!=null) {
-        freq = Math.round((e.target.filter.parameters.freq+e.target.nextSibling.filter.parameters.freq)/2);
-    } else {
-        freq = Math.round((e.target.filter.parameters.freq+20000)/2);
+    if (e==undefined) {        
+        currentElementFreq=0;
+        peqChannel= document.getElementById("peqChannel0")
+    }  else {
+        peqChannel= e.target.parentElement;
+        parseInt(peqChannel.getAttribute("channelno"));
+
+
+        currentElementFreq = e.target.filter.parameters.freq;        
+        if (e.target.nextSibling!=null) {
+            freq = Math.round((currentElementFreq+e.target.nextSibling.filter.parameters.freq)/2);
+        } else {
+            freq = Math.round((currentElementFreq+20000)/2);
+        }
     }
 
     // Set frequency to average of where filter is being insterted
-    filter[Object.keys(filter)[0]].parameters.freq=freq;
+    filter[Object.keys(filter)[0]].parameters.freq=freq;    
+    
+    // Create new DSP filter and upload
+    let newFilter = DSP.createNewFilter(filter,channel);
+    await DSP.uploadConfig();
 
-    console.log("New Filter :", filter);    
-    let channelCount = DSP.getChannelCount();
-    for (let channel=0;channel<channelCount;channel++) {
-        // Create a new filter in config    
-        let newFilter = DSP.createNewFilter(filter,channel);
-        await DSP.uploadConfig();
+    // Create and load the filter element to the channel element    
+    let peqElement = createFilterElement(newFilter);
 
-        // Load the created filter to the channel
-        let peqChannel= document.getElementById("peqChannel"+channel);
-
-        if (peqChannel!=null) {
-            let peqElement = createFilterElement(newFilter);
-            // Insert after current element which is to say before its next sibling        
-            if (e.target.nextSibling!=null) peqChannel.insertBefore(peqElement,e.target.nextSibling); else peqChannel.appendChild(peqElement);
+    // If first filter or last, just append it, if not insert after current element 
+    if (e==undefined) {
+        peqChannel.appendChild(peqElement);
+    } else {
+        if (e.target.nextSibling!=null) {
+            peqChannel.insertBefore(peqElement,e.target.nextSibling);
+        } else {
+            peqChannel.appendChild(peqElement);
         }
-    }
+    }  
+    
 }
 
 function resetPEQ() {

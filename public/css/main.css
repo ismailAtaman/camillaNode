@@ -56,7 +56,7 @@
 
 body {    
     color: white;
-    
+    padding-bottom: 50px;
 } 
 
 input[type="checkbox"] {    
@@ -205,8 +205,8 @@ section {
     padding-top: 30px;
     display: flex;
     flex-direction: column;        
-    border-right: 1px solid #222;    
-    
+    border-right: 1px solid #222;        
+    padding-bottom: 100px;
 }
 
 .leftTitle {
@@ -218,7 +218,7 @@ section {
     text-align: left;       
     user-select: none;
     border-bottom: 1px solid hsla(0,100%,100%,25%);
-    margin-top: 50px;
+    margin-top: 30px;
 }
 
 .leftTitle:first-of-type {
