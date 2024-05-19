@@ -9,7 +9,7 @@ interval = setInterval(function(){
         equalizerOnLoad();
         clearInterval(interval);
     }
-},50);
+},100);
 
 
 async function equalizerOnLoad() {            
@@ -116,6 +116,7 @@ async function loadFiltersFromConfig() {
     PEQ.innerHTML='';        
     await DSP.downloadConfig();    
 
+    console.log("Multi channel? ",window.parent.activeSettings.peqDualChannel)
     if (window.parent.activeSettings.peqDualChannel) {        
         let singleChannel = DSP.isSingleChannel();
         console.log("Single channel :",singleChannel);
@@ -131,6 +132,10 @@ async function loadFiltersFromConfig() {
         window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
         window.document.documentElement.style.setProperty("--peq-channel-before-display","block");
+    } else {
+        // let singleChannel = DSP.isSingleChannel();
+        // if (!singleChannel) DSP.mergeFilters(DSP.config.filters);
+        // await DSP.uploadConfig();       
     }
         
     let channelCount = DSP.getChannelCount();

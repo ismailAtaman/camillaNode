@@ -346,7 +346,7 @@ class camillaDSP {
     removeFilter(filterName) {
         let channelCount = this.getChannelCount();
         for (let channel=0;channel<channelCount;channel++) {
-            removeFilterFromChannelPipeline(filterName,channel);
+            this.removeFilterFromChannelPipeline(filterName,channel);
         }
 
     }
@@ -407,23 +407,27 @@ class camillaDSP {
         return channelCount;
     }
 
-    mergeFilters(filters) {                
-        // simple version : take common filters and add filters for channel_0 for all channels
-        
-        let tmpFilters={};
-        let commonFilters = Object.keys(filters).filter(function(e){ return !e.includes("_channel_") });
-        let channelFilters = Object.keys(filters).filter(function(e){ return e.includes("_channel_0") });
-        for (let f of Object.keys(filters)) {                        
-            if (commonFilters.includes(f)) tmpFilters[f]=filters[f];
-            if (channelFilters.includes(f)) {
-                let filterName = f.split("_c")[0];
-                tmpFilters[filterName]=filters[f];
-                // console.log(f,filterName)
-            }
+    mergeFilters() {               
+        // simple version : take common filters and add filters for channel_0 for all channels        
+        let filters = this.config.filters;
+        this.config.filters={};
+        this.config.pipeline=this.defaultPipeline;
+
+        let commonFilters = Object.keys(filters).filter(function(e){ return !e.includes("__c") });
+        let channelFilters = Object.keys(filters).filter(function(e){ return e.includes("__c0") });
+        let totalArray = commonFilters.concat(channelFilters)
+
+        console.log("Channel filters",totalArray)
+
+        for (let f of totalArray) {                                    
+            let tmpFilter={}
+            let filterName = f.split("_")[0];
+            console.log("Merging >> ",f,filterName)
+            tmpFilter[filterName]=filters[f];
+            this.addFilterToAllChannels(tmpFilter);        
             // console.log("Common check > ",f,commonFilters.includes(f));
         }
-        console.log(tmpFilters)
-        return tmpFilters;
+        if (debugLevel=="high") console.log("Merged filters >>> ",this.config.filters)        
     }
 
     isSingleChannel() {
