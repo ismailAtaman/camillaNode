@@ -112,46 +112,56 @@ function updateElementWidth() {
     plotConfig();
 }
 
-
 async function loadFiltersFromConfig() {                        
     PEQ.innerHTML='';        
     await DSP.downloadConfig();    
 
     if (window.parent.activeSettings.peqDualChannel) {        
-        console.log("Single channel :",DSP.isSingleChannel());
-        if (DSP.isSingleChannel()) await splitChannels();                
-
+        let singleChannel = DSP.isSingleChannel();
+        console.log("Single channel :",singleChannel);
+        
+        if (singleChannel) {
+            DSP.splitFiltersToChannels();    
+            await DSP.uploadConfig();        
+        }                  
+                
+        await DSP.downloadConfig();    
+        console.log("Downloaded config >>>:", DSP.config);        
+        
         window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
         window.document.documentElement.style.setProperty("--peq-channel-before-display","block");
     }
         
-    for (let channelNo=0;channelNo<2;channelNo++) {
-
+    let channelCount = DSP.getChannelCount();
+    for (let channelNo=0;channelNo<channelCount;channelNo++) {
         let peqChannel = document.createElement('div');
         peqChannel.className="peqChannel"; peqChannel.id="peqChannel"+channelNo;
-        peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);
+        peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);        
+        PEQ.appendChild(peqChannel);
 
-        let filterList;
-        if (window.parent.activeSettings.peqDualChannel) filterList=DSP.getChannelFiltersList(channelNo); else filterList=Object.keys(DSP.filters);
+        let filterList;        
+        filterList=DSP.getChannelFiltersList(channelNo)
+        console.log("filter list of channel ",channelNo,filterList)        
+        
+        for (let filter of filterList) {        
+            let currentFilter = DSP.createFilter(filter,channelNo);            
+            
+            // if (currentFilter.type=="Gain") {
+            //     let gain =Math.round(currentFilter.parameters.gain);
+            //     await setPreamp(gain);                 
+            //     preamp.setVal(gain * 10 + 181);
+            // }
 
-        // console.log("filter list ",filterList);
+            if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;            
+            
 
-        for (let filter of filterList) {
-            let currentFilter = DSP.filters[filter];
-            if (currentFilter.type=="Gain") {
-                let gain =Math.round(currentFilter.parameters.gain);
-                setPreamp(gain);                 
-                preamp.setVal(gain * 10 + 181);
-            }
-
-            if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;
             let peqElement = createFilterElement(currentFilter);
             peqChannel.appendChild(peqElement);
         }
-
-        PEQ.appendChild(peqChannel);
-        if (channelNo>=0 && !window.parent.activeSettings.peqDualChannel) break;
+        
+        
+        //if (!window.parent.activeSettings.peqDualChannel) break;
     }
 
     sortAll();
@@ -207,67 +217,38 @@ function createFilterElement(currentFilter) {
     return peqElement;
 }
 
-async function splitChannels() {
-    DSP.config.filters= DSP.splitFiltersToChannels(DSP.config.filters);                 
-
-    // Update pipeline
-    let pipeline=[];
-    for (let mixer in DSP.config.mixers) {
-        pipeline.push({"type":"Mixer","name":mixer});
-    }
-
-    pipeline.push({"type":"Filter","channel":0,"names":Object.keys(DSP.config.filters).filter(e=>e.includes("__c0"))})
-    pipeline.push({"type":"Filter","channel":1,"names":Object.keys(DSP.config.filters).filter(e=>e.includes("__c1"))})
-
-    DSP.config.pipeline=pipeline;
-
-    await DSP.uploadConfig();
-}
-
-
 function plotConfig() {
     const canvas = document.getElementById("plotCanvas");            
     plot(DSP.config.filters,canvas,DSP.config.title);            
 }
 
-async function setPreamp(gain) {
-    await DSP.downloadConfig();
-    if (DSP.config.filters.Gain == undefined) {
-        DSP.config.filters.Gain = {"type":"Gain","parameters":{"gain":0,"inverted":false,"scale":"dB"}}
+async function setPreamp(gain) {    
+    if (DSP.config.filters.Gain == undefined) {        
+        let gainFilter = {}
+        gainFilter["Gain"]={"type":"Gain","parameters":{"gain":0,"inverted":false,"scale":"dB"}};
+        DSP.addFilterToAllChannels(gainFilter);
     }  
-    DSP.config.filters.Gain.parameters.gain= Math.round(gain);                
-    DSP.config.pipeline=DSP.updatePipeline(DSP.config);
-    await DSP.uploadConfig(DSP.config);
+    DSP.config.filters.Gain.parameters.gain= Math.round(gain);                    
+    await DSP.uploadConfig();
 }
 
-function addLine(parent,filterName,insertBefore) {
-    let line = PEQline.addPEQLine(parent,insertBefore);            
-    line.setAttribute("filterName",filterName);            
-    line.addEventListener("update",peqlineUpdate);            
-    line.addEventListener("remove",function(){peqlineRemove(this)});     
-    line.addEventListener("add",function(){peqlineAdd(this)});  
-    return line;   
-}
+
 
 function sortAll() {
-    const PEQs=document.getElementsByClassName("PEQ");                        
+    const PEQs=document.getElementsByClassName("peqChannel");                        
     for (let PEQ of PEQs) {
         sortByFreq(PEQ);
     }
 }
 
 function sortByFreq(parent) {    
-
     let elementArray=[];
-    parent.childNodes.forEach(element => {                
-        element.childNodes.forEach(peqElement=> {
-            if (peqElement.className=="peqElement") {                    
-                elementArray.push(peqElement);                                                    
+    parent.childNodes.forEach(element => {                        
+            if (element.className=="peqElement") {                    
+                elementArray.push(element);                                                    
             }                
         })
-        element.innerHTML='';
-    });
-
+    parent.innerHTML='';    
     // console.log(elementArray);
 
     function compareLines(a,b) {    
@@ -275,97 +256,19 @@ function sortByFreq(parent) {
     }
 
     elementArray=elementArray.sort(compareLines);            
-    for (let element of elementArray) {                        
-        parent.childNodes.forEach(channel=>{
-            channel.appendChild(element);
-        })  
+    for (let element of elementArray) {                                
+        parent.appendChild(element);        
     }            
 }
 
-function generateFiltersObject() {
-    let filters={};
-    const PEQ = document.getElementById('PEQ');
-    PEQ.childNodes.forEach(e=>{
-        if (e.className=="peqline") {                                   
-            filters[e.getAttribute("filterName")] = e.instance.valuesToJSON();
-        }
-    })
-    // If there is a preamp setting, create the preamp filter
-    preampGain=(preamp.knob.instance.getVal()-181)/10;
-    if (preampGain!=0) {
-        filters.Gain = {"type":"Gain","parameters":{"gain":preampGain,"inverted":false,"scale":"dB"}}
-    }
-    return filters;
-}
 async function clearPEQ() {        
-    setPreamp(0);
-    await DSP.clearFilters(true);        
-    DSP.config.title=" ";
-    await DSP.uploadConfig();
+    await setPreamp(0);
+    DSP.clearFilters();       
+    await DSP.uploadConfig();    
     document.getElementById('PEQ').innerHTML='';
-    plotConfig();
-    // peqlineUpdate();
- 
+    plotConfig(); 
 }
 
-const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
-'315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
-'3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
-
-async function initSpectrum(){          
-    // Create bars and boxes
-    const spec = document.getElementById("spectrum");   
-    const barCount=freq.length-1;
-    const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
-    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
-    
-
-    let bar,box;
-    spec.innerHTML='';
-    for (i=0;i<=barCount;i++){
-        bar = document.createElement("div");
-        bar.className='levelbar';        
-        bar.setAttribute('freq',freq[i]);        
-        
-        let hue=parseInt(window.document.documentElement.style.getPropertyValue('--bck-hue'));
-        for (j=1;j<40;j++) {
-            box = document.createElement('div');
-            box.className='levelbox';                    
-            box.style="background-color: hsl("+hue+", 30%, 50%);"        
-            hue=hue-10;
-            bar.appendChild(box);
-        }
-
-        spec.appendChild(bar);
-    }
-
-    // Get the data and update the analyser
-    
-    setInterval(async function(){
-        const spec = document.getElementById("spectrum");
-        let r = await DSP.getSpectrumData();                
-        
-        let i=0, height, boxCount, count;
-        spec.childNodes.forEach(e=>{
-            if (e.tagName=="DIV") {                         
-                height = 200 + (2*Math.round(r[i]));  
-                if (height<0) height=0;
-                if (height>200) height=0;     
-                boxCount= Math.round(height/8)-1;                                
-                count=0;
-                e.childNodes.forEach(e=>{
-                    if (e.tagName=="DIV") {
-                        if (count>boxCount) e.style.opacity=0; else e.style.opacity=1;
-                        count++
-                    }
-                })
-                i=i+2;
-            }                     
-        })       
-                
-
-    },100)
-}
 
 async function addNewFilter(e) {    
     // Create a filter object based on default filter 
@@ -433,14 +336,71 @@ async function removeFilter(e) {
 
 function resetPEQ() {
     console.log("Reset needs to be re-implemented")
-    // const PEQ = document.getElementById('PEQ');
-    // for (let peqLine of PEQ.childNodes) {
-    //     peqLine.instance.reset();
-        
-    // }
 }
 
+const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
+'315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
+'3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
+
+async function initSpectrum(){          
+    // Create bars and boxes
+    const spec = document.getElementById("spectrum");   
+    const barCount=freq.length-1;
+    const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
+    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
+    
+
+    let bar,box;
+    spec.innerHTML='';
+    for (i=0;i<=barCount;i++){
+        bar = document.createElement("div");
+        bar.className='levelbar';        
+        bar.setAttribute('freq',freq[i]);        
+        
+        let hue=parseInt(window.document.documentElement.style.getPropertyValue('--bck-hue'));
+        for (j=1;j<40;j++) {
+            box = document.createElement('div');
+            box.className='levelbox';                    
+            box.style="background-color: hsl("+hue+", 30%, 50%);"        
+            hue=hue-10;
+            bar.appendChild(box);
+        }
+
+        spec.appendChild(bar);
+    }
+
+    // Get the data and update the analyser
+    
+    setInterval(async function(){
+        const spec = document.getElementById("spectrum");
+        let r = await DSP.getSpectrumData();                
+        
+        let i=0, height, boxCount, count;
+        spec.childNodes.forEach(e=>{
+            if (e.tagName=="DIV") {                         
+                height = 200 + (2*Math.round(r[i]));  
+                if (height<0) height=0;
+                if (height>200) height=0;     
+                boxCount= Math.round(height/8)-1;                                
+                count=0;
+                e.childNodes.forEach(e=>{
+                    if (e.tagName=="DIV") {
+                        if (count>boxCount) e.style.opacity=0; else e.style.opacity=1;
+                        count++
+                    }
+                })
+                i=i+2;
+            }                     
+        })       
+                
+
+    },100)
+}
+
+
 async function convertConfigs() {
+    // Converts camillaNode v1 configurations to v2 configurations
+
     fetch("/getConfigList").then((res)=>res.text().then(async cData=>{
         const configList = JSON.parse(cData);
 

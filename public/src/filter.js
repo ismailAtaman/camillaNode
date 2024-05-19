@@ -19,6 +19,7 @@ class filter {
     DSP;
     filterElement;
     elementCollection={};
+    loading=false;
     
     
 
@@ -33,6 +34,7 @@ class filter {
 
     createElement(basic) {
         if (basic==undefined) basic=false;
+        this.loading=true;
 
         const filterName = document.createElement('input');        
         filterName.className="filterName"; filterName.value=this.name; filterName.id="filterName";
@@ -98,6 +100,8 @@ class filter {
         })
 
         this.elementCollection.removeButton = removeButton;
+
+        this.loading=false;
         
     }
 
@@ -191,6 +195,8 @@ class filter {
             e.target.value=0;
 
         }
+
+        if (peqElement.filter.loading) return;
 
         // console.log("peq element ",id,value,peqElement.filter.type)
         switch (id) {

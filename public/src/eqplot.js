@@ -374,10 +374,8 @@ function plot(filterObject, canvas, name) {
 	}
 
 	let max = Math.round(Math.max(...canvas.totalArray[1]));
-	console.log("Max ",max);
-	return max
-	// console.log("Plot completed.")
-
+	// console.log("Max ",max);
+	return max;
 }
 
 export default plot;

@@ -8,6 +8,7 @@ const fs = require('fs');
 const WebSocket = require('ws');
 const configsFile = "savedConfigs.dat"
 
+
 //// Global variables
 let strAppConfig;
 
@@ -57,6 +58,22 @@ app.get('/preferences',(req,res)=>{
     res.sendFile(__dirname+'/public/html/preferences.html');
 }) 
 
+// app.post('/validateConfig',(req,res)=>{
+//     let queryResponse="";
+//     req.on('data', function(chunk) {
+//         queryResponse+=chunk;        
+//     }).on('end', function(){
+//         let config = JSON.parse(queryResponse);              
+//         let fileName = configsFile;
+//         // console.log(fileName)
+//         let fileBuffer = Buffer.from(JSON.stringify(config),'utf-8');        
+//         fs.writeFileSync(fileName,fileBuffer,function(err){
+//             console.log("Error saving file ",fileName,"\n",err);            
+//         });        
+//         res.end();
+//     }); 
+    
+// })
 
 
 

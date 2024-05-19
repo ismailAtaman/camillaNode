@@ -274,7 +274,7 @@ async function connect(camillaDSP) {
 
     
     let config =  await DSP.sendDSPMessage("GetConfigJson");                     
-    if (config.pipeline==null || config.mixers==null || config.filter==null) config = camillaDSP.getDefaultConfig(config,true);
+    if (config.pipeline==null || config.mixers==null || config.filter==null) config = DSP.getDefaultConfig(config,true);
                 
     conencted = DSP.uploadConfig(config);            
     if (connected) {
@@ -316,17 +316,15 @@ async function loadPreferences() {
             navigator.dispatchEvent(new Event("click"));
             break;
         }
-    };
-    
-    
-
+    };    
 
     if (window.activeSettings.DCProtection) {
-        const DSP = window.parent.DSP;
-        await DSP.downloadConfig();        
-        Object.assign(DSP.config.filters,DSP.DCProtectionFilter);
-        DSP.config.pipeline = DSP.updatePipeline(DSP.config);
-        DSP.uploadConfig();
+        const DSP = window.parent.DSP;        
+        console.log("DCP Exists?",DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]])
+        if (DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]==undefined) {
+            DSP.addFilterToAllChannels(DSP.DCProtectionFilter);        
+            DSP.uploadConfig();
+        }
     }
 }
 

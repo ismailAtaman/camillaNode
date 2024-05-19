@@ -1,6 +1,6 @@
 import filter from "/src/filter.js"
 
-const debugLevel = 'low';
+const debugLevel = 'high';
 
 class camillaDSP {
     ws;    
@@ -18,11 +18,6 @@ class camillaDSP {
     upperMidsFreq=3000;
     trebleFreq=8000;
 
-    filters = {}
-    mixers = {}
-    pipeline = {}
-    
-
     DCProtectionFilter = {"__DCProFilter":{"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}}};
     Limiter = {"__Limiter":{"type":"Limiter","parameters":{"clip_limit":-3}}};
     defaultMixer = {"recombine":{
@@ -34,7 +29,28 @@ class camillaDSP {
             ]
         }
     };      
-
+    defaultPipeline = [
+        {          
+            "type": "Mixer",
+            "name": "recombine",
+            "description": "CamillaNode Default Mixer",
+            "bypassed": false
+        },
+        {
+            "type": "Filter",
+            "channel": 0,
+            "names": [],
+            "description": "Channel 0 Filters",
+            "bypassed": false
+        },
+        {
+            "type": "Filter",
+            "channel": 1,
+            "names": [],
+            "description": "Channel 1 Filters",
+            "bypassed": false
+        }
+    ]
 
     constructor() { 
         return this;        
@@ -48,6 +64,7 @@ class camillaDSP {
         }
 
         let connect = false;
+
         await this.connectToDSP(server,port).then((r)=>{ 
             this.ws = r[1];                                    
             this.server=server;
@@ -62,17 +79,12 @@ class camillaDSP {
             connect=false;
         });        
 
-        if (connect) {            
-            let initSuccess = await this.initAfterConnection();
-
-            // console.log("InitSuccess",initSuccess);
-
-            if (initSuccess==undefined || initSuccess==false) { console.log("Configuration initialization failed!"); return false}
+        if (connect) {
             connect = await this.connectToDSP(server,spectrumPort).then(p=>{                
                 this.ws_spectrum=p[1];
                 this.spectrumPort=spectrumPort;
                 console.log("Connected to spectrum.") 
-                this.spectrum_connected=true;
+                this.spectrum_connected=true;                
                 return true;
             }).catch(f=>{
                 console.error("Error connecting to spectrum error");
@@ -80,14 +92,19 @@ class camillaDSP {
                 return false;
             })            
         }
+
+        let initSuccess = await this.initAfterConnection();
+        if (initSuccess==undefined || initSuccess==false) { console.log("Configuration initialization failed!"); return false}
+        
         return connect;
+
     }
 
     async initAfterConnection() {
         // Download and initialize configuration                
         this.config = await this.sendDSPMessage("GetConfigJson");                
         this.config = this.getDefaultConfig(this.config,true);                                 
-        return this.uploadConfig(this.config);
+        return this.uploadConfig();
     }
 
     connectToDSP(server,port) {        
@@ -202,23 +219,29 @@ class camillaDSP {
 
 /******************************************* End of WS message exchange  **********************************************************/
 
-    async uploadConfig() {                      
-        return this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
-            if (debugLevel=='high') console.log("Config uploaded successfully.",config);
-            return true;
-        }).catch(e=>{
-            console.error("Upload error",this.config);
-            if (debugLevel=='high') console.log("Error while config being uploaded.",this.config);
-            return false;
-        });        
+    async uploadConfig() {          
+        // lola;              
+        if (debugLevel=='high') console.log("Upload >>> ",this.config);
+        return await this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)});
+
+        // return new Promise(async (res,rej)=>{
+        //     let uploadResult = await this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)});
+        //     if (uploadResult) res(true); else rej(false);
+        // })
+
+        // return this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
+        //     if (debugLevel=='high') console.log("Config uploaded successfully.",this.config);
+        //     return true;
+        // }).catch(e=>{
+        //     console.error("Upload error",this.config);
+        //     if (debugLevel=='high') console.log("Error while config being uploaded.",e,this.config);
+        //     return false;
+        // });        
     }
 
     async downloadConfig() {
-        this.config = await this.sendDSPMessage("GetConfigJson");     
-        // console.log("Filters :",this.config.filters)   
-        this.loadFilters();
-        
-        // console.log(this.filters)
+        this.config = await this.sendDSPMessage("GetConfigJson");             
+        // this.loadFilters();                
     }
 
     loadFilters() {
@@ -236,7 +259,7 @@ class camillaDSP {
         let newFilter = new filter(filterName,this.config.filters[filterName]);
         newFilter.DSP=this;
         newFilter.channel=channelNo;                
-        this.filters[filterName]=newFilter;          
+        // this.filters[filterName]=newFilter;          
         return newFilter;
     }
 
@@ -246,6 +269,100 @@ class camillaDSP {
         return this.createFilter(filterName,channelNo);
     }
 
+    clearFilters(clearAll) {                
+        let channelCount=this.getChannelCount();
+        for (let filterName of Object.keys(this.config.filters)) {                                                
+            for (let channel=0;channel<channelCount;channel++) {                                                      
+                // if (!clearAll && filterName.startsWith("__")) continue;
+                this.removeFilterFromChannelPipeline(filterName,channel);  
+            }               
+        }
+    }
+
+    addFilters(filterList,channel) {        
+        if (channel==undefined) {
+            let channelCount=this.getChannelCount();
+            for (let channel=0;channel<channelCount;channel++) {
+                let filterNameList = Object.keys(filterList);
+                for (let filterName of filterNameList) {
+                    let filter = {}
+                    filter[filterName]=filterList[filterName];
+                    // console.log(" >> ",filter ,channel)                    
+                    this.addFilter(filter,channel);
+                }
+            }
+        } else {
+            let filterNameList = Object.keys(filterList);
+            for (let filterName of filterNameList) {
+                let filter = {}
+                filter[filterName]=filterList[filterName];                
+                this.addFilter(filter,channel);                
+            }
+        }
+    }
+
+    addFilterToAllChannels(filter) {    
+        let channelCount=this.getChannelCount();
+        for (let channel=0;channel<channelCount;channel++) {
+            this.addFilter(filter,channel)
+        }
+    }
+
+    addFilter(filter,channelNo) {            
+        Object.assign(this.config.filters,filter);        
+        this.addFilterToChannelPipeline(filter,channelNo)        
+        return true;
+    }
+
+    addFilterToChannelPipeline(filter,channelNo) {
+        let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
+        let pipeIndex = this.config.pipeline.indexOf(pipe);    
+        let filterName = Object.keys(filter)[0]        
+        pipe.names.push(filterName);
+        this.config.pipeline[pipeIndex] = pipe;        
+        // console.log("Filter added to pipeline",filter,channelNo,pipe)
+    }   
+    
+    removeFilterFromChannelPipeline(filterName,channelNo) {
+        // removed FilterName filter from channelNo channel pipeline. If filter is no pipeline, removes filter
+        let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
+        let pipeIndex = this.config.pipeline.indexOf(pipe);              
+        
+        let elementIndex = pipe.names.indexOf(filterName); 
+        if (elementIndex==-1) {
+            console.error("Filter to be removed not found in channel pipeline.",filterName,channelNo)
+            return;
+        }
+
+        pipe.names.splice(elementIndex,1);        
+        this.config.pipeline[pipeIndex] = pipe;        
+
+        if (!this.isFilterInPipeline(filterName)) {
+            if (debugLevel=='high') console.log(">>> Filter '", filterName,"' does not exists in any pipeline. Deleting filter.")
+            delete this.config.filters[filterName];
+        } 
+    }
+
+    removeFilter(filterName) {
+        let channelCount = this.getChannelCount();
+        for (let channel=0;channel<channelCount;channel++) {
+            removeFilterFromChannelPipeline(filterName,channel);
+        }
+
+    }
+
+    isFilterInPipeline(filter) {
+        
+        let channelCount = this.getChannelCount();
+        let filterName=typeof(filter)=="Object"?Object.keys(filter)[0]:filter;
+        for (let channel=0;channel<channelCount;channel++) {
+            let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channel)})[0];
+            if (pipe.names.includes(filterName)) return true;
+        }
+
+        return false;
+    }
+
     getDefaultFilter() {
         let filterName ="F_"+new Date().getTime().toString().substring(7)
         let filter = {}
@@ -253,35 +370,41 @@ class camillaDSP {
         return filter;
     }
 
-    getDefaultConfig(config, override) {
-            if (override==undefined) override=false;               
-            config.description="Config file is auto-generated by CamillaNode 2";
-            
-            if (override) {                
-                config.mixers=this.defaultMixer;                
-                config.pipeline=[];
-                return config;
-            } 
+    getDefaultConfig(config) {        
+        let defaultConfig={}
+        defaultConfig.devices = config.devices;                        
+        if (config.filters==null || config.filters==undefined) config.filters={};
 
-            if (config.filters==undefined) config.filters={};
-            if (config.mixers==undefined) config.mixers=this.defaultMixer;
-            if (config.pipeline==undefined) config.pipeline=[];
-            // if (config.processors==null) config.processors={};               
-
-            config.pipeline = this.updatePipeline(config);   
-
-            return config;
+        if (Object.keys(config.filters).length>0) {
+            defaultConfig.filters = config.filters;
+            defaultConfig.mixers = config.mixers;
+            defaultConfig.pipeline=config.pipeline;
+        } else {
+            defaultConfig.filters={};            
+            defaultConfig.mixers=this.defaultMixer;
+            defaultConfig.pipeline=this.defaultPipeline;
+        }
+        
+        defaultConfig.processors={};        
+        return defaultConfig;
     }
     
-    splitFiltersToChannels(filters) {
-        let tmpFilters={}
+    splitFiltersToChannels() {        
         let channelCount = this.getChannelCount();
-        for (let c=0;c<channelCount;c++) {
-            for (let f of Object.keys(filters)) {                        
-                tmpFilters[f+"__c"+c]=filters[f];
-            }
+        for (let filterName of Object.keys(this.config.filters)) {                                                
+            for (let channel=0;channel<channelCount;channel++) {              
+                let filterObject={};
+                if (filterName.startsWith("__") || filterName=="Gain") 
+                    filterObject[filterName]=this.config.filters[filterName]; 
+                    else filterObject[filterName+"__c"+channel]=this.config.filters[filterName];                    
+                if (debugLevel=='high') console.log("Split filters : ",filterName," >>> ", Object.keys(filterObject)[0],channel);
+                
+                this.addFilter(filterObject,channel);                                    
+                this.removeFilterFromChannelPipeline(filterName,channel);  
+            }               
         }
-        return tmpFilters;
+        if (debugLevel=="high") console.log("Split filters\t:",this.config.filters,"\nSplit pipeline\t:",this.config.pipeline);             
+        return channelCount;
     }
 
     mergeFilters(filters) {                
@@ -304,15 +427,30 @@ class camillaDSP {
     }
 
     isSingleChannel() {
-        let pipelineFilters = this.config.pipeline.filter(function(e){return e.type=="Filter"});
-        let sameFilters = true;
-        for (let i=0;i<pipelineFilters.length-1;i++) {
-            if (pipelineFilters[i].names.length != pipelineFilters[i+1].names.length) { sameFilters=false; break;}
-            for (let name of pipelineFilters[i].names) {                    
-                if (pipelineFilters[i+1].names.filter((e)=>{return (e==name)}).length==0) {sameFilters=false; break;}
+        console.log("Single check pipeline",this.config.pipeline);
+        let channelCount = this.getChannelCount();        
+
+        let ret = true;
+        for (let channel=0;channel<channelCount-1;channel++) {
+            let pipe = this.config.pipeline.filter(e=>e.type=="Filter" && e.channel==channel)[0];
+            let nextPipe = this.config.pipeline.filter(e=>e.type=="Filter" && e.channel==channel+1)[0];
+            if (pipe.names.length!=nextPipe.names.length) {
+                if (debugLevel=="high") console.log("Single channel check : pipeline length mismatch!");
+                return false;
+                break;
+            }
+
+            for (let i=0;i<pipe.names.length;i++) {
+                if (!nextPipe.names.includes(pipe.names[i])) {
+                    if (debugLevel=="high")  console.log(pipe.names[i]," not found!");
+                    ret= false;
+                    return false;
+                }
+                if (debugLevel=="high")  console.log(pipe.names[i]," : ", nextPipe.names.includes(pipe.names[i]))
             }
         }
-        return sameFilters;
+
+        return true;
     }
 
 
@@ -391,43 +529,47 @@ class camillaDSP {
         return {"type":"Biquad","parameters":{"type":"Peaking","freq":freq,"gain":gain,"q":q}};                
     }        
     
-    updatePipeline(config) {
+    // updatePipeline(config) {
 
-        if (this.isSingleChannel==false) {
-            console.error("Multi-channel mode can not use updatePipeline function.")
-        }
-        let pipeline=[];                
+    //     if (this.isSingleChannel==false) {
+    //         console.error("Multi-channel mode can not use updatePipeline function.")
+    //     }
 
-        for (let mixer in config.mixers) {
-            pipeline.push({"type":"Mixer","name":mixer});
-        }
-         
-        const channelCount = this.getChannelCount();         
-        for (let i=0;i<channelCount;i++) {
-            pipeline.push({"type":"Filter","channel":i,"names":Object.keys(config.filters)})
-        }                    
+    //     let pipeline=[];                
 
-        // console.log(config.pipeline);
-        return pipeline;
-    }
+    //     for (let mixer in config.mixers) {
+    //         pipeline.push({"type":"Mixer","name":mixer});
+    //     }
+                
+    //     let inChannels = config.mixers[Object.keys(config.mixers)[0]].channels.in;
+    //     let outChannels = config.mixers[Object.keys(config.mixers)[0]].channels.out;    
+    //     const channelCount =  Math.max(config.devices.playback.channels,config.devices.capture.channels,inChannels,outChannels);
+
+    //     for (let i=0;i<channelCount;i++) {
+    //         if (config.filters!=undefined) pipeline.push({"type":"Filter","channel":i,"names":Object.keys(config.filters)})
+    //     }                    
+
+    //     // console.log(config.pipeline);
+    //     return pipeline;
+    // }
 
     async getSpectrumData() {
         return await this.sendSpectrumMessage("GetPlaybackSignalPeak");
     }
 
-    filterToJSON(filter) {                        
-        let tmpObj = new Object();        
+    // filterToJSON(filter) {                        
+    //     let tmpObj = new Object();        
         
-        if (filter.enabled) gain=0;
+    //     if (filter.enabled) gain=0;
 
-        if (filter.type=="Gain") {
-             tmpObj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
-         } else {
-            tmpObj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
-         }
-        //  console.log("json",tmpObj)    
-        return tmpObj;
-    }
+    //     if (filter.type=="Gain") {
+    //          tmpObj={"type":"Gain","parameters":{"gain":filter.gain,"inverted":false,"scale":"dB"}};
+    //      } else {
+    //         tmpObj={"type":"Biquad","parameters":{"type":filter.type,"freq":filter.freq,"gain":filter.gain,"q":filter.q}};       
+    //      }
+    //     //  console.log("json",tmpObj)    
+    //     return tmpObj;
+    // }
 
     async convertConfigToText() {        
         this.config = await this.sendDSPMessage("GetConfigJson");                
@@ -467,89 +609,7 @@ class camillaDSP {
         
     }
 
-    async clearFilters(clearAll) {        
-        await this.downloadConfig();        
 
-        if (clearAll) { this.config.filters={}; this.config.pipeline=this.updatePipeline(this.config); return; }       
-        
-        let tmpFilters = {};
-        for (let filterName of Object.keys(this.config.filters)) {            
-            if (filterName.startsWith('__')) tmpFilters[filterName]=this.config.filters[filterName];
-        }
-
-        this.config.filters=tmpFilters;        
-        this.config.pipeline=this.updatePipeline(this.config);
-        // console.log("Clear Filters",this.config.filters);
-    }
-
-    addFilters(filterList,channel) {
-        console.log(filterList);
-        if (channel==undefined) {
-            let channelCount=this.getChannelCount();
-            for (let channel=0;channel<channelCount;channel++) {
-                let filterNameList = Object.keys(filterList);
-                for (let filterName of filterNameList) {
-                    let filter = {}
-                    filter[filterName]=filterList[filterName];
-                    // console.log(" >> ",filter ,channel)                    
-                    this.addFilter(filter,channel);
-                }
-            }
-        } else {
-            let filterNameList = Object.keys(filterList);
-            for (let filterName of filterNameList) {
-                let filter = {}
-                filter[filterName]=filterList[filterName];                
-                this.addFilter(filter,channel);
-            }
-        }
-    }
-
-    addFilter(filter,channelNo) {            
-        Object.assign(this.config.filters,filter);        
-        this.addFilterToChannelPipeline(filter,channelNo)        
-        return true;
-    }
-
-    addFilterToChannelPipeline(filter,channelNo) {
-        let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
-        let pipeIndex = this.config.pipeline.indexOf(pipe);    
-        let filterName = Object.keys(filter)[0]        
-        pipe.names.push(filterName);
-        this.config.pipeline[pipeIndex] = pipe;        
-    }
-
-    
-    removeFilterFromChannelPipeline(filterName,channelNo) {
-        // removed FilterName filter from channelNo channel pipeline. If filter is no pipeline, removes filter
-        let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
-        let pipeIndex = this.config.pipeline.indexOf(pipe);              
-        
-        let elementIndex = pipe.names.indexOf(filterName); 
-        if (elementIndex==-1) {
-            console.error("Filter to be removed not found in channel pipeline.",filterName,channelNo)
-            return;
-        }
-
-        pipe.names.splice(elementIndex,1);        
-        this.config.pipeline[pipeIndex] = pipe;        
-
-        if (!this.isFilterInPipeline(filterName)) {
-            console.log(">>> Filter '", filterName,"' does not exists in any pipeline. Deleting filter.")
-            delete this.config.filters[filterName];
-        } 
-    }
-
-    isFilterInPipeline(filter) {
-        let channelCount = this.getChannelCount();
-        let filterName=typeof(filter)=="Object"?Object.keys(filter)[0]:filter;
-        for (let channel=0;channel<channelCount;channel++) {
-            let pipe  = this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channel)})[0];
-            if (pipe.names.includes(filterName)) return true;
-        }
-
-        return false;
-    }
 
     async linearizeConfig() {    
         // Breakdown config into channel pipelines
@@ -611,8 +671,28 @@ class camillaDSP {
         let pipe =  this.config.pipeline.filter(function(e){ return (e.type=="Filter" && e.channel==channelNo)})[0];
         if (pipe!=undefined) return pipe.names; else return [];
     }
+
+    validateConfig() {
+        // upload config 
+        // convert to yaml at server
+        // run validate
+        // return result
+    }
 }
 
 
 
 export default camillaDSP;
+
+
+
+// if (filterName.startsWith("__")) {
+//     filterObject[filterName]=this.config.filters[filterName];
+// } else {
+//     filterObject[filterName+"__c"+channel]=this.config.filters[filterName];
+// }
+
+// filterObject={};
+
+// console.log("Split to channel ",channel,filterObject)
+// this.addFilters(filterObject,channel);     
