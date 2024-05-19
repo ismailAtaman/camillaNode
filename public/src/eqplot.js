@@ -326,20 +326,21 @@ function createGrid(canvas) {
 	
 }
 
-function plot(filterObject, canvas, name) {
+function plot(filterObject, canvas, name,color) {
 	const ctx = canvas;        
 	const context = ctx.getContext('2d');             
+	if (color == undefined) color = "#FFF";
 
-	// Clear the canvas
-	context.clearRect(0, 0, ctx.width, ctx.height)        	
+	// Clear the canvas	
+	// context.clearRect(0, 0, ctx.width, ctx.height);        	
 	
 
 	// Create the grid
 	createGrid(ctx); 
 
-	canvas.totalArray = plotFilters(Object.keys(filterObject),ctx,"#FFF");
+	canvas.totalArray = plotFilters(Object.keys(filterObject),ctx,color);
 
-	function plotFilters(filters, ctx, mainColor) {
+	function plotFilters(filters, ctx, color) {
 		let totalArray = new Array(QUADLEN).fill(0).map(() => new Array(QUADLEN).fill(0));
 		let dataMatrix=[];	
 
@@ -358,7 +359,7 @@ function plot(filterObject, canvas, name) {
 			
 			plotArray(ctx,dataMatrix,"#CCFFBB",0.3);		
 		}
-		let t= plotArray(ctx, totalArray,mainColor,3);					
+		let t= plotArray(ctx, totalArray,color,3);					
 		return totalArray;
 	}
 

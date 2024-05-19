@@ -98,7 +98,7 @@ function updateElementWidth() {
     DSP = window.parent.DSP;            
     
     canvas.width = basicControls.getBoundingClientRect().width;
-    plot(DSP.config.filters,ctx,DSP.config.title);
+    plotConfig();
 }
 
 async function loadData() {
@@ -121,7 +121,7 @@ async function loadData() {
 
     // Load filters
     await DSP.downloadConfig()
-    if (DSP.config.filters==undefined) DSP.config.filters={};
+    // if (DSP.config.filters==undefined) DSP.config.filters={};
     
     if (DSP.config.filters["subBass"]==undefined) {        
         await DSP.setTone(0,0,0,0,0);        
@@ -135,7 +135,29 @@ async function loadData() {
     upperMids.knob.instance.setVal(DSP.config.filters["upperMids"].parameters.gain*10+181);
     treble.knob.instance.setVal(DSP.config.filters["treble"].parameters.gain*10+181);
     
-    plot(DSP.config.filters,ctx,DSP.config.title);
+    plotConfig();
+}
+
+function plotConfig() {
+    const canvas = document.getElementById("plotCanvas");        
+    const context = canvas.getContext('2d');             
+	context.clearRect(0, 0, canvas.width, canvas.height);        	
+    
+    if (window.parent.activeSettings.peqDualChannel) {
+        let colors = ["#B55","#55B","#5B5","#F33","#33F","#3F3"]
+        let channelCount = DSP.getChannelCount();
+        for (let channelNo=0;channelNo<channelCount;channelNo++) {
+            let channelFilters = {};
+            filterList=DSP.getChannelFiltersList(channelNo)                
+            for (let filter of filterList) {     
+                channelFilters[filter]=DSP.config.filters[filter];
+            }
+            plot(channelFilters,canvas,DSP.config.title,colors[channelNo]);
+        }
+
+    } else {
+        plot(DSP.config.filters,canvas,DSP.config.title);            
+    }    
 }
 
 async function setTone() {
@@ -159,7 +181,7 @@ async function setTone() {
     // console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
     let config = await DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
     const canvas = document.getElementById('plotCanvas');        
-    plot(config.filters,canvas,config.title);  
+    plotConfig();
 }
 
 

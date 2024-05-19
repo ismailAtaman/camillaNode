@@ -145,23 +145,19 @@ async function loadFiltersFromConfig() {
         console.log("filter list of channel ",channelNo,filterList)        
         
         for (let filter of filterList) {        
-            let currentFilter = DSP.createFilter(filter,channelNo);            
-            
-            // if (currentFilter.type=="Gain") {
-            //     let gain =Math.round(currentFilter.parameters.gain);
-            //     await setPreamp(gain);                 
-            //     preamp.setVal(gain * 10 + 181);
-            // }
-
+            let currentFilter = DSP.createFilter(filter,channelNo);                        
+            if (currentFilter.type=="Gain") {
+                let gain =Math.round(currentFilter.parameters.gain);
+                await setPreamp(gain);                 
+                preamp.setVal(gain * 10 + 181);
+            }
             if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;            
-            
-
             let peqElement = createFilterElement(currentFilter);
             peqChannel.appendChild(peqElement);
         }
         
         
-        //if (!window.parent.activeSettings.peqDualChannel) break;
+        if (!window.parent.activeSettings.peqDualChannel) break;
     }
 
     sortAll();
@@ -218,8 +214,25 @@ function createFilterElement(currentFilter) {
 }
 
 function plotConfig() {
-    const canvas = document.getElementById("plotCanvas");            
-    plot(DSP.config.filters,canvas,DSP.config.title);            
+    const canvas = document.getElementById("plotCanvas");        
+    const context = canvas.getContext('2d');             
+	context.clearRect(0, 0, canvas.width, canvas.height);        	
+    
+    if (window.parent.activeSettings.peqDualChannel) {
+        let colors = ["#B55","#55B","#5B5","#F33","#33F","#3F3"]
+        let channelCount = DSP.getChannelCount();
+        for (let channelNo=0;channelNo<channelCount;channelNo++) {
+            let channelFilters = {};
+            filterList=DSP.getChannelFiltersList(channelNo)                
+            for (let filter of filterList) {     
+                channelFilters[filter]=DSP.config.filters[filter];
+            }
+            plot(channelFilters,canvas,DSP.config.title,colors[channelNo]);
+        }
+
+    } else {
+        plot(DSP.config.filters,canvas,DSP.config.title);            
+    }    
 }
 
 async function setPreamp(gain) {    

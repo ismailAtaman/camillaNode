@@ -13,7 +13,7 @@ class camillaDSP {
     spectrum_connected=false;
     
     subBassFreq=50;
-    bassFre=200;
+    bassFreq=200;
     midsFreq=1000;
     upperMidsFreq=3000;
     trebleFreq=8000;
@@ -471,31 +471,31 @@ class camillaDSP {
     async setTone(subBass, bass, mids, upperMids, treble) {
         await this.downloadConfig();
 
-        const subBassFilter = camillaDSP.createPeakFilterJSON(this.subBassFreq,subBass,1.41);
-        const bassFilter = camillaDSP.createPeakFilterJSON(this.bassFreq,bass,1.41);
-        const midsFilter = camillaDSP.createPeakFilterJSON(this.midsFreq,mids,1.41);
-        const upperMidsFilter = camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41);
-        const trebleFilter = camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41);
+        const subBassFilter ={"subBass":camillaDSP.createPeakFilterJSON(this.subBassFreq,subBass,1.41)};
+        const bassFilter = {"bass":camillaDSP.createPeakFilterJSON(this.bassFreq,bass,1.41)};
+        const midsFilter = {"mids":camillaDSP.createPeakFilterJSON(this.midsFreq,mids,1.41)};
+        const upperMidsFilter = {"upperMids":camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41)};
+        const trebleFilter = {"treble":camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41)};
         
-        // // Multi channel
-        // const channelCount = this.getChannelCount();
+        // Multi channel
+        const channelCount = this.getChannelCount();
 
-        // for (let i=0;i<channelCount;i++) {
-        //     this.config.filters["subBass_channel_"+i]=subBassFilter;
-        //     this.config.filters["bass_channel_"+i]=bassFilter;
-        //     this.config.filters["mids_channel_"+i]=midsFilter;
-        //     this.config.filters["upperMids_channel_"+i]=upperMidsFilter;
-        //     this.config.filters["treble_channel_"+i]=trebleFilter;                
-        // }
+        if (DSP.config.filters["subBass"]==undefined) {
+            for (let channel=0;channel<channelCount;channel++) {
+                this.addFilter(subBassFilter,channel)              
+                this.addFilter(bassFilter,channel)       
+                this.addFilter(midsFilter,channel)       
+                this.addFilter(upperMidsFilter,channel)       
+                this.addFilter(trebleFilter,channel)       
+            }
+        }
         
-        // this.config.pipeline=this.updatePipeline(this.config,true);        
+        this.config.filters["subBass"].parameters.gain=subBass;
+        this.config.filters["bass"].parameters.gain=bass;
+        this.config.filters["mids"].parameters.gain=mids;
+        this.config.filters["upperMids"].parameters.gain=upperMids;
+        this.config.filters["treble"].parameters.gain=treble;  
         
-        this.config.filters["subBass"]=subBassFilter;
-        this.config.filters["bass"]=bassFilter;
-        this.config.filters["mids"]=midsFilter;
-        this.config.filters["upperMids"]=upperMidsFilter;
-        this.config.filters["treble"]=trebleFilter;                
-        this.config.pipeline=this.updatePipeline(this.config);        
         
         await this.uploadConfig();
         return this.config;
