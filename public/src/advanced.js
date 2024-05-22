@@ -25,11 +25,11 @@ async function advancedOnLoad() {
 
 
     const channelCount = await window.parent.DSP.getChannelCount();
-    loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
+    // loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
 
-    document.addEventListener('click',function() {
-        document.getElementById('pipeContextMenu').style.display='none';        
-    })
+    // document.addEventListener('click',function() {
+    //     document.getElementById('pipeContextMenu').style.display='none';        
+    // })
 
     
 }

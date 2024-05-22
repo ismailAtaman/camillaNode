@@ -63,12 +63,14 @@ async function basicLoad() {
     balance.knob.addEventListener("change",function(e){
         const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
         DSP.setBalance(bal);
+        DSP.uploadConfig();        
     })
 
     crossfeed.knob.addEventListener("change",function(e){
         let crossfeedVal = (this.instance.getVal()-331)/20;
         // console.log(crossfeedVal)
         DSP.setCrossfeed(crossfeedVal);
+        DSP.uploadConfig();
     })
 
     subBass.knob.addEventListener("change",setTone);

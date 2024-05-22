@@ -318,14 +318,14 @@ async function loadPreferences() {
         }
     };    
 
-    if (window.activeSettings.DCProtection) {
-        const DSP = window.parent.DSP;        
-        console.log("DCP Exists?",DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]])
-        if (DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]==undefined) {
-            DSP.addFilterToAllChannels(DSP.DCProtectionFilter);        
-            DSP.uploadConfig();
-        }
-    }
+    // if (window.activeSettings.DCProtection) {
+    //     const DSP = window.parent.DSP;        
+    //     // console.log("DCP Exists?",DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]!=undefined)
+    //     if (DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]==undefined) {
+    //         DSP.addFilterToAllChannels(DSP.DCProtectionFilter);        
+    //         DSP.uploadConfig();
+    //     }
+    // }
 }
 
 function applyColorScheme(doc) {
@@ -360,6 +360,7 @@ async function exportConfig() {
 function showAutoEQ() {
     const mod = document.getElementById("autoEQDialog");
     const repoList = document.getElementById('autoEQRepo');
+    let searchText = document.getElementById('autoEQSearch').addEventListener("keyup",searchAutoEq)
     loadRepoList(repoList);
     loadHeadphoneList();
     mod.showModal();            

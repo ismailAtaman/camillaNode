@@ -279,12 +279,11 @@ dialog .navigate {
     border-radius: 10px;
     margin-top: 20px;
 }
-
+/* 
 .button {
     display: inline-block;
     line-height: 2;    
-    height: 30px;
-    /* width: 100px; */
+    height: 30px;    
     font-size: 14px;
     background-color: hsl(var(--bck-hue), var(--bck-sat), 40%);    
     padding: 5px;
@@ -293,12 +292,13 @@ dialog .navigate {
     text-align: center;
     border-radius: 5px;        
     user-select: none;
-}
-
+} 
+ */
+/* 
 .button:hover {
     filter: hue-rotate(30deg) saturate(150%);
     transition: all 350ms;
-}
+} */
 
 .small {
     font-size:10px;
@@ -927,7 +927,7 @@ select {
     border-radius: 0px 0px 7px 7px;
 }
 
-.filterParams div, input {
+.filterParams > div input[type="text"] {
     margin-left: 5px;
     margin-block: 5px;
     height: 22px;
