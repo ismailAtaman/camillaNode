@@ -160,11 +160,10 @@ async function loadFiltersFromConfig() {
         for (let filter of filterList) {        
             // console.log(filter);
             let currentFilter = DSP.createFilter(filter,channelNo);                        
-            // if (currentFilter.type=="Gain") {
-            //     let gain =Math.round(currentFilter.parameters.gain);
-            //     setPreamp(gain);                 
-            //     preamp.setVal(gain * 10 + 181);
-            // }
+            if (currentFilter.type=="Gain") {
+                let gain =Math.round(currentFilter.parameters.gain);                           
+                preamp.setVal(gain * 10 + 181);
+            }
             if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;            
             let peqElement = createFilterElement(currentFilter);
             peqChannel.appendChild(peqElement);

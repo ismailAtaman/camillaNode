@@ -226,7 +226,7 @@ class filter {
 
         peqElement.setAttribute("configName",Object.keys(filterJson)[0]);
         peqElement.dispatchEvent(new Event("updated"));
-        beep();
+        // beep();
 
     }
 
