@@ -327,7 +327,7 @@ canvas {
     display: block;
     border-radius: 10px;    
     padding-bottom: 10px;    
-    margin-right: 10%;
+    margin-right: 10%;    
 }
 
 .group::before {
@@ -492,11 +492,12 @@ select {
 #PEQ {
     display: grid;
     grid-template-columns: var(--peq-columns); 
-    gap: 5px;    
+    gap: 5px;        
 }
 
 #PEQ::before {
     grid-column: var(--peq-before-grid-column);
+    
 }
 
 .peqChannel {
@@ -506,6 +507,7 @@ select {
     justify-content: left;
     margin-inline: 10px;
     overflow-y: none;
+    
 }
 
 .peqChannel::before {
@@ -527,7 +529,7 @@ select {
     align-items: center;    
     user-select: none;
     border:1px solid hsl(var(--bck-hue), 20%, 30%);        
-    border-radius: 7px;        
+    border-radius: 7px;            
 }
 
 
@@ -547,16 +549,15 @@ select {
  
 }
 
-.peqParams > div, input {
+.peqParams > input {
     margin-left: 5px;
     margin-block: 5px;
-    padding-inline: 5px;    
-    height: 25px;    
-    width: fit-content;
-    border-radius: 5px;
+    height: 22px;
+    max-width: 40px;            
+    
 }
 
-.peqParams > div, input:hover {
+.peqParams > div input:hover {
     background-color: hsl(var(--bck-hue), 50%, 80%);
 }
 
@@ -927,11 +928,12 @@ select {
     border-radius: 0px 0px 7px 7px;
 }
 
-.filterParams > div input[type="text"] {
+.filterParams input[type="text"] {
     margin-left: 5px;
     margin-block: 5px;
     height: 22px;
     max-width: 40px;        
+    border: 2px solid red;
 }
 
 .filterParams span {

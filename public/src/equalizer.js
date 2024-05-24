@@ -3,6 +3,7 @@ document.loading=false;
         
 // Run equalizerOnLoad function after DSP is connected.
 let interval;
+window.addEventListener("unload",documentUnload)
 interval = setInterval(function(){            
     // console.log(window.parent.DSP);
     if (window.parent.DSP!=undefined) {                
@@ -58,24 +59,27 @@ async function equalizerOnLoad() {
     vol.knob.addEventListener("change",function(e){
         const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
         DSP.sendDSPMessage({"SetVolume":volume})
+        
     })
 
     balance.knob.addEventListener("change",function(e){
         const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
         DSP.setBalance(bal);
+        DSP.uploadConfig();
     })
 
     crossfeed.knob.addEventListener("change",function(e){
         let crossfeedVal = (this.instance.getVal()-331)/20;
         // console.log(crossfeedVal)
         DSP.setCrossfeed(crossfeedVal);
+        DSP.uploadConfig();
     })
 
     preamp.knob.addEventListener("change",async function(e){
         const preampGain = (this.instance.getVal() -181)/10*1; // 1db change per every tick       
         // console.log(preampGain);
         setPreamp(preampGain);        
-        //await DSP.uploadConfig();
+        await DSP.uploadConfig();
     })
 
     updateElementWidth();
@@ -122,12 +126,7 @@ async function loadFiltersFromConfig() {
     
     if (multiChannel) {
         let singleChannel = DSP.isSingleChannel();        
-        if (singleChannel) {
-            DSP.splitFiltersToChannels();            
-            let r = await DSP.uploadConfig();
-            if (r) await loadFiltersFromConfig();
-            return;
-        }
+        if (singleChannel) DSP.splitFiltersToChannels();                      
     
         window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
@@ -135,10 +134,13 @@ async function loadFiltersFromConfig() {
     } else {        
         let singleChannel = DSP.isSingleChannel();   
         console.log("DSP config single channel?",singleChannel);     
-        if (!singleChannel) {
-            let validConfigAfterMerge = DSP.mergeFilters();                        
-            if (validConfigAfterMerge) r = await DSP.uploadConfig();
-        }
+        if (!singleChannel) DSP.mergeFilters();                        
+            // let validConfigAfterMerge = DSP.mergeFilters();                        
+            //if (validConfigAfterMerge) r = await DSP.uploadConfig();
+            
+            // let r;
+            // if (validConfigAfterMerge) r = await DSP.uploadConfig();
+            // if (r) await loadFiltersFromConfig();         
     }
         
 
@@ -170,6 +172,7 @@ async function loadFiltersFromConfig() {
         if (!window.parent.activeSettings.peqDualChannel) break;
     }
 
+    
     sortAll();        
     document.loading=false;    
 }
@@ -244,6 +247,8 @@ function plotConfig() {
         plot(DSP.config.filters,canvas,DSP.config.title);            
     }    
 }
+
+
 
 function setPreamp(gain) {    
     if (DSP.config.filters.Gain == undefined) {        
@@ -473,5 +478,9 @@ async function convertConfigs() {
         })
         
     }
+}
 
+
+function documentUnload() {
+    alert("Byeee!");
 }
