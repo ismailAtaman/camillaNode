@@ -225,7 +225,8 @@ class camillaDSP {
             console.error(">>>>>>>>>>>>>>>>>>>>>>> Invalid configuration! <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
             return false;
         }
-        if (debugLevel=='high') console.log("Upload >>> ",this.config);        
+        if (debugLevel=='high') console.log("Upload >>> ",this.config);
+
         return new Promise((res,rej)=>{
             this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
                 res(true);                
@@ -238,11 +239,11 @@ class camillaDSP {
 
     downloadConfig() {
         return new Promise((res,rej)=>{
-            this.sendDSPMessage("GetConfigJson").then(r=>{
+            this.sendDSPMessage("GetConfigJson").then(r=>{                
                 this.config=r;    
                 res(true);
             }).catch(e=>{
-                console.error("Error in download config. >> ",e);
+                console.error("Error in config download from DSP >> ", e);
                 rej(false);
             });
         })        
@@ -443,6 +444,7 @@ class camillaDSP {
                 this.removeFilterFromChannelPipeline(filterName,channel);  
             }               
         }
+        
         if (debugLevel=="high") console.log("Split filters\t:",this.config.filters,"\nSplit pipeline\t:",this.config.pipeline);                     
     }
 
@@ -460,7 +462,7 @@ class camillaDSP {
 
         let totalArray = channelFilters; //.concat(channelFilters)
 
-        console.log("Channel filters",totalArray)
+        console.log("mergeFilters > Channel filters : ",totalArray)
 
         for (let f of totalArray) {                                    
             if (f.startsWith("__")) continue;
@@ -468,15 +470,17 @@ class camillaDSP {
             let filterName= f.split("_")[0];
             // console.log("Merging >> ",f,filterName)
             tmpFilter[filterName]=filters[f];
-            this.addFilterToAllChannels(tmpFilter);                    
-            // this.removeFilter(f);
+            this.addFilterToAllChannels(tmpFilter);   
+                             
+            this.removeFilter(f);
+            this.removeFilter(f.replace("_c0","_c1"));            
         }
 
 
         let validConfig = this.validateConfig()        
         // console.log("Valid after merge?", validConfig);
 
-        if (debugLevel=="high") console.log("Merged filters >>> ",this.config.filters,this.config.pipeline);        
+        if (debugLevel=="high") console.log("Merged filters >>> ",this.config," Valid? ",validConfig);          
         return validConfig;
     }
 

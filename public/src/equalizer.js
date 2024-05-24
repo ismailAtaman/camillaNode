@@ -3,7 +3,6 @@ document.loading=false;
         
 // Run equalizerOnLoad function after DSP is connected.
 let interval;
-window.addEventListener("unload",documentUnload)
 interval = setInterval(function(){            
     // console.log(window.parent.DSP);
     if (window.parent.DSP!=undefined) {                
@@ -126,23 +125,26 @@ async function loadFiltersFromConfig() {
     
     if (multiChannel) {
         let singleChannel = DSP.isSingleChannel();        
-        if (singleChannel) DSP.splitFiltersToChannels();                      
-    
+        if (singleChannel) await DSP.splitFiltersToChannels();
+
         window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
         window.document.documentElement.style.setProperty("--peq-channel-before-display","block");
     } else {        
         let singleChannel = DSP.isSingleChannel();   
         console.log("DSP config single channel?",singleChannel);     
-        if (!singleChannel) DSP.mergeFilters();                        
+        if (!singleChannel) await DSP.mergeFilters();                        
             // let validConfigAfterMerge = DSP.mergeFilters();                        
             //if (validConfigAfterMerge) r = await DSP.uploadConfig();
             
             // let r;
             // if (validConfigAfterMerge) r = await DSP.uploadConfig();
             // if (r) await loadFiltersFromConfig();         
-    }
-        
+    }        
+
+    await DSP.uploadConfig();
+    await DSP.downloadConfig();
+
 
     let channelCount = DSP.getChannelCount();    
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
@@ -166,15 +168,14 @@ async function loadFiltersFromConfig() {
             if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;            
             let peqElement = createFilterElement(currentFilter);
             peqChannel.appendChild(peqElement);
-        }
-        
+        }        
         
         if (!window.parent.activeSettings.peqDualChannel) break;
     }
 
-    
     sortAll();        
     document.loading=false;    
+    await DSP.uploadConfig();
 }
 
 function createFilterElement(currentFilter) {
@@ -248,8 +249,6 @@ function plotConfig() {
     }    
 }
 
-
-
 function setPreamp(gain) {    
     if (DSP.config.filters.Gain == undefined) {        
         let gainFilter = {}
@@ -258,7 +257,6 @@ function setPreamp(gain) {
     }  
     DSP.config.filters.Gain.parameters.gain= Math.round(gain);                    
 }
-
 
 function sortAll() {
     const PEQs=document.getElementsByClassName("peqChannel");                        
@@ -294,7 +292,6 @@ async function clearPEQ() {
     document.getElementById('PEQ').innerHTML='';
     plotConfig(); 
 }
-
 
 async function addNewFilter(e) {    
     // Create a filter object based on default filter 
@@ -425,7 +422,6 @@ async function initSpectrum(){
     },100)
 }
 
-
 async function convertConfigs() {
     // Converts camillaNode v1 configurations to v2 configurations
 
@@ -480,7 +476,3 @@ async function convertConfigs() {
     }
 }
 
-
-function documentUnload() {
-    alert("Byeee!");
-}
