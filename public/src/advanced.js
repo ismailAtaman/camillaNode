@@ -25,7 +25,7 @@ async function advancedOnLoad() {
 
 
     const channelCount = await window.parent.DSP.getChannelCount();
-    // loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
+    loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
 
     // document.addEventListener('click',function() {
     //     document.getElementById('pipeContextMenu').style.display='none';        
@@ -33,39 +33,94 @@ async function advancedOnLoad() {
 
     
 }
-
-function loadPipelineEx(element,pipeline) {
+async function loadPipeline(element, DSP) {    
+    element.replaceChildren();
+    const channels = await DSP.linearizeConfig();  
+    window.channels = channels;  
+    const channelCount = channels.length;
+    const nodeWidth = 100;
+    const nodeHeight = 110;    
+    const channelDistance = 5;
+    const margin = 10;
     
-    for (let pipe of pipeline) {        
-        let pipeElement = document.createElement("div"); pipeElement.className="pipe";
-        
-        let enabled = document.createElement("input"); enabled.type="checkbox"; enabled.checked=true;
-        if (pipe.bypassed) enabled.checked=false;    
-        // if (pipe.type=="Mixer") enabled.disabled=true;    
-        pipeElement.appendChild(enabled);
+    // Resize element based on # of channels 
+    // element.style.height = channelCount * (nodeHeight + 2 * margin ) + (channelCount - 1) * channelDistance+'px';    
+    
+    for (let channelNo=0;channelNo<channelCount;channelNo++) {
+        let channelElement = document.createElement("div"); channelElement.className="pipelineChannel"; 
+        channelElement.setAttribute("channel",channelNo); channelElement.setAttribute("label","Channel "+channelNo);
+        channelElement.addEventListener("wheel",function(e){
+            this.scrollLeft += e.deltaY/2;
+            e.preventDefault();
+        });
+        element.appendChild(channelElement);
 
-        let pipeType= document.createElement("span"); pipeType.innerText=pipe.type;
-        pipeElement.appendChild(pipeType);
-        
-        switch (pipe.type) {
-            case "Filter":
-                let channelName = document.createElement('span'); channelName.innerText='Channel :';
-                pipeElement.appendChild(channelName);
-                // Channels should come from a drop down that is driven by the mixer before
-                let channel = document.createElement('div'); channel.innerText=pipe.channel;
-                pipeElement.appendChild(channel);
+        for (let component of channels[channelNo]) {
+            // console.log(component)
+            let type = component.type;
+            let node = addNode(channelElement,type);
+            
+            if (type=="input" || type=="output") {
+                node.innerText = type.toUpperCase() +"\n"+ component.device.device+"\n"+ component.device.format;
+            }
 
-                let filterNames = pipe.names.sort();
-                // console.log(filterNames);
-                break;
-        }
+            if (type=="mixer") {
+                node.innerText = type.toUpperCase()+"\n";
+                let sources = component["sources"];
+                for (let source of sources) {
+                    node.innerText=node.innerText+" C:"+source.channel+" G:"+source.gain+ " Muted:"+ source.mute+"\n";
+                }
+            }
+
+            if (type=="filter") {
+                let filterName = Object.keys(component)[1];
+                node.innerText =  filterName;              
+                node.setAttribute("id",filterName);
+                if (component[filterName].type=="Biquad") {                    
+                    node.innerText = node.innerText + "\n"+component[filterName].type+"\n" + component[filterName].parameters.type+"\n"+ component[filterName].parameters.freq + "Hz"
+                    if (component[filterName].parameters.gain!=undefined) node.innerText = node.innerText+ "\n"+component[filterName].parameters.gain+'dB';
+                }
+                if (component[filterName].type=="Gain") {
+                    node.innerText = node.innerText + "\n"+component[filterName].type+"\n" + component[filterName].parameters.gain+"dB";
+                }                            
+
+                node.addEventListener('click',function(e){
+                    let filterChannels = document.getElementsByClassName("filterChannel");
+                    for (let filterChannel of filterChannels) {                        
+                        // console.log("Filter left",filterChannel.children[filterName].getBoundingClientRect().left);
+                        if (filterChannel.children[filterName]!=undefined) {
+                            let target = filterChannel.children[filterName].getBoundingClientRect().left - 45 + filterChannel.scrollLeft;
+                            filterChannel.children[filterName].classList.remove("selected")
+                            console.log(">>Target",target,"Left",filterChannel.scrollLeft);
+                            let i = setInterval(()=>{
+                                let stepSize = (target - filterChannel.scrollLeft)/4;
+
+                                if (stepSize>50) stepSize = 50;
+                                if (stepSize<-50) stepSize = -50;
+
+                                console.log("Target",target,"Left",filterChannel.scrollLeft,"Step Size",stepSize);
+                                
+                                if (Math.abs(stepSize)<1) {
+                                    filterChannel.scrollLeft=target;
+                                    filterChannel.children[filterName].classList.add("selected")
+                                    clearInterval(i);
+                                    
+
+                                }
+                                if (filterChannel.scrollLeft!=target) filterChannel.scrollLeft += stepSize;
+                            },20)
+                            // filterChannel.scrollLeft += filterChannel.children[filterName].getBoundingClientRect().left - 45;
+                        }
+                    }
+                })
 
 
-
-        element.appendChild(pipeElement);
+            }                                         
+        }        
     }
-
+    
 }
+
 
 function loadMixers(element, mixers) {
     //  console.log(mixers);
@@ -128,6 +183,7 @@ function loadFilters(element,config,channelCount) {
     element.replaceChildren();
     const filters = config.filters;
     const pipeline = config.pipeline;
+    const DSP = window.parent.DSP;
 
 
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
@@ -141,115 +197,70 @@ function loadFilters(element,config,channelCount) {
         
         let channelPipeline = pipeline.filter(function(p){ return (p.type=="Filter" && p.channel==channelNo) });        
         for (let filterName of channelPipeline[0].names) {            
-            let filterElement = createFilter(filterName);
+            let filter = DSP.createFilter(filterName,channelNo);
+            let filterElement = createFilterElement(filter);
             filterChannel.appendChild(filterElement);
-            // console.log(filterElement.children["filterParams"])            
-            
+            // console.log(filterElement.children["filterParams"])                        
         }
-        element.appendChild(filterChannel);
-        
+        element.appendChild(filterChannel);        
     }
-
-    function createFilter(filterName) {
-        const filter = new filterClass(window.parent.DSP);
-        let filterElement = filter.createElement(filterName);  
-        
-        
-        filterElement.filter=filter;
-        filterElement.id=filterName;
-        filterElement.querySelector("#filterType").value =filters[filterName].type;
-
-        // filterElement.children['filterBasic'].children["filterType"].value=filters[filterName].type;
-        filterElement.children['filterBasic'].children["filterType"].dispatchEvent(new Event("change"));
-        if (filterElement.children['filterBasic'].children["filterSubType"]) {
-
-            filterElement.children['filterBasic'].children["filterSubType"].value=filters[filterName].parameters.type;
-            filterElement.children['filterBasic'].children["filterSubType"].dispatchEvent(new Event("change"));
-
-            let filterSubType = filters[filterName].parameters.type
-            if (filterSubType=="Peaking" || filterSubType == "Lowshelf" || filterSubType == "Highshelf") {
-                filterElement.children["filterParams"].children["frequency"].value=filters[filterName].parameters.freq;
-                filterElement.children["filterParams"].children["gain"].value=filters[filterName].parameters.gain;
-                filterElement.children["filterParams"].children["q"].value=filters[filterName].parameters.q;
-            }
-            if (filterSubType=="Highpass" || filterSubType == "Lowpass" || filterSubType == "Allpass" || filterSubType == "Bandpass") {
-                filterElement.children["filterParams"].children["frequency"].value=filters[filterName].parameters.freq;                
-                filterElement.children["filterParams"].children["q"].value=filters[filterName].parameters.q;
-            }
-
-        }
-        
-        return filterElement;
-    }
-} 
-
-
-async function loadPipeline(element, DSP) {
-    
-    element.replaceChildren();
-    const channels = await DSP.linearizeConfig();
-    window.channels = channels;
-    const channelCount = channels.length;
-    const nodeWidth = 100;
-    const nodeHeight = 110;    
-    const channelDistance = 5;
-    const margin = 10;
-    
-    // Resize element based on # of channels 
-    // element.style.height = channelCount * (nodeHeight + 2 * margin ) + (channelCount - 1) * channelDistance+'px';    
-    
-    for (let channelNo=0;channelNo<channelCount;channelNo++) {
-        let channelElement = document.createElement("div"); channelElement.className="pipelineChannel"; 
-        channelElement.setAttribute("channel",channelNo); channelElement.setAttribute("label","Channel "+channelNo);
-        channelElement.addEventListener("wheel",function(e){
-            this.scrollLeft += e.deltaY/2;
-            e.preventDefault();
-        });
-        element.appendChild(channelElement);
-
-        for (let component of channels[channelNo]) {
-            // console.log(component)
-            let type = component.type;
-            let node = addNode(channelElement,type);
-            
-            if (type=="input" || type=="output") {
-                node.innerText = type.toUpperCase() +"\n"+ component.device.device+"\n"+ component.device.format;
-            }
-
-            if (type=="mixer") {
-                node.innerText = type.toUpperCase()+"\n";
-                let sources = component["sources"];
-                for (let source of sources) {
-                    node.innerText=node.innerText+" C:"+source.channel+" G:"+source.gain+ " Muted:"+ source.mute+"\n";
-                }
-            }
-
-            if (type=="filter") {
-                let filterName = Object.keys(component)[1];
-                node.innerText =  filterName;              
-                node.setAttribute("id",filterName);
-                if (component[filterName].type=="Biquad") {                    
-                    node.innerText = node.innerText + "\n"+component[filterName].type+"\n" + component[filterName].parameters.type+"\n"+ component[filterName].parameters.freq + "Hz"
-                    if (component[filterName].parameters.gain!=undefined) node.innerText = node.innerText+ "\n"+component[filterName].parameters.gain+'dB';
-                }
-                if (component[filterName].type=="Gain") {
-                    node.innerText = node.innerText + "\n"+component[filterName].type+"\n" + component[filterName].parameters.gain+"dB";
-                }                            
-
-                node.addEventListener('click',function(e){
-                    let filterChannels = document.getElementsByClassName("filterChannel");
-                    for (let filterChannel of filterChannels) {                        
-                        // console.log(filterChannel.children[filterName].getBoundingClientRect().left);
-                        if (filterChannel.children[filterName]!=undefined) filterChannel.scrollLeft += filterChannel.children[filterName].getBoundingClientRect().left;                        
-                    }
-                })
-
-
-            }                                         
-        }        
-    }
-    
 }
+
+function createFilterElement(currentFilter) {
+    currentFilter.createElement(true);            
+
+    let peqElement = document.createElement('div');
+    peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
+    peqElement.setAttribute("id",currentFilter.name);
+        
+    let filterBasic = document.createElement('div'); 
+    filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
+
+    // let nameSpan = document.createElement('span'); nameSpan.innerText='Name :'
+    // filterBasic.appendChild(nameSpan);
+    // filterBasic.appendChild(currentFilter.elementCollection.filterName);    
+    
+    let typeSpan = document.createElement('span'); typeSpan.innerText='Filter Type :'
+    filterBasic.appendChild(typeSpan);
+    filterBasic.appendChild(currentFilter.elementCollection.filterType);                
+
+    let subTypeSpan = document.createElement('span'); subTypeSpan.innerText='Filter Sub Type :'
+    filterBasic.appendChild(subTypeSpan);
+    filterBasic.appendChild(currentFilter.elementCollection.filterSubType);       
+
+    let peqParams = document.createElement('div');             
+    peqParams.id = "peqParams"; peqParams.className='peqParams';          
+    
+    peqElement.appendChild(filterBasic);
+    
+    // Disable updates with wheel as interferes with scrolling
+    currentFilter.elementCollection.peqParams.children["frequency"].setAttribute("wheel","disabled")
+    currentFilter.elementCollection.peqParams.children["gain"].setAttribute("wheel","disabled")
+    currentFilter.elementCollection.peqParams.children["q"].setAttribute("wheel","disabled")
+
+    peqElement.appendChild(currentFilter.elementCollection.peqParams);   
+    
+    
+    peqElement.addEventListener("addNewFilter",e=>addNewFilter(e))
+    peqElement.addEventListener("removeFilter",e=>removeFilter(e))    
+
+    // if (window.parent.activeSettings.peqSingleLine) {        
+    //     peqElement.style = "display:flex; height: 40px;"
+    //     filterBasic.style = 'margin-right: 20px'
+    //     window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 7px 7px 0px");
+        
+
+    //     peqElement.appendChild(currentFilter.elementCollection.addButton);
+    //     peqElement.appendChild(currentFilter.elementCollection.removeButton);
+    // } else {
+    //     window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 0px 7px 7px");
+
+    //     filterBasic.appendChild(currentFilter.elementCollection.addButton);
+    //     filterBasic.appendChild(currentFilter.elementCollection.removeButton);
+    // }
+    return peqElement;
+}
+
 
 function addNode(parent, type) {
     let node = document.createElement('div');
@@ -280,17 +291,16 @@ async function deleteNode() {
     } else if (nodeType=="filter") {
         let filterName = selectedNode.id;
         if (confirm("Are you sure you would like like to delete filter '"+filterName+"'?")) {
-            delete window.parent.DSP.config.filters[filterName];
-            window.parent.DSP.config.pipeline = window.parent.DSP.updatePipeline(window.parent.DSP.config);
+            window.parent.DSP.removeFilter(filterName);
             await window.parent.DSP.uploadConfig();
-
-            let channels = document.getElementsByClassName("pipelineChannel");
-            for (let channel of channels) {
-                channel.removeChild(channel.children[filterName]);
-            }
+            // document.getElementById(filterName).remove();
         };              
+        
     }
-    document.getElementById("pipeContextMenu").style.display='none';        
+
+    document.getElementById("pipeContextMenu").style.display='none';            
+    const pipelineContainer = document.getElementById("pipelineContainer");
+    loadPipeline(pipelineContainer,window.parent.DSP)
 }
 
 async function addNodeManual() {
@@ -308,26 +318,6 @@ async function addNodeManual() {
     
     // window.location.reload();
 }    
-
-
-async function splitFilterToAllChannels() {    
-    const DSP = window.parent.DSP;
-    let filters = DSP.splitFiltersToChannels(DSP.config.filters);
-    DSP.config.filters= filters;
-    DSP.config.pipeline = DSP.updatePipeline(DSP.config,true);
-    await DSP.uploadConfig()
-    advancedOnLoad();    
-}
-
-async function mergeFilters() {
-    const DSP = window.parent.DSP;
-    let filters = DSP.mergeFilters(DSP.config.filters);
-    DSP.config.filters= filters;
-    DSP.config.pipeline = DSP.updatePipeline(DSP.config);
-    await DSP.uploadConfig()
-    advancedOnLoad();
-}
-
 
 // ADCB : 30195 / 1250 EXPENSE  5.5%
 // 30084 / 29971 

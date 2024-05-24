@@ -27,6 +27,8 @@
     --peq-channel-before-display: none;
     --peq-param-border-radius: 0px 0px 7px 7px;
 
+    --peq-element-last-of : 80vw;
+
     background-color:hsl(var(--bck-hue), var(--bck-sat), var(--bck-light));
 
     font-family: "Abel", sans-serif;
@@ -840,6 +842,7 @@ select {
     scrollbar-width: thick;
     scrollbar-color: hsl(var(--bck-hue), 60%, 20%);   
     justify-content: left;
+    transition: all 500ms;
 }
 
 .filterChannel::before {
@@ -859,7 +862,36 @@ select {
     z-index: 1;
 }
 
-.filterElement {            
+.filterChannel .peqElement {
+    margin: 0px;    
+    padding: 0px;
+    padding-left: 10px;
+    width: max-content;
+    align-items: center;    
+    user-select: none;
+    border:1px solid hsl(var(--bck-hue), 20%, 40%);        
+    border-radius: 7px;    
+    
+}
+
+
+.filterChannel .peqElement:first-of-type {
+    margin-left: 40px;
+}
+
+.filterChannel .peqElement:last-of-type {
+    margin-right: var(--peq-element-last-of);
+}
+
+.filterChannel .selected {
+    animation-name: blink;
+    animation-duration: 900ms;
+    animation-timing-function: ease-in-out;
+    transition: all 100ms;
+}
+
+
+/* .filterElement {            
     margin: 0px;    
     padding: 0px;
     padding-left: 10px;
@@ -881,7 +913,7 @@ select {
 .filterElement:hover {    
     filter: saturate(1.2) brightness(1.2);
     box-shadow: 0px 0px 20px 0px black;
-}
+} */
 
 .filterBasic {
     display: flex;
@@ -1081,3 +1113,7 @@ select {
     height: 18px;
 }
 
+@keyframes blink {    
+    20%     { box-shadow: 0px 0px 20px hsl(var(--bck-hue), 40%, 50%), inset 0px 0px 5px hsl(var(--bck-hue), 40%, 50%) }            
+    100%   { box-shadow: unset; }
+}

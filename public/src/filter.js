@@ -136,7 +136,8 @@ class filter {
             switch (Object.values(param)[0]) {
                 case "num":
                     elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0; elem.id=Object.keys(param)[0].toLowerCase();
-                    elem.addEventListener("wheel",function(e){
+                    elem.addEventListener("wheel",function(e){                        
+                        if (this.getAttribute("wheel")=="disabled") return;
                         let dir = e.deltaY> 0 ? 1:-1;
                         let val; 
                         if (dir>0) val = parseFloat(this.value) * 0.1; else val = parseFloat(this.value) / 11;
