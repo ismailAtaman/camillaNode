@@ -50,7 +50,7 @@ class preferences {
 
             {"id":"backgroundHue",
             "name":"Backround hue",
-            "value":140,
+            "value":180,
             "type":"range",        
             "options":{"min":0,"max":330,"step":1},
             "enabled":true,

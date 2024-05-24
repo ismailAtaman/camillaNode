@@ -6,9 +6,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 
 :root {
-    --bck-hue: 160;
+    --bck-hue: 180;
     --bck-sat: 30%;
-    --bck-light : 20%;
+    --bck-light : 15%;
     --bck-color: hsl(var(--bck-hue),var(--bck-sat),var(--bck-light));   
     --bck-group: hsl(var(--bck-hue),var(--bck-sat),15%);  
     --hue-rotate: -90deg; 
@@ -240,8 +240,8 @@ section {
 }
 
 .navigate:hover {    
-    background-color: hsl(var(--bck-hue), 35%, 15%); 
-    color: hsl(calc( 180 + var(--bck-hue)), 75%, 65%); 
+    background-color: hsl(var(--bck-hue), 35%, 11%); 
+    color: hsl(calc( 180 + var(--bck-hue)), 50%, 65%); 
 }
 
 .navigate img {        
@@ -729,11 +729,11 @@ select {
 
 .levelbox {
     width: 100%;
-    height: 5px;
+    height: 6px;
     margin: 0px;    
     opacity: 0;
     margin-bottom: 3px;
-    border-radius: 2px;
+    border-radius: 3px;
     transition: all 50ms;
 }
 
