@@ -234,9 +234,12 @@ function createFilterElement(currentFilter) {
     peqElement.appendChild(filterBasic);
     
     // Disable updates with wheel as interferes with scrolling
-    currentFilter.elementCollection.peqParams.children["frequency"].setAttribute("wheel","disabled")
-    currentFilter.elementCollection.peqParams.children["gain"].setAttribute("wheel","disabled")
-    currentFilter.elementCollection.peqParams.children["q"].setAttribute("wheel","disabled")
+    if (currentFilter.elementCollection.peqParams.children["frequency"]!=undefined) 
+        currentFilter.elementCollection.peqParams.children["frequency"].setAttribute("wheel","disabled")
+    if (currentFilter.elementCollection.peqParams.children["gain"]!=undefined) 
+        currentFilter.elementCollection.peqParams.children["gain"].setAttribute("wheel","disabled")
+    if (currentFilter.elementCollection.peqParams.children["q"]!=undefined) 
+        currentFilter.elementCollection.peqParams.children["q"].setAttribute("wheel","disabled")
 
     peqElement.appendChild(currentFilter.elementCollection.peqParams);   
     

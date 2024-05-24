@@ -885,8 +885,8 @@ select {
 
 .filterChannel .selected {
     animation-name: blink;
-    animation-duration: 900ms;
-    animation-timing-function: ease-in-out;
+    animation-duration: 500ms;
+    animation-timing-function: ease;
     transition: all 100ms;
 }
 
@@ -1114,6 +1114,6 @@ select {
 }
 
 @keyframes blink {    
-    20%     { box-shadow: 0px 0px 20px hsl(var(--bck-hue), 40%, 50%), inset 0px 0px 5px hsl(var(--bck-hue), 40%, 50%) }            
+    30%     { box-shadow: 0px 0px 20px 5px hsl(var(--bck-hue), 40%, 40%) }            
     100%   { box-shadow: unset; }
 }
