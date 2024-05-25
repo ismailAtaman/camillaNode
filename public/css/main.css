@@ -310,16 +310,13 @@ dialog .navigate {
 
 
 canvas {    
-    /* background:linear-gradient(45deg,var(--bck-color),#222); */
-    --hue1: calc(45 + var(--bck-hue));
-    --hue2: calc(135 + var(--bck-hue));
-    --col1: hsla(var(--bck-hue),30%,5%,90%);
-    --col2: hsla(var(--bck-hue),30%,15%,90%);
-    /* background-image: linear-gradient(135deg,var(--col1),var(--col2));     */
     background-image: linear-gradient(45deg,hsl(var(--bck-hue), 35%, 15%) ,hsl(var(--bck-hue), 45%, 10%));    
     border-radius: 10px;     
     transform-origin: 0 0;
     transform: scale(1);    
+    border: 1px solid hsl(var(--bck-hue), 35%, 20%);
+    padding: 10px;
+    box-shadow: 0px 0px 10px 1px #111;
 }
 
 .group {
@@ -330,13 +327,15 @@ canvas {
     border-radius: 10px;    
     padding-bottom: 10px;    
     margin-right: 10%;    
+    border: 1px solid hsl(var(--bck-hue), 35%, 20%);
+    box-shadow: 0px 0px 10px 1px #111;
 }
 
 .group::before {
     content: attr(label);
     display: block;      
     font-size: 1.2rem;        
-    background-color: hsl(var(--bck-hue), 45%, 10%);
+    background-color: hsl(var(--bck-hue), 35%, 10%);
     color: white;  
     border-radius: 10px 10px 0 0 ;    
     padding-left: 10px;
@@ -372,9 +371,9 @@ select {
     margin: 15px;
     margin-top: 35px;
     border-radius: 50%;
-    background:hsl(var(--bck), 30%, 70%);   
+    background: hsl(var(--bck), 30%, 70%);   
     border: 0px solid 333;    
-    box-shadow: 0px 0px 8px 0px hsl(var(--bck), 30%, 70%); 
+    box-shadow: 0px 0px 5px 0px hsl(var(--bck), 30%, 70%); 
 }
 
 .knob::before {

@@ -42,7 +42,7 @@ class EQKnob {
                     if (Number.isNaN(offset)) offset=0;      
 
                     dot.style = 'transform: rotate('+val+'deg);'
-                    const hue=170-val/2;                    
+                    const hue= 170-val/2;                    
                     knob.style= '--bck:'+hue;
 
                     // make the ring invisible if knob is at defailt value and offAtDefault is set to true

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100vw, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
+
+        :root {
+            --bck-hue: 180;
+            --bck-sat: 30%;
+            --bck-light : 15%;
+            --bck-color: hsl(var(--bck-hue),var(--bck-sat),var(--bck-light));   
+            --bck-group: hsl(var(--bck-hue),var(--bck-sat),15%);  
+            --hue-rotate: -90deg; 
+
+            --font-size: 16px;
+            --toolbar-width: 250px;
+
+            --slider-width: 3em;
+            --slider-height: 15rem;
+
+            --levelbar-width: 31px;
+
+            --peq-columns: 1fr;
+            --peq-before-grid-column: 1 / span 2;
+            --peq-channel-before-display: none;
+            --peq-param-border-radius: 0px 0px 7px 7px;
+
+            --peq-element-last-of : 80vw;
+
+            background-color:hsl(var(--bck-hue), var(--bck-sat), var(--bck-light));
+
+            font-family: "Abel", sans-serif;
+            font-size: var(--font-size);
+
+            
+            width: 100vw;
+            height: 100vh;
+
+            margin: 0px;
+            border: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+
+        .group {
+            position: relative;
+            margin-block: 10px;
+            background-image: linear-gradient(45deg,hsl(var(--bck-hue), 35%, 15%) ,hsl(var(--bck-hue), 45%, 10%));    
+            display: block;
+            margin: 0px;
+            border-radius: 10px;    
+            padding: 5px;                
+            border: 1px solid hsl(var(--bck-hue), 35%, 20%);
+            box-shadow: 0px 0px 10px 1px #111;
+        }
+
+        #spectrum {
+            display: grid;        
+            grid-template-columns: repeat(60,auto);        
+            height: calc(20px - 100%);    
+            align-items:end;
+            padding-left: 5px;
+        }
+
+        .levelbar {        
+            display: flex;        
+            flex-direction: column;
+            flex-wrap: wrap-reverse;
+            align-items: center;
+            justify-items: baseline;
+            position: relative;
+            width: var(--levelbar-width);
+            height: 250px;
+            margin-inline: 2px;    
+            font-size: 11px;
+            background-color: hsla(160, 50%, 50%,10%) ;        
+            border-radius: 4px;        
+            transform: rotate(180deg);
+            z-index: 0;
+        }
+
+        .levelbar::after{
+            content: attr(freq);
+            position: absolute;
+            bottom: 0;    
+            color: hsl(var(--bck-hue), 30%, 40%) ;     
+            background-color: none;
+            font-size: 13px;
+            transform: translateX(-50%);
+            transform: rotate(180deg);
+        }
+
+        .levelbox {
+            width: 100%;
+            height: 6px;
+            margin: 0px;    
+            opacity: 0;
+            margin-bottom: 2px;
+            border-radius: 2px;
+            transition: all 30ms;
+        }
+
+    </style>
+    <script>
+
+
+        function updateElementWidth() {
+            const spec = document.getElementById("spectrum");   
+            console.log("H : ",window.innerHeight)
+            spec.style.height=window.innerHeight;
+            const barCount=spec.childNodes.length-1;
+            const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
+            document.documentElement.style.setProperty("--levelbar-width",barWidth+"px")                         
+        }
+
+        const  freq = [ '25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
+                        '315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
+                        '3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
+
+        async function initSpectrum(){          
+            // Create bars and boxes
+            DSP = window.opener.parent.DSP;            
+
+            const spec = document.getElementById("spectrum");   
+            const barCount=freq.length-1;
+            const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
+            document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
+            
+            let bar,box;
+            spec.innerHTML='';
+            for (i=0;i<=barCount;i++){
+                bar = document.createElement("div");
+                bar.className='levelbar';        
+                bar.setAttribute('freq',freq[i]);        
+                
+                let hue=parseInt(window.opener.document.documentElement.style.getPropertyValue('--bck-hue'));
+                document.documentElement.style.setProperty("--bck-hue",hue);
+
+                console.log("Hue ",hue)
+                for (j=1;j<40;j++) {
+                    box = document.createElement('div');
+                    box.className='levelbox';                    
+                    box.style="background-color: hsl("+hue+", 30%, 50%);"        
+                    hue=hue-10;
+                    bar.appendChild(box);
+                }
+
+                spec.appendChild(bar);
+            }
+
+            // Get the data and update the analyser
+            
+            setInterval(async function(){
+                const spec = document.getElementById("spectrum");                
+                let r = await DSP.getSpectrumData();                
+
+                if (r.length==0) return;
+                // console.log(r);
+
+                let i=0, height, boxCount, count;
+                spec.childNodes.forEach(e=>{
+                    if (e.tagName=="DIV") {                         
+                         height = 200 + (2*Math.round(r[i]));  
+                        if (height<0) height=0;
+                        if (height>200) height=0;     
+                        boxCount= Math.round(height/8)-1;                                
+                        count=0;
+                        e.childNodes.forEach(e=>{
+                            if (e.tagName=="DIV") {
+                                if (count>boxCount) e.style.opacity=0; else e.style.opacity=1;
+                                count++
+                            }
+                        })
+                        i=i+2;
+                    }                     
+                    }) 
+            },50)
+        }
+
+        
+        document.addEventListener("DOMContentLoaded",initSpectrum);
+        window.addEventListener("resize",updateElementWidth);
+        
+
+    </script>
+    
+    
+</head>
+<body>
+    <div id="spectrum" class="group">
+    </div>    
+</body>
+</html>

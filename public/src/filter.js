@@ -108,10 +108,11 @@ class filter {
     updateSubTypes(basic) {
         if (basic==undefined) basic=false;
 
-        let basicTypes = ["Highshelf","Lowshelf","Peaking"]
+        let basicTypes = ["Highshelf","Lowshelf","Peaking"]        
 
         const filterSubType = document.createElement("select");
         filterSubType.className="filterType"; filterSubType.setAttribute("id","filterSubType");
+
         for (let subType of this.getFilterSubTypes(this.type)) {                        
             if (basic && !basicTypes.includes(subType)) continue;
             let opt = document.createElement("option");
@@ -198,6 +199,9 @@ class filter {
 
         if (peqElement.filter.loading) return;
 
+        let basic = peqElement.getAttribute("basic")=="true";
+        // console.log("Filter basic?",basic)
+
         // console.log("peq element ",id,value,peqElement.filter.type)
         switch (id) {
             case "filterName":
@@ -206,8 +210,10 @@ class filter {
             case "filterDesc":
                 peqElement.filter.description = value;
                 break;
-            case "type":
+            case "filterType":
                 peqElement.filter.type = value
+                peqElement.filter.updateSubTypes(basic);
+                peqElement.filter.updateParams();                
                 break;
             default:
                 let val;

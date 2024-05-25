@@ -14,9 +14,25 @@ interval = setInterval(function(){
 
 async function equalizerOnLoad() {            
     document.loading=true;
-    const PEQ = document.getElementById('PEQ');            
-    
+    const PEQ = document.getElementById('PEQ');                
     DSP=window.parent.DSP;            
+
+    document.getElementById("spectrum").addEventListener("dblclick",()=>{
+
+        // let params = "width=600,height=200,popup=true,menubar=false,toolbar=false,status=false,resizable=false,scrollbars=false,left=800,top=200"        
+        console.log("W :",window.screen.availWidth)
+        let w = Math.round(window.screen.availWidth/3.5);
+        let h = 280; //Math.round(w/4);
+        let params = "location=no,status=no,menubar=no,scrollbars=no,width="+w+",height="+h;
+        let win = window.open("/spectrum","spectrumWindow",params);        
+        win.DSP=window.parent.DSP;
+        
+
+        win.document.documentElement.style.setProperty("--bck-hue",window.parent.activeSettings.backgroundHue) 
+        console.log("Hue : ",window.parent.activeSettings.backgroundHue)
+        
+    })
+
     
     /// Basics Controls Section
     const basicControls = document.getElementById('basicControls');
@@ -111,7 +127,7 @@ function updateElementWidth() {
     document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
     
     const canvas = document.getElementById("plotCanvas");           
-    canvas.width = spec.getBoundingClientRect().width;
+    canvas.width = spec.getBoundingClientRect().width - 20;
     plotConfig();
 }
 
@@ -181,7 +197,10 @@ function createFilterElement(currentFilter) {
     currentFilter.createElement(true);            
 
     let peqElement = document.createElement('div');
-    peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
+    peqElement.filter=currentFilter; peqElement.className="peqElement"; 
+    peqElement.setAttribute("configName",currentFilter.name);
+    peqElement.setAttribute("id",currentFilter.name);
+    peqElement.setAttribute("basic",true);
         
     let filterBasic = document.createElement('div'); 
     filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
@@ -364,12 +383,15 @@ const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '
 '315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
 '3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
 
-async function initSpectrum(){          
+async function initSpectrum(parentWindow){          
     // Create bars and boxes
-    const spec = document.getElementById("spectrum");   
+    if (parentWindow==undefined) parentWindow=window;
+    console.log("Parent window : ",parentWindow);
+
+    const spec = parentWindow.document.getElementById("spectrum");   
     const barCount=freq.length-1;
     const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
-    document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
+    parentWindow.document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
     
 
     let bar,box;
@@ -394,7 +416,7 @@ async function initSpectrum(){
     // Get the data and update the analyser
     
     setInterval(async function(){
-        const spec = document.getElementById("spectrum");
+        const spec = parentWindow.document.getElementById("spectrum");
         let r = await DSP.getSpectrumData();                
 
         if (r.length==0) return;
@@ -418,7 +440,7 @@ async function initSpectrum(){
         })       
                 
 
-    },100)
+    },50)
 }
 
 async function convertConfigs() {
