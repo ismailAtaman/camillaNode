@@ -207,11 +207,12 @@ function loadFilters(element,config,channelCount) {
 }
 
 function createFilterElement(currentFilter) {
-    currentFilter.createElement(true);            
+    currentFilter.createElement(false);            
 
     let peqElement = document.createElement('div');
     peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
     peqElement.setAttribute("id",currentFilter.name);
+    peqElement.setAttribute("basic",false);
         
     let filterBasic = document.createElement('div'); 
     filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';

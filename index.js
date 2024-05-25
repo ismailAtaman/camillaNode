@@ -58,6 +58,10 @@ app.get('/preferences',(req,res)=>{
     res.sendFile(__dirname+'/public/html/preferences.html');
 }) 
 
+app.get('/spectrum',(req,res)=>{
+    res.sendFile(__dirname+'/public/html/spectrum.html');
+}) 
+
 // app.post('/validateConfig',(req,res)=>{
 //     let queryResponse="";
 //     req.on('data', function(chunk) {
