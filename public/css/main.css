@@ -339,7 +339,8 @@ canvas {
     color: white;  
     border-radius: 10px 10px 0 0 ;    
     padding-left: 10px;
-    padding-block: 5px;            
+    padding-block: 5px;   
+    height: 30px;         
 }
 
 
@@ -424,22 +425,7 @@ select {
     transition: all 1000ms;
 }
 
-/**************************************** SLIDER ****************************************************************************/
-
-.sliderBody {
-    --bar-width: 10px;
-    --slider-width: calc(2 * var(--bar-width));    
-    --body-width: calc(30px + var(--slider-width));
-    --param-width: calc(-5px + var(--body-width));
-    display: inline-block;
-    width: var(--body-width);
-    height: 200px;        
-    
-}
-
-.sliderBody:first-of-type {
-    margin-left: 10px;
-}
+/********************************************************************************************************************/
 
 .bar {
     position: relative;
@@ -494,10 +480,12 @@ select {
     display: grid;
     grid-template-columns: var(--peq-columns); 
     gap: 5px;        
+    min-height: 120px;
 }
 
 #PEQ::before {
     grid-column: var(--peq-before-grid-column);
+    
     
 }
 
@@ -707,7 +695,7 @@ select {
     justify-items: baseline;
     position: relative;
     width: var(--levelbar-width);
-    height: 240px;
+    height: 260px;
     margin-inline: 2px;    
     font-size: 11px;
     background-color: hsla(160, 50%, 50%,10%) ;        

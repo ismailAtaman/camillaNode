@@ -118,6 +118,8 @@ async function equalizerOnLoad() {
     } else {
         spec.style.display="none";
     }
+
+    
 }
 
 function updateElementWidth() {
@@ -141,7 +143,7 @@ async function loadFiltersFromConfig() {
     
     if (multiChannel) {
         let singleChannel = DSP.isSingleChannel();        
-        if (singleChannel) await DSP.splitFiltersToChannels();
+        if (singleChannel) DSP.splitFiltersToChannels();
 
         window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
@@ -149,24 +151,18 @@ async function loadFiltersFromConfig() {
     } else {        
         let singleChannel = DSP.isSingleChannel();   
         console.log("DSP config single channel?",singleChannel);     
-        if (!singleChannel) await DSP.mergeFilters();                        
-            // let validConfigAfterMerge = DSP.mergeFilters();                        
-            //if (validConfigAfterMerge) r = await DSP.uploadConfig();
-            
-            // let r;
-            // if (validConfigAfterMerge) r = await DSP.uploadConfig();
-            // if (r) await loadFiltersFromConfig();         
+        if (!singleChannel) DSP.mergeFilters();                       
     }        
 
     await DSP.uploadConfig();
     await DSP.downloadConfig();
 
-
     let channelCount = DSP.getChannelCount();    
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
         let peqChannel = document.createElement('div');
         peqChannel.className="peqChannel"; peqChannel.id="peqChannel"+channelNo;
-        peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);        
+        peqChannel.setAttribute("channelNo",channelNo); peqChannel.setAttribute("label","Channel "+channelNo);   
+        // peqChannel.addEventListener("dblclick",addNewFilter())     
         PEQ.appendChild(peqChannel);
 
         let filterList;        
@@ -339,7 +335,10 @@ async function addNewFilter(e) {
     filter[Object.keys(filter)[0]].parameters.freq=freq;    
     
     // Create new DSP filter and upload
-    let newFilter = DSP.createNewFilter(filter,channel);
+    let newFilter = DSP.createNewFilter(filter,channel);    
+    if (!window.parent.activeSettings.peqDualChannel) DSP.addFilterToAllChannels(filter);
+    
+
     await DSP.uploadConfig();
 
     // Create and load the filter element to the channel element    
@@ -385,15 +384,13 @@ const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '
 
 async function initSpectrum(parentWindow){          
     // Create bars and boxes
-    if (parentWindow==undefined) parentWindow=window;
-    console.log("Parent window : ",parentWindow);
+    if (parentWindow==undefined) parentWindow=window;    
 
     const spec = parentWindow.document.getElementById("spectrum");   
     const barCount=freq.length-1;
     const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
     parentWindow.document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
     
-
     let bar,box;
     spec.innerHTML='';
     for (i=0;i<=barCount;i++){

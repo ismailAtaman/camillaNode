@@ -400,7 +400,7 @@ class camillaDSP {
     }
 
     getDefaultFilter() {
-        let filterName ="F_"+new Date().getTime().toString().substring(7)
+        let filterName ="F"+new Date().getTime().toString().substring(8)
         let filter = {}
         filter[filterName] = {"type":"Biquad","parameters":{"type":"Peaking","freq":3146,"gain":0,"q":1.41}};
         return filter;
@@ -435,13 +435,18 @@ class camillaDSP {
         for (let filterName of Object.keys(filters)) {                                                
             for (let channel=0;channel<channelCount;channel++) {              
                 let filterObject={};
-                if (filterName.startsWith("__") || filterName=="Gain") 
+                if (filterName.startsWith("__") || filterName=="Gain") {
                     filterObject[filterName]=filters[filterName]; 
-                    else filterObject[filterName+"__c"+channel]=filters[filterName];                    
+                    this.addFilter(filterObject,channel);                                                 
+                } else {                     
+                    filterObject[filterName+"__c"+channel]=filters[filterName];                    
+                    this.addFilter(filterObject,channel);                                    
+                    this.removeFilterFromChannelPipeline(filterName,channel);  
+                }
+
                 // if (debugLevel=='high') console.log("Split filters : ",filterName," >>> ", Object.keys(filterObject)[0],channel);
                 
-                this.addFilter(filterObject,channel);                                    
-                this.removeFilterFromChannelPipeline(filterName,channel);  
+                
             }               
         }
         
@@ -465,7 +470,12 @@ class camillaDSP {
         console.log("mergeFilters > Channel filters : ",totalArray)
 
         for (let f of totalArray) {                                    
-            if (f.startsWith("__")) continue;
+            if (f.startsWith("__")) {                
+                let tmpFilter={}            
+                tmpFilter[f]=filters[f];
+                this.addFilterToAllChannels(tmpFilter);   
+                continue;
+            } 
             let tmpFilter={}            
             let filterName= f.split("_")[0];
             // console.log("Merging >> ",f,filterName)
@@ -520,31 +530,28 @@ class camillaDSP {
         return this.config.mixers.recombine.mapping[1].sources[0].gain;
     }
 
-    setTone(subBass, bass, mids, upperMids, treble) {
-        const subBassFilter ={"subBass":camillaDSP.createPeakFilterJSON(this.subBassFreq,subBass,1.41)};
-        const bassFilter = {"bass":camillaDSP.createPeakFilterJSON(this.bassFreq,bass,1.41)};
-        const midsFilter = {"mids":camillaDSP.createPeakFilterJSON(this.midsFreq,mids,1.41)};
-        const upperMidsFilter = {"upperMids":camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41)};
-        const trebleFilter = {"treble":camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41)};
-        
+    setTone(subBass, bass, mids, upperMids, treble) {        
         // Multi channel
-        const channelCount = this.getChannelCount();
+        if (DSP.config.filters["__subBass"]==undefined) {
+            const subBassFilter ={"__subBass":camillaDSP.createPeakFilterJSON(this.subBassFreq,subBass,1.41)};
+            const bassFilter = {"__bass":camillaDSP.createPeakFilterJSON(this.bassFreq,bass,1.41)};
+            const midsFilter = {"__mids":camillaDSP.createPeakFilterJSON(this.midsFreq,mids,1.41)};
+            const upperMidsFilter = {"__upperMids":camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41)};
+            const trebleFilter = {"__treble":camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41)};
 
-        if (DSP.config.filters["subBass"]==undefined) {
-            for (let channel=0;channel<channelCount;channel++) {
-                this.addFilter(subBassFilter,channel)              
-                this.addFilter(bassFilter,channel)       
-                this.addFilter(midsFilter,channel)       
-                this.addFilter(upperMidsFilter,channel)       
-                this.addFilter(trebleFilter,channel)       
-            }
+            this.addFilterToAllChannels(subBassFilter)              
+            this.addFilterToAllChannels(bassFilter)       
+            this.addFilterToAllChannels(midsFilter)       
+            this.addFilterToAllChannels(upperMidsFilter)       
+            this.addFilterToAllChannels(trebleFilter)        
+            return;
         }
         
-        this.config.filters["subBass"].parameters.gain=subBass;
-        this.config.filters["bass"].parameters.gain=bass;
-        this.config.filters["mids"].parameters.gain=mids;
-        this.config.filters["upperMids"].parameters.gain=upperMids;
-        this.config.filters["treble"].parameters.gain=treble;  
+        this.config.filters["__subBass"].parameters.gain=subBass;
+        this.config.filters["__bass"].parameters.gain=bass;
+        this.config.filters["__mids"].parameters.gain=mids;
+        this.config.filters["__upperMids"].parameters.gain=upperMids;
+        this.config.filters["__treble"].parameters.gain=treble;  
         return this.config;
     }
 

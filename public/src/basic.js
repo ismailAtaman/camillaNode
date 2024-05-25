@@ -4,6 +4,7 @@ async function basicLoad() {
     
     const basicControls = document.getElementById('basicControls');
     const ctx = document.getElementById('plotCanvas');    
+
     DSP = window.parent.DSP;            
     DSP.subBassFreq= parseInt(window.parent.activeSettings.subBassFreq)
     DSP.bassFreq= parseInt(window.parent.activeSettings.bassFreq)
@@ -106,36 +107,38 @@ function updateElementWidth() {
 async function loadData() {
     const ctx = document.getElementById('plotCanvas');    
     DSP = window.parent.DSP;            
+    
 
-    // Load data from DSP
+    // Load v from DSP
     DSP.sendDSPMessage("GetVolume").then(r=>{            
         let volMarker = r/3*10 + 181;
         vol.setVal(volMarker);            
     });
 
-    // load crossfeed
-    let crossfeedVal = await DSP.getCrossfeed() * 20 + 331;        
+    await DSP.downloadConfig();
+
+    // Load crossfeed
+    let crossfeedVal = DSP.getCrossfeed() * 20 + 331;        
     crossfeed.knob.instance.setVal(crossfeedVal);
 
-    // load balance
-    let bal = await DSP.getBalance() * 10 +181;
+    // Load balance
+    let bal = DSP.getBalance() * 10 +181;
     balance.knob.instance.setVal(bal)
 
-    // Load filters
-    await DSP.downloadConfig()
-    // if (DSP.config.filters==undefined) DSP.config.filters={};
-    
-    if (DSP.config.filters["subBass"]==undefined) {        
-        await DSP.setTone(0,0,0,0,0);        
-        await DSP.downloadConfig();
-        // console.log("Basic filters created at default values.")
+    // Load filters    
+    if (DSP.config.filters["__subBass"]==undefined) {        
+        DSP.setTone(0,0,0,0,0);                
+        await DSP.uploadConfig();
+        console.log("Basic filters created at default values.")
     }            
     
-    subBass.knob.instance.setVal(DSP.config.filters["subBass"].parameters.gain*10+181);
-    bass.knob.instance.setVal(DSP.config.filters["bass"].parameters.gain*10+181);
-    mids.knob.instance.setVal(DSP.config.filters["mids"].parameters.gain*10+181);
-    upperMids.knob.instance.setVal(DSP.config.filters["upperMids"].parameters.gain*10+181);
-    treble.knob.instance.setVal(DSP.config.filters["treble"].parameters.gain*10+181);
+    console.log("Subbass:",DSP.config.filters["__subBass"].parameters.gain);
+
+    subBass.knob.instance.setVal(DSP.config.filters["__subBass"].parameters.gain*10+181);
+    bass.knob.instance.setVal(DSP.config.filters["__bass"].parameters.gain*10+181);
+    mids.knob.instance.setVal(DSP.config.filters["__mids"].parameters.gain*10+181);
+    upperMids.knob.instance.setVal(DSP.config.filters["__upperMids"].parameters.gain*10+181);
+    treble.knob.instance.setVal(DSP.config.filters["__treble"].parameters.gain*10+181);
     
     plotConfig();
 }
@@ -181,7 +184,8 @@ async function setTone() {
     trebleVal = (parseInt(trebleVal)-181)/10
     
     // console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
-    let config = await DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
+    let config = DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
+    await DSP.uploadConfig();
     const canvas = document.getElementById('plotCanvas');        
     plotConfig();
 }
