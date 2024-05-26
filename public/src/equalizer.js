@@ -437,7 +437,7 @@ async function initSpectrum(parentWindow){
         })       
                 
 
-    },50)
+    },100)
 }
 
 async function convertConfigs() {
