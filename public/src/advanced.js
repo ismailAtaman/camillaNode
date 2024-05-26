@@ -262,6 +262,7 @@ function createFilterElement(currentFilter) {
     //     filterBasic.appendChild(currentFilter.elementCollection.addButton);
     //     filterBasic.appendChild(currentFilter.elementCollection.removeButton);
     // }
+    peqElement.disabled=true;
     return peqElement;
 }
 

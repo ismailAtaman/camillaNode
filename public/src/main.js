@@ -150,7 +150,7 @@ async function initIndicators() {
 
     samplingRateInd.innerText=  new Intl.NumberFormat('en-US').format(rate);
     uzilizationInd.innerText=Math.round(utl*10)/10+"%";
-    if (clp>0) { clippingInd.innerText = "CLIPPED"; clippingInd.style.color="red"; } else {clippingInd.innerText = "No clipping"; clippingInd.style.color="#9A9";}
+    if (clp>0) { clippingInd.innerText = "CLIPPED"; clippingInd.style.color="red"; } else {clippingInd.innerText = "No clipping"; clippingInd.style.color="unset";}
     if (bal==0) balanceInd.innerText="0 Centre";
     if (bal>0) balanceInd.innerText=bal+" Right";
     if (bal<0) balanceInd.innerText=bal+" Left";
@@ -454,8 +454,6 @@ async function searchAutoEq() {
     loadHeadphoneList(searchText);    
 }
 
-
-
 function loadHeadphoneList(filter) {    
     const listObject = document.getElementById('headphoneList');
     const autoEQ = window.autoEQ;
@@ -507,7 +505,6 @@ function loadHeadphoneList(filter) {
         listObject.appendChild(div)
     }
 }
-
 
 // Configuration functions //////////////////////////////////////////////////////////////////////////////////////////////
 
