@@ -169,7 +169,7 @@ async function loadFiltersFromConfig() {
 
         let filterList;        
         filterList=DSP.getChannelFiltersList(channelNo)
-        console.log("filter list of channel ",channelNo,filterList)        
+        // console.log("Filter list of channel No",channelNo," : " , filterList)        
         
         for (let filter of filterList) {        
             // console.log(filter);
@@ -395,6 +395,12 @@ async function initSpectrum(parentWindow){
     const barWidth= ((spec.getBoundingClientRect().width - (barCount*6)) / barCount);
     parentWindow.document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
     
+    let barHeight = spec.getBoundingClientRect().height;
+    let boxHeight = 6+3;
+    const boxCount =Math.round(barHeight/boxHeight);     
+
+    console.log("Count ",boxCount,"Spec ",spec.getBoundingClientRect().height);
+
     let bar,box;
     spec.innerHTML='';
     for (i=0;i<=barCount;i++){
@@ -403,11 +409,11 @@ async function initSpectrum(parentWindow){
         bar.setAttribute('freq',freq[i]);        
         
         let hue=parseInt(window.document.documentElement.style.getPropertyValue('--bck-hue'));
-        for (j=1;j<40;j++) {
+        for (j=1;j<boxCount;j++) {
             box = document.createElement('div');
             box.className='levelbox';                    
-            box.style="background-color: hsl("+hue+", 30%, 50%);"        
-            hue=hue-10;
+            hue=hue-(240/boxCount);
+            box.style="background-color: hsl("+hue+", 30%, 50%);"                    
             bar.appendChild(box);
         }
 
@@ -416,32 +422,37 @@ async function initSpectrum(parentWindow){
 
     // Get the data and update the analyser
     
-    setInterval(async function(){
-        const spec = parentWindow.document.getElementById("spectrum");
-        let r = await DSP.getSpectrumData();                
 
-        if (r.length==0) return;
-        
-        let i=0, height, boxCount, count;
+    const maxVal = 0;
+    const minVal = -100;
+    const scaler = 1;
+    const levelPerBox = Math.round((maxVal-minVal)/boxCount * scaler)  ;
+
+    console.log("Level per box ",levelPerBox);
+    // Get the data and update the analyser
+    
+    setInterval(async function(){
+        const spec = document.getElementById("spectrum");                
+        let r = await DSP.getSpectrumData();                                    
+        if (r.length==0) return;                
+
+        let i=0, height, pos, count, level;
         spec.childNodes.forEach(e=>{
-            if (e.tagName=="DIV") {                         
-                height = 200 + (2*Math.round(r[i]));  
-                if (height<0) height=0;
-                if (height>200) height=0;     
-                boxCount= Math.round(height/8)-1;                                
+            if (e.tagName=="DIV") {  
+                level = -Math.round(r[i]);
+                let pos = boxCount - (level/levelPerBox);                        
                 count=0;
                 e.childNodes.forEach(e=>{
                     if (e.tagName=="DIV") {
-                        if (count>boxCount) e.style.opacity=0; else e.style.opacity=1;
-                        count++
+                        if (count>=pos) e.style.opacity=0; else e.style.opacity=1;
+                        count++;
                     }
                 })
                 i=i+2;
             }                     
-        })       
-                
-
+        }) 
     },100)
+
 }
 
 async function convertConfigs() {

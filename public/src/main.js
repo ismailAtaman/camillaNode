@@ -381,8 +381,7 @@ async function applyPreferences() {
 }
 
 function applyColorScheme(doc) {
-    const hue = window.preferences.getSettingValue('ui','backgroundHue');
-    console.log("Hue :",hue)
+    const hue = window.preferences.getSettingValue('ui','backgroundHue');    
     window.preferences.applyBackgroundHue(doc,hue); 
     window.preferences.applyBackgroundHue(window.mainframe.contentDocument,hue); 
 

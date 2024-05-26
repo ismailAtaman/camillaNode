@@ -1,6 +1,6 @@
 import filter from "/src/filter.js"
 
-const debugLevel = 'high';
+const debugLevel = 'low';
 
 class camillaDSP {
     ws;    

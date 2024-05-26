@@ -15,12 +15,11 @@
 
 
     --font-size: 16px;
-    --toolbar-width: 220px;
+   --toolbar-width: 220px;
 
-    --slider-width: 3em;
-    --slider-height: 15rem;
-
+    --spectrum-height: 300px;
     --levelbar-width: 31px;
+    --level-box-height: 6px;
 
     --peq-columns: 1fr;
     --peq-before-grid-column: 1 / span 2;
@@ -658,11 +657,10 @@ select {
 
 #spectrum {
     display: grid;        
-    grid-template-columns: repeat(60,auto);        
-    height: 250px;    
+    grid-template-columns: repeat(60,auto);            
     align-items:end;
     padding: 5px;
-    padding-bottom: 15px;
+    height: var(--spectrum-height);
 }
 
 #spectrum::before {
@@ -678,7 +676,7 @@ select {
     justify-items: baseline;
     position: relative;
     width: var(--levelbar-width);
-    height: 260px;
+    height: calc(var(--spectrum-height) - 10px);
     margin-inline: 2px;    
     font-size: 11px;
     background-color: hsla(160, 50%, 50%,10%) ;        
@@ -699,7 +697,7 @@ select {
 
 .levelbox {
     width: 100%;
-    height: 6px;
+    height: var(--level-box-height);
     margin: 0px;    
     opacity: 0;
     margin-bottom: 3px;
