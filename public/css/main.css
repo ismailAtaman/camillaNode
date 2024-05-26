@@ -15,7 +15,7 @@
 
 
     --font-size: 16px;
-    --toolbar-width: 250px;
+    --toolbar-width: 220px;
 
     --slider-width: 3em;
     --slider-height: 15rem;
@@ -128,8 +128,7 @@ input[type="checkbox"]:disabled::before {
 
 #mainBody {
     height: 100%;
-    color: white;
-    
+    color: white;    
     overflow: hidden;
 }
 
@@ -237,18 +236,20 @@ section {
     align-items: center;
     padding-bottom: 15px;    
     user-select: none;
+    line-height: 1;
 }
 
 .navigate:hover {    
-    background-color: hsl(var(--bck-hue), 35%, 11%); 
+    background-color: hsl(var(--bck-hue), 35%, 10%); 
     color: hsl(calc( 180 + var(--bck-hue)), 50%, 65%); 
+    border-radius: 10px;
 }
 
 .navigate img {        
     height: 20px;
     filter:invert(0.75);    
     transition: all linear 300ms;    
-    padding-right: 5px;    
+    padding-right: 10px;    
 }
 
 .navigate:hover img {         
@@ -260,19 +261,21 @@ dialog {
     position: absolute;    
     left: 50%;
     top: 50%;
-    background-color: var(--bck-color);
+    background-color: hsl(var(--bck-hue), 40%, 15%);    
+    border: 3px solid hsl(var(--bck-hue), 35%, 30%); 
     border-radius: 10px;
-    border: none;
     overflow: auto;
-    color: white;    
+    color: white; 
+    box-shadow: 0px 0px 50px 5px black;   
+
 }
 
 dialog::backdrop {
-    background-color: hsla(calc( 180 + var(--bck-hue)), 20%, 15%, 0.75);
+    background-color: hsla(calc( 180 + var(--bck-hue)), 15%, 15%, 0.80);
 }
 
 dialog .navigate {
-    background-color: hsl(var(--bck-hue), 75%, 10%);     
+    background-color: hsl(var(--bck-hue), 75%, 12%);     
     display: inline-flex;
     justify-content: center;
     max-width: fit-content;
@@ -281,33 +284,12 @@ dialog .navigate {
     border-radius: 10px;
     margin-top: 20px;
 }
-/* 
-.button {
-    display: inline-block;
-    line-height: 2;    
-    height: 30px;    
-    font-size: 14px;
-    background-color: hsl(var(--bck-hue), var(--bck-sat), 40%);    
-    padding: 5px;
-    margin: 5px;
-    cursor: pointer;
-    text-align: center;
-    border-radius: 5px;        
-    user-select: none;
-} 
- */
-/* 
-.button:hover {
-    filter: hue-rotate(30deg) saturate(150%);
-    transition: all 350ms;
-} */
 
 .small {
     font-size:10px;
     width: 60px;
     margin: 2px;
 }
-
 
 canvas {    
     background-image: linear-gradient(45deg,hsl(var(--bck-hue), 35%, 15%) ,hsl(var(--bck-hue), 45%, 10%));    
@@ -752,33 +734,55 @@ select {
 .preferenceSection {
     position: relative;
     display: grid;
-    grid-template-columns: 500px auto;
-    gap: 15px;
+    grid-template-columns: 1fr;    
+    gap: 10px;
     margin-bottom: 50px;
-    width: 100%;
+    width: calc(80% - 30px);
+ 
 }
-
 .preferenceSection::before {
-    grid-column: 1 / span 2;
-    content: attr(label);
-    list-style:circle;
+    content: attr(label);    
     font-size: 25px;
+    display: flex;
     font-weight: 400;
     color: white;
-    display: inline-block;    
-    top:0;
+    
+    align-items: center;
+    top:0px;
     height: 40px;                 
+    padding-inline: 10px;
+    background-color:hsl(var(--bck-hue), 35%, 18%);
+    border-radius: 10px 0px 0px 10px;
+    
+}
+
+.preferenceItem {    
+    display: grid;
+    grid-template-columns: 40vw auto;
+    gap: 0px;
+    width: 70vw;
+    min-width: fit-content;
+    padding-inline: 5px;    
+    padding-block:2px;
+    height: 30px;
+}
+
+.preferenceItem:nth-of-type(even) {
+    background-color:hsl(var(--bck-hue), 25%, 15%)
 }
 
 .preferenceSection input[type="text"], select {
     display: relative;
     max-width: 100px;    
-    text-align: left;
+    text-align: left;    
+    border-radius: 5px;
 }
 
 .preferenceSection input[type="range"] {
     max-width: 250px;
 }
+
+
 
 .preferenceName {
     margin-block: 3px;    

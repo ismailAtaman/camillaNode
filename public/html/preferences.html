@@ -14,14 +14,13 @@
 
 <script>
     function preferencesOnLoad() {
-        preferences.createPreferencesElements(document.getElementById("preferences"))
+        preferences.createPreferencesElements(document.getElementById("preferences"))        
         document.getElementById("defaultPage").value=window.parent.activeSettings.defaultPage;
-
     }
 
     function backgroundHueChange() {
         preferences.applyBackgroundHue(window.parent.document,this.value)
-        preferences.applyBackgroundHue(document,this.value)        
+        preferences.applyBackgroundHue(document,this.value)           
     }
 
 </script>

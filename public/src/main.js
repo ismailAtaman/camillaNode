@@ -30,7 +30,9 @@ async function mainBodyOnLoad() {
     // Connect to camillaDSP
     await conectToDSP();
 
-    loadPreferences(); 
+    // Load & Apply preferences
+    window.parent.activeSettings = window.preferences.getPreferences();
+    applyPreferences(); 
     
     // Track which page we are on to update tools accordingly
     const eqTools = document.getElementById("eqTools");
@@ -47,8 +49,62 @@ async function mainBodyOnLoad() {
 
     observer.observe(window.mainframe,{attributes:true});    
 
-       
+    if (true==false) {
+        document.addEventListener("mousemove",(e)=>{
+            console.log(e.clientX)
+            if (e.clientX<30) leftAnimateOpen();
+                if (e.clientX>255) {
+                if (e.timeout!=undefined) clearTimeout(timeout); 
+                // if (window.leftClosing || window.leftOpening) return;
+                let timeout = setTimeout(leftAnimateClose,5000);
+                e.timeout= timeout;
+            }
+        })    
+
+        setTimeout(()=>{        
+            leftAnimateClose();
+            //document.documentElement.style.setProperty("--toolbar-width",0);        
+        },1000)
+    }
 }
+
+function leftAnimateClose() {    
+    let sectionLeft = document.getElementById("sectionLeft");
+    window.leftClosing=true;
+    let interval = setInterval(()=>{
+        if (window.leftOpening) {
+            clearInterval(interval); 
+            return;
+        }
+        let currentWidth = sectionLeft.getBoundingClientRect().width;
+        let stepSize = currentWidth / 20;
+        if (stepSize<0.2) {             
+            document.documentElement.style.setProperty("--toolbar-width","0px");    
+            clearInterval(interval); 
+            window.leftClosing=false;
+            return;
+        }
+        document.documentElement.style.setProperty("--toolbar-width",currentWidth-stepSize+"px");        
+        sectionLeft.style.opacity=(currentWidth-stepSize)/220;
+    },20)    
+}
+
+function leftAnimateOpen() {    
+    window.leftOpening=true;
+    let interval = setInterval(()=>{
+        let currentWidth = sectionLeft.getBoundingClientRect().width;
+        let stepSize = (220 - currentWidth) / 15;
+        if (stepSize<0.3) {             
+            document.documentElement.style.setProperty("--toolbar-width","250px");    
+            clearInterval(interval); 
+            window.leftOpening=false;
+            return;
+        }
+        document.documentElement.style.setProperty("--toolbar-width",currentWidth+stepSize+"px");        
+        sectionLeft.style.opacity=(currentWidth+stepSize)/220;
+    },30)    
+}
+
 
 function updateActions(page) {
     const eqTools = document.getElementById("eqTools");
@@ -130,8 +186,6 @@ async function initIndicators() {
         
     },2000);    
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -304,12 +358,8 @@ function downloadFile(filename, text) {
     document.body.removeChild(element);
   }
 
-async function loadPreferences() {
-    // Load preferences
-    window.parent.activeSettings = window.preferences.getPreferences();
-
-    // Apply preferences
-    //// Find the navigator that default page is pointing and invote its click event
+async function applyPreferences() {    
+    //// Find the navigator that default page is pointing and invoke its click event
     let navigators = document.getElementsByClassName("navigate");
     for (let navigator of navigators) {                
         if (navigator.getAttribute("target").replace("/","")==window.activeSettings.defaultPage.toLowerCase()) {            
@@ -318,18 +368,21 @@ async function loadPreferences() {
         }
     };    
 
-    // if (window.activeSettings.DCProtection) {
-    //     const DSP = window.parent.DSP;        
-    //     // console.log("DCP Exists?",DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]!=undefined)
-    //     if (DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]==undefined) {
-    //         DSP.addFilterToAllChannels(DSP.DCProtectionFilter);        
-    //         DSP.uploadConfig();
-    //     }
-    // }
+    if (window.activeSettings.DCProtection) {
+        const DSP = window.parent.DSP;        
+        // console.log("DCP Exists?",DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]!=undefined)
+        if (DSP.config.filters[Object.keys(DSP.DCProtectionFilter)[0]]==undefined) {
+            DSP.addFilterToAllChannels(DSP.DCProtectionFilter);        
+            await DSP.uploadConfig();
+        }
+    }
+
+    applyColorScheme(document);
 }
 
 function applyColorScheme(doc) {
     const hue = window.preferences.getSettingValue('ui','backgroundHue');
+    console.log("Hue :",hue)
     window.preferences.applyBackgroundHue(doc,hue); 
     window.preferences.applyBackgroundHue(window.mainframe.contentDocument,hue); 
 

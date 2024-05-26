@@ -112,7 +112,9 @@ async function equalizerOnLoad() {
 
     const spec = document.getElementById("spectrum");   
 
-    if(window.parent.activeSettings.showEqualizerSpectrum) {        
+    
+
+    if(window.parent.activeSettings.showEqualizerSpectrum && window.parent.activeSettings.enableSpectrum) {        
         spec.style.display="grid";
         initSpectrum();    
     } else {
@@ -382,7 +384,9 @@ const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '
 '315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
 '3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
 
-async function initSpectrum(parentWindow){          
+async function initSpectrum(parentWindow){         
+    
+    if (!window.parent.activeSettings.enableSpectrum) return;
     // Create bars and boxes
     if (parentWindow==undefined) parentWindow=window;    
 

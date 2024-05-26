@@ -142,7 +142,7 @@ class preferences {
 
 
     createPreferencesElements(parentElement) {
-        let sectionElement, subElement, subTitleElement, optionElement;
+        let sectionElement, subElement, subTitleElement, optionElement, lineElement;
         for (let section of Object.keys(this.preferenceObject.sections)) {
             sectionElement=document.createElement("div");
             sectionElement.setAttribute("id",section);
@@ -150,11 +150,18 @@ class preferences {
             sectionElement.className="preferenceSection";
             for (let item of this.preferenceObject[section]) {
                 // console.log(section,item);
+
+                // Preference line
+                lineElement=document.createElement("div"); 
+                lineElement.className = "preferenceItem";
+
+                // Title of the item
                 subTitleElement = document.createElement("div");
                 subTitleElement.innerText=item.name;
                 subTitleElement.className="preferenceName"
-                sectionElement.appendChild(subTitleElement);
-                
+                lineElement.appendChild(subTitleElement);
+
+                                
                 switch (item.type) {
                     case "boolean":
                         subElement = document.createElement("input");
@@ -213,7 +220,8 @@ class preferences {
                     this.dispatchEvent(new Event("callback"));
                     window.parent.activeSettings = window.preferences.getPreferences();
                 });
-                sectionElement.appendChild(subElement);
+                lineElement.appendChild(subElement);
+                sectionElement.appendChild(lineElement);
             }
 
             parentElement.appendChild(sectionElement);
