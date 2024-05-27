@@ -126,7 +126,6 @@ class filter {
     }
 
     updateParams() {
-
         const peqParams=document.createElement('div');
         peqParams.setAttribute("id","peqParams"); peqParams.className="peqParams";
         let elem;
@@ -179,7 +178,7 @@ class filter {
 
             peqParams.appendChild(elem);
         }
-        // console.log("Filter Params :",filterParams)
+        console.log("peqParams :",peqParams.children)
         this.elementCollection.peqParams=peqParams;
     }
 
@@ -199,10 +198,10 @@ class filter {
 
         if (peqElement.filter.loading) return;
 
-        let basic = peqElement.getAttribute("basic")=="true";
+        let basic = (peqElement.getAttribute("basic")=="true");
         // console.log("Filter basic?",basic)
 
-        // console.log("peq element ",id,value,peqElement.filter.type)
+        console.log("peqUpdate : ",id, value)
         switch (id) {
             case "filterName":
                 peqElement.filter.name = value;
@@ -215,6 +214,10 @@ class filter {
                 peqElement.filter.updateSubTypes(basic);
                 peqElement.filter.updateParams();                
                 break;
+            case "filterSubType":
+                peqElement.filter.subType = value                    
+                peqElement.filter.updateParams();                
+                break;
             default:
                 let val;
                 if (id=="frequency") id="freq";
@@ -223,16 +226,21 @@ class filter {
                 peqElement.filter.parameters[id]= val;
         }
 
-        let configName = peqElement.getAttribute("configName");
-        let filterJson = peqElement.filter.createFilterJson(peqElement.filter.name,peqElement.filter.type,peqElement.filter.parameters);
+        
         // console.log(configName,filterJson)
 
-        delete peqElement.filter.DSP.config.filters[configName];
-        Object.assign(peqElement.filter.DSP.config.filters,filterJson);
-        await peqElement.filter.DSP.uploadConfig()
-
-        peqElement.setAttribute("configName",Object.keys(filterJson)[0]);
         peqElement.dispatchEvent(new Event("updated"));
+
+        if (id!="filterType") {
+            let configName = peqElement.getAttribute("configName");
+            let filterJson = peqElement.filter.createFilterJson(peqElement.filter.name,peqElement.filter.type,peqElement.filter.parameters);
+
+            delete peqElement.filter.DSP.config.filters[configName];
+            Object.assign(peqElement.filter.DSP.config.filters,filterJson);
+            await peqElement.filter.DSP.uploadConfig();
+            peqElement.setAttribute("configName",Object.keys(filterJson)[0]);
+        }
+        
         // beep();
 
     }

@@ -11,15 +11,13 @@
 
     <div id="sectionMainTitle"><img src="img/icon/equalizer.png" class="icon">Equalizer</div>
     
-    <script type="module">
-        import PEQline from '/src/PEQLine.js';
+    <script type="module">        
         import camillaDSP from "/src/camillaDSP.js";       
         import EQKnob from '/src/knob.js';
         import plot from '/src/eqplot.js';        
         import savedConfigs from "/src/savedConfigs.js";        
         
-        window.savedConfigs = new savedConfigs();        
-        window.PEQline = PEQline;
+        window.savedConfigs = new savedConfigs();                
         window.camillaDSP = camillaDSP;                        
         window.EQKnob=EQKnob;
         window.plot = plot;               

@@ -70,7 +70,7 @@ class savedConfigs {
     
     deleteLocal(id) {
         if (this.configs==undefined) this.loadConfigs();    
-        let element = this.configs.filter((e)=>e.id==id)[0];                
+        let element = this.configs.filter((e)=>e.id==id)[0];
         let index = this.configs.indexOf(element);
         if (index==-1) return false; 
         this.configs.splice(index,1);         
@@ -78,7 +78,7 @@ class savedConfigs {
         return true;
     }
     
-    saveLastConfigLocal(configName) {
+    saveLastConfigLocal(configName) {                        
         window.localStorage.setItem("lastConfigName",configName);
         return true;
     }
