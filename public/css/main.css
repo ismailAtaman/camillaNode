@@ -679,7 +679,7 @@ select {
     height: calc(var(--spectrum-height) - 10px);
     margin-inline: 2px;    
     font-size: 11px;
-    background-color: hsla(160, 50%, 50%,10%) ;        
+    background-color: hsl(var(--bck-hue), 40%, 10%); 
     border-radius: 4px;        
     transform: rotate(180deg);
 }
@@ -691,6 +691,7 @@ select {
     color: hsl(var(--bck-hue), 30%, 40%) ;     
     background-color: none;
     font-size: 13px;
+    padding-top: 5px;
     transform: translateX(-50%);
     transform: rotate(180deg);
 }
