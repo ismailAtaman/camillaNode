@@ -424,9 +424,9 @@ async function initSpectrum(parentWindow){
     
 
     const maxVal = 0;
-    const minVal = -100;
+    const minVal = -90;
     const scaler = 1;
-    const levelPerBox = Math.round((maxVal-minVal)/boxCount * scaler)  ;
+    const levelPerBox = Math.round(10 * (maxVal-minVal)/boxCount * scaler)/10;
 
     console.log("Level per box ",levelPerBox);
     // Get the data and update the analyser

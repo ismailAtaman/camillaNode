@@ -66,6 +66,10 @@ async function mainBodyOnLoad() {
             //document.documentElement.style.setProperty("--toolbar-width",0);        
         },1000)
     }
+
+    
+
+
 }
 
 function leftAnimateClose() {    
@@ -644,7 +648,7 @@ async function openConfigurationClick() {
 
     }
 
-    // configsObject.saveLastConfig(configName);
+    configsObject.saveLastConfigLocal(configName.value);
     document.getElementById("manageConfigs").close();
 }
 

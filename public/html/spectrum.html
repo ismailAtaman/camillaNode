@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=100vw, height=100vh, initial-scale=1.0">
     <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+    <title>CamillaNode Spectrum Analyser</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
 
@@ -47,16 +48,10 @@
             overflow: hidden;
         }
 
-        .group {
-            position: relative;
-            margin-block: 10px;
-            background-image: linear-gradient(45deg,hsl(var(--bck-hue), 35%, 15%) ,hsl(var(--bck-hue), 45%, 10%));    
+        .group {            
             display: block;
             margin: 0px;
-            border-radius: 10px;    
-            padding: 5px;                
-            border: 1px solid hsl(var(--bck-hue), 35%, 20%);
-            box-shadow: 0px 0px 10px 1px #111;
+            padding: 0px;                        
         }
 
         #spectrum {
@@ -64,7 +59,7 @@
             grid-template-columns: repeat(60,auto);        
             gap:0px;            
             align-items:end;
-            padding: 5px;
+            /* padding: 5px; */
             height: var(--spectrum-height);
         }
 
@@ -76,10 +71,9 @@
             justify-items: baseline;
             position: relative;
             width: var(--levelbar-width);            
-            height: calc(var(--spectrum-height) - 10px);
-            margin-inline: 2px;    
-            font-size: 11px;
-            background-color: hsla(160, 50%, 50%,10%) ;        
+            height: calc(var(--spectrum-height) - 0px);
+            margin-inline: 2px;                
+            background-color: hsl(var(--bck-hue), 30%, 9%) ;        
             border-radius: 4px;        
             transform: rotate(180deg);
             z-index: 0;
@@ -91,7 +85,8 @@
             bottom: 0;    
             color: hsl(var(--bck-hue), 30%, 40%) ;     
             background-color: none;
-            font-size: 13px;
+            font-size: 12px;
+            padding-top: 5px;
             transform: translateX(-50%);
             transform: rotate(180deg);
         }
@@ -164,11 +159,12 @@
             }
 
             const maxVal = 0;
-            const minVal = -100;
+            const minVal = -90;
             const scaler = 1;
-            const levelPerBox = Math.round((maxVal-minVal)/boxCount * scaler)  ;
+            const levelPerBox = Math.round(10 * (maxVal-minVal)/boxCount * scaler)/10;
+            
 
-            console.log("Level per box ",levelPerBox);
+            // console.log("Level per box ",levelPerBox);
             // Get the data and update the analyser
             
             if (window.spectrumInterval!=undefined) clearInterval(window.spectrumInterval);

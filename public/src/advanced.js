@@ -91,14 +91,14 @@ async function loadPipeline(element, DSP) {
                         if (filterChannel.children[filterName]!=undefined) {
                             let target = filterChannel.children[filterName].getBoundingClientRect().left - 45 + filterChannel.scrollLeft;
                             filterChannel.children[filterName].classList.remove("selected")
-                            console.log(">>Target",target,"Left",filterChannel.scrollLeft);
+                            // console.log(">>Target",target,"Left",filterChannel.scrollLeft);
                             let i = setInterval(()=>{
                                 let stepSize = (target - filterChannel.scrollLeft)/4;
 
                                 if (stepSize>50) stepSize = 50;
                                 if (stepSize<-50) stepSize = -50;
 
-                                console.log("Target",target,"Left",filterChannel.scrollLeft,"Step Size",stepSize);
+                                // console.log("Target",target,"Left",filterChannel.scrollLeft,"Step Size",stepSize);
                                 
                                 if (Math.abs(stepSize)<1) {
                                     filterChannel.scrollLeft=target;
@@ -120,7 +120,6 @@ async function loadPipeline(element, DSP) {
     }
     
 }
-
 
 function loadMixers(element, mixers) {
     //  console.log(mixers);
@@ -197,19 +196,27 @@ function loadFilters(element,config,channelCount) {
         
         let channelPipeline = pipeline.filter(function(p){ return (p.type=="Filter" && p.channel==channelNo) });        
         for (let filterName of channelPipeline[0].names) {            
-            let filter = DSP.createFilter(filterName,channelNo);
-            let filterElement = createFilterElement(filter);
+            let filterElement = loadFilter(filterName,channelNo)
             filterChannel.appendChild(filterElement);
-            // console.log(filterElement.children["filterParams"])                        
         }
         element.appendChild(filterChannel);        
     }
 }
 
+function loadFilter(filterName, channelNo ) {
+    let filter = window.parent.DSP.createFilter(filterName,channelNo);
+    return createFilterElement(filter);    
+}
+
 function createFilterElement(currentFilter) {
     currentFilter.createElement(false);            
 
-    let peqElement = document.createElement('div');
+    let peqElement = document.getElementById(currentFilter.name);    
+    if (peqElement.className!="peqElement") peqElement=undefined;
+    if (peqElement==undefined) peqElement = document.createElement('div');     
+
+    peqElement.remove();
+
     peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
     peqElement.setAttribute("id",currentFilter.name);
     peqElement.setAttribute("basic",false);
@@ -242,11 +249,17 @@ function createFilterElement(currentFilter) {
     if (currentFilter.elementCollection.peqParams.children["q"]!=undefined) 
         currentFilter.elementCollection.peqParams.children["q"].setAttribute("wheel","disabled")
 
-    peqElement.appendChild(currentFilter.elementCollection.peqParams);   
-    
-    
+    peqElement.appendChild(currentFilter.elementCollection.peqParams);       
+        
     peqElement.addEventListener("addNewFilter",e=>addNewFilter(e))
     peqElement.addEventListener("removeFilter",e=>removeFilter(e))    
+    peqElement.addEventListener("updated",function(e){
+        // console.log("Running updated for ",e.target.id);
+        let filterName = e.target.getAttribute("configName");
+        let channelNo = e.target.parentElement.getAttribute("label").split(" ")[1];
+        let peqElement = loadFilter(filterName, channelNo);
+        console.log(peqElement.children["peqParams"].children)        
+    })   
 
     // if (window.parent.activeSettings.peqSingleLine) {        
     //     peqElement.style = "display:flex; height: 40px;"
