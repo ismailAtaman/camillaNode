@@ -216,12 +216,12 @@ class filter {
                 break;
             case "filterType":
                 peqElement.filter.type = value
-                peqElement.filter.updateSubTypes(basic);
-                peqElement.filter.updateParams();                
+                // peqElement.filter.updateSubTypes(basic);
+                // peqElement.filter.updateParams();                
                 break;
             case "filterSubType":
                 peqElement.filter.parameters.type = value                    
-                peqElement.filter.updateParams();                
+                // peqElement.filter.updateParams();                
                 break;
             default:
                 let val;
@@ -239,11 +239,11 @@ class filter {
         // if (id!="filterType") {
             let configName = peqElement.getAttribute("configName");
             let filterJson = peqElement.filter.createFilterJson(peqElement.filter.name,peqElement.filter.type,peqElement.filter.parameters);
-            peqElement.filter.DSP.config.filters[configName]=filterJson;
-        //     delete peqElement.filter.DSP.config.filters[configName];
-        //     Object.assign(peqElement.filter.DSP.config.filters,filterJson);
-        //     //await peqElement.filter.DSP.uploadConfig();
-        //     peqElement.setAttribute("configName",Object.keys(filterJson)[0]);
+            // peqElement.filter.DSP.config.filters[configName]=filterJson;
+            delete peqElement.filter.DSP.config.filters[configName];
+            Object.assign(peqElement.filter.DSP.config.filters,filterJson);
+            await peqElement.filter.DSP.uploadConfig();
+            peqElement.setAttribute("configName",Object.keys(filterJson)[0]);
         // }
         
         // beep();
