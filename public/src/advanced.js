@@ -254,11 +254,14 @@ function createFilterElement(currentFilter) {
     peqElement.addEventListener("addNewFilter",e=>addNewFilter(e))
     peqElement.addEventListener("removeFilter",e=>removeFilter(e))    
     peqElement.addEventListener("updated",function(e){
-        // console.log("Running updated for ",e.target.id);
+        // // console.log("Running updated for ",e.target.id);        
         let filterName = e.target.getAttribute("configName");
-        let channelNo = e.target.parentElement.getAttribute("label").split(" ")[1];
-        let peqElement = loadFilter(filterName, channelNo);
-        console.log(peqElement.children["peqParams"].children)        
+        let channelNo = e.target.parentElement.getAttribute("label").split(" ")[1];        
+        e.target.parentElement.insertBefore(loadFilter(filterName, channelNo),e.target);
+        e.target.remove();
+        // console.log(peqElement.children["peqParams"].children)        
+
+        
     })   
 
     // if (window.parent.activeSettings.peqSingleLine) {        

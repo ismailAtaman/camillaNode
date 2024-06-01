@@ -123,6 +123,9 @@ class filter {
         if (this.parameters.type!=undefined) filterSubType.value=this.parameters.type;
         // console.log("Filter Sub Type :",filterSubType)
         this.elementCollection.filterSubType=filterSubType;        
+
+        
+
     }
 
     updateParams() {
@@ -208,20 +211,19 @@ class filter {
 
         console.log("peqUpdate : ",id, value)
         switch (id) {
-            case "filterName":
-                peqElement.filter.name = value;
+            case "filterName":                               
                 break;
             case "filterDesc":
                 peqElement.filter.description = value;
                 break;
             case "filterType":
                 peqElement.filter.type = value
-                // peqElement.filter.updateSubTypes(basic);
-                // peqElement.filter.updateParams();                
+                peqElement.filter.updateSubTypes(basic);
+                peqElement.filter.updateParams();                
                 break;
             case "filterSubType":
                 peqElement.filter.parameters.type = value                    
-                // peqElement.filter.updateParams();                
+                peqElement.filter.updateParams();                
                 break;
             default:
                 let val;
@@ -230,175 +232,16 @@ class filter {
                 if (!isNaN(parseFloat(value))) val = parseFloat(value); else val = value;
                 peqElement.filter.parameters[id]= val;
         }
-
-        
-        // console.log(configName,filterJson)
-
         peqElement.dispatchEvent(new Event("updated"));
-
-        // if (id!="filterType") {
-            let configName = peqElement.getAttribute("configName");
-            let filterJson = peqElement.filter.createFilterJson(peqElement.filter.name,peqElement.filter.type,peqElement.filter.parameters);
-            // peqElement.filter.DSP.config.filters[configName]=filterJson;
-            delete peqElement.filter.DSP.config.filters[configName];
-            Object.assign(peqElement.filter.DSP.config.filters,filterJson);
-            await peqElement.filter.DSP.uploadConfig();
-            peqElement.setAttribute("configName",Object.keys(filterJson)[0]);
-        // }
-        
-        // beep();
-
+        await peqElement.filter.updateDSP();
     }
 
-    createElementEx(name) {
-        this.name=name;
-        const filterElement = document.createElement('div');
-        filterElement.filter=this; filterElement.className="filterElement"; filterElement.setAttribute("configName",name);
-
-        const filterBasic = document.createElement('div'); 
-        filterBasic.id = "filterBasic"; filterBasic.className='filterBasic';
-
-
-        let nameSpan = document.createElement('span');
-        nameSpan.innerText='Name :'
-        filterBasic.appendChild(nameSpan);
-
-        const filterName = document.createElement('input');
-        filterName.className="filterName"; filterName.value=this.name; filterName.id="filterName";
-        filterBasic.appendChild(filterName);
-        
-        let typeSpan = document.createElement('span');
-        typeSpan.innerText='Type :'
-        filterBasic.appendChild(typeSpan);
-
-        const filterType = document.createElement('select');
-        filterType.className="filterType"; filterType.setAttribute("id","filterType");       
-        for (let type of Object.keys(Types)) {
-            let opt = document.createElement("option");
-            opt.setAttribute("value",type); opt.innerText=type;
-            filterType.appendChild(opt);
-        }
-        filterType.addEventListener("change",(e)=>{     
-            let target = e.target;            
-            updateSubTypes(this,target.parentElement,target);
-            updateParams(this,target,target.parentElement.children["filterSubType"])
-        })
-        filterBasic.appendChild(filterType);        
-        filterElement.appendChild(filterBasic);
-
-        updateSubTypes(this,filterElement,filterType);
-
-        function updateSubTypes(filter,element,type) {
-            
-            let existingElement = element.children["filterSubType"];                
-            if (existingElement!=undefined) existingElement.remove();               
-
-            existingElement = type.parentElement.children["filterParams"];
-            if (existingElement!=undefined) existingElement.remove();
-
-            const filterSubType = document.createElement("select");
-            filterSubType.className="filterType"; filterSubType.setAttribute("id","filterSubType");
-            for (let subType of filter.getFilterSubTypes(type.value)) {            
-                let opt = document.createElement("option");
-                opt.setAttribute("value",subType); opt.innerText=subType;
-                filterSubType.appendChild(opt);
-            }
-
-            if (filterSubType.childNodes.length>0) {
-                filterSubType.addEventListener("change",(e)=>{
-                    updateParams(filter,filterType,e.target)
-                })
-                element.appendChild(filterSubType);
-            }
-        }
-
-        const filterSubType = filterElement.children["filterSubType"]; 
-        updateParams(this,filterType,filterSubType)
-
-        function updateParams(filterA,type,subType) {            
-            let typeVal = Types[type.value];            
-            let subTypeVal;
-            if (subType!=undefined) subTypeVal=subType.value;
-
-            let existingElement = type.parentElement.parentElement.children["filterParams"];
-            if (existingElement!=undefined) existingElement.remove();
-            
-            const filterParams=document.createElement('div');
-            filterParams.setAttribute("id","filterParams"); filterParams.className="filterParams";
-            let elem;
-            // console.log("Types ",typeVal,subTypeVal)
-            for (let param of filter.getFilterParams(typeVal,subTypeVal)) { 
-                let title=document.createElement("span"); title.innerText=Object.keys(param)[0]+" :";
-                filterParams.appendChild(title);
-                switch (Object.values(param)[0]) {
-                    case "num":
-                        elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0; elem.id=Object.keys(param)[0].toLowerCase();
-                        break;
-                    case "bool":
-                        elem = document.createElement("input"); elem.setAttribute("type","checkbox");elem.id=Object.keys(param)[0].toLowerCase();
-                        break;
-                    case "text":
-                        elem = document.createElement("input"); elem.setAttribute("type","text");elem.value="";elem.id=Object.keys(param)[0].toLowerCase();
-                        break;
-                    case "array":
-                        elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0;elem.id=Object.keys(param)[0].toLowerCase();
-                        break;
-                    default:
-                        elem = document.createElement("select"); 
-                        elem.id = Object.keys(param)[0];
-                        for (let opt of Object.values(param)[0]) {                            
-                            let o = document.createElement("option");
-                            o.innerText=opt;o.setAttribute("value",opt);    
-                            elem.appendChild(o);
-                        }
-                }
-                filterParams.appendChild(elem);
-            }
-            
-            type.parentElement.parentElement.appendChild(filterParams);
-        }
-
-        // const filterType = document.createElement('div');
-
-        filterElement.filter=this;
-        this.filterElement=filterElement;
-
-        assignObserver(filterElement);
-
-        async function eventListener(e) {                        
-            // Below line ensures each event runs once (so far)
-            if (e.currentTarget.className!='filterElement') return;
-
-            let filterElement;
-            if (e.target.className=='filterElement') filterElement=e.target;
-            if (e.target.parentElement.className=='filterElement') filterElement=e.target.parentElement;
-            if (e.target.parentElement.parentElement.className=='filterElement') filterElement=e.target.parentElement.parentElement;
-
-            // console.log("Listener for ",e.target," : " ,filter.getParams(filterElement));
-            
-            let configName = filterElement.getAttribute("configName");
-            let filterJson = filterElement.filter.createFilterJson(filter.getParams(filterElement));
-            console.log(configName,filterJson)
-
-            delete filterElement.filter.DSP.config.filters[configName];
-            Object.assign(filterElement.filter.DSP.config.filters,filterJson);
-            await filterElement.filter.DSP.uploadConfig()
-
-            filterElement.setAttribute("configName",Object.keys(filterJson)[0]);
-
-
-        }
-
-        function assignObserver(element) {                               
-            for (let e of element.children) {
-                if (e.children.length>0) assignObserver(e); else e.addEventListener("change",eventListener);
-            }
-            element.addEventListener("change",eventListener);
-        }
-
-        return filterElement;
+    async updateDSP() {                
+        DSP.config.filters[this.name].description=this.description;
+        DSP.config.filters[this.name].type=this.type;
+        DSP.config.filters[this.name].parameters=this.parameters
+        await DSP.uploadConfig();        
     }
-
 
     getFilterTypes() {
         return ["Gain","Biquad","Conv","Delay"];
@@ -515,8 +358,6 @@ class filter {
         delete this.DSP.config.filter[filterName];        
         this.DSP.createFilters();
     }
-
-
 }
 
 export default filter;

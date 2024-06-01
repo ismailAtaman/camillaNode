@@ -137,7 +137,7 @@
             document.documentElement.style.setProperty("--levelbar-width",barWidth+"px");
             
             let barHeight = spec.getBoundingClientRect().height;
-            let boxHeight = 6+3;
+            let boxHeight = 6+2;
             const boxCount =Math.round(barHeight/boxHeight);     
             
             spec.innerHTML='';
@@ -152,14 +152,14 @@
                     let box = document.createElement('div');
                     box.className='levelbox';                    
                     hue=hue-(240/boxCount);
-                    box.style="background-color: hsl("+hue+", 30%, 50%);"                            
+                    box.style="background-color: hsl("+hue+", 40%, 50%);"                            
                     bar.appendChild(box);
                 }
                 spec.appendChild(bar); 
             }
 
             const maxVal = 0;
-            const minVal = -90;
+            const minVal = -86;
             const scaler = 1;
             const levelPerBox = Math.round(10 * (maxVal-minVal)/boxCount * scaler)/10;
             

@@ -305,7 +305,9 @@ async function clearPEQ() {
     setPreamp(0);
     DSP.clearFilters();       
     await DSP.uploadConfig();    
-    document.getElementById('PEQ').innerHTML='';
+    let channels = document.getElementsByClassName("peqChannel")
+    for (let channel of channels) channel.innerHTML="";
+
     plotConfig(); 
 }
 
