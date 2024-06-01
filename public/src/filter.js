@@ -119,16 +119,13 @@ class filter {
             opt.setAttribute("value",subType); opt.innerText=subType;
             filterSubType.appendChild(opt);
         }
+        
         filterSubType.addEventListener("change",this.updateEventHandler);
         if (this.parameters.type!=undefined) filterSubType.value=this.parameters.type;
-        // console.log("Filter Sub Type :",filterSubType)
         this.elementCollection.filterSubType=filterSubType;        
-
-        
-
     }
 
-    updateParams() {
+    updateParams() {        
         //console.log("Exiting params?",this.elementCollection.peqParams);
         this.elementCollection.peqParams={}
 
@@ -136,6 +133,9 @@ class filter {
         peqParams.setAttribute("id","peqParams"); peqParams.className="peqParams";
         let elem;
 
+        let oldParams = this.parameters;
+        this.parameters={};
+        this.parameters.type=oldParams.type;
 
         // console.log("Type ",this.type,"Subtype ",this.parameters.type)
         for (let param of filter.filterParamsTemplate(this.type,this.parameters.type)) { 
@@ -143,7 +143,11 @@ class filter {
             peqParams.appendChild(title);
             switch (Object.values(param)[0]) {
                 case "num":
-                    elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0; elem.id=Object.keys(param)[0].toLowerCase();
+                    elem = document.createElement("input"); 
+                    elem.setAttribute("type","text");
+                    elem.value=0; 
+                    elem.id=Object.keys(param)[0].toLowerCase();
+
                     elem.addEventListener("wheel",function(e){                        
                         if (this.getAttribute("wheel")=="disabled") return;
                         let dir = e.deltaY> 0 ? 1:-1;
@@ -151,20 +155,29 @@ class filter {
                         if (dir>0) val = parseFloat(this.value) * 0.1; else val = parseFloat(this.value) / 11;
                         if (val<1) val=1;
                         val = Math.round(val);                        
-                        this.value = parseFloat(this.value) + dir * val;
+                        this.value = Math.round(parseFloat(this.value) + dir * val);
                         e.preventDefault();
                         this.dispatchEvent(new Event("change"));
                     })
+
                     elem.addEventListener("dblclick",e=>{e.target.value=0;e.target.dispatchEvent(new Event("change"));});
                     break;
                 case "bool":
-                    elem = document.createElement("input"); elem.setAttribute("type","checkbox");elem.id=Object.keys(param)[0].toLowerCase();
+                    elem = document.createElement("input"); 
+                    elem.setAttribute("type","checkbox");
+                    elem.id=Object.keys(param)[0].toLowerCase();
                     break;
                 case "text":
-                    elem = document.createElement("input"); elem.setAttribute("type","text");elem.value="";elem.id=Object.keys(param)[0].toLowerCase();
+                    elem = document.createElement("input"); 
+                    elem.setAttribute("type","text");
+                    elem.value="";
+                    elem.id=Object.keys(param)[0].toLowerCase();
                     break;
                 case "array":
-                    elem = document.createElement("input"); elem.setAttribute("type","text");elem.value=0;elem.id=Object.keys(param)[0].toLowerCase();
+                    elem = document.createElement("input"); 
+                    elem.setAttribute("type","text");
+                    elem.value=0;
+                    elem.id=Object.keys(param)[0].toLowerCase();
                     break;
                 default:
                     elem = document.createElement("select"); 
@@ -175,18 +188,20 @@ class filter {
                         elem.appendChild(o);
                     }
             }
-            // Fix name from clean text to param name 
-            
+
+            // Correct parameter names from UI friendly to DSP correct name
             let paramText = Object.keys(param)[0].toLowerCase().replace(" ","_");
-
             if (paramText=="frequency") paramText="freq";
-            if (paramText=="filtersubtype") paramText="type";
-            elem.value=this.parameters[paramText];            
+            if (paramText=="filtersubtype") paramText="type";         
+            this.parameters[paramText]!=undefined
+            
+            if (oldParams[paramText]!=undefined) this.parameters[paramText]=oldParams[paramText];
+            if (this.parameters[paramText]!=undefined) elem.value=this.parameters[paramText];             
             elem.addEventListener("change",this.updateEventHandler);
-
             peqParams.appendChild(elem);
         }
-        console.log("peqParams :",peqParams.childNodes)
+                
+        //  console.log("peqParams :",peqParams.childNodes)
         this.elementCollection.peqParams=peqParams;
     }
 
@@ -232,6 +247,8 @@ class filter {
                 if (!isNaN(parseFloat(value))) val = parseFloat(value); else val = value;
                 peqElement.filter.parameters[id]= val;
         }
+
+        console.log("Updated >>> ", peqElement.filter.elementCollection)
         peqElement.dispatchEvent(new Event("updated"));
         await peqElement.filter.updateDSP();
     }
@@ -241,21 +258,6 @@ class filter {
         DSP.config.filters[this.name].type=this.type;
         DSP.config.filters[this.name].parameters=this.parameters
         await DSP.uploadConfig();        
-    }
-
-    getFilterTypes() {
-        return ["Gain","Biquad","Conv","Delay"];
-    }
-
-    getFilterSubTypes(filterType) {        
-        switch (filterType) {
-            case Types.Biquad:
-                return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "HighpassFO", "LowpassFO", "HighshelfFO", "LowshelfFO", "Notch", "Allpass", "Bandpass", "AllpassFO", "Tilt", "LinkwitzTransform"]                  
-            case Types.Conv:
-                return ["Raw","Wav","Values"];
-            default:
-                return [];
-        }        
     }
 
     static getParams(element) {
@@ -316,6 +318,23 @@ class filter {
         return filterJson;
     }
 
+    getFilterTypes() {
+        return ["Gain","Biquad","Conv","Delay"];
+    }
+
+    getFilterSubTypes(filterType) {        
+        switch (filterType) {
+            case Types.Biquad:
+                // return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "HighpassFO", "LowpassFO", "HighshelfFO", "LowshelfFO", "Notch", "Allpass", "Bandpass", "AllpassFO", "Tilt", "LinkwitzTransform"]                  
+                return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "Allpass", "Bandpass", "Tilt", "LinkwitzTransform"]                  
+            case Types.Conv:
+                return ["Raw","Wav","Values"];
+            default:
+                return [];
+        }        
+    }
+
+
     static filterParamsTemplate(filterType, filterSubType) {
         switch (filterType) {
             case Types.Gain:
@@ -341,7 +360,7 @@ class filter {
                 if (filterSubType=="Highpass" || filterSubType=="Lowpass" || filterSubType=="Bandpass" || filterSubType=="Allpass") return [{"Frequency":"num"},{"Q":"num"}];
                 if (filterSubType=="Peaking" || filterSubType=="Highshelf" || filterSubType=="Lowshelf") return [{"Frequency":"num"},{"Gain":"num"},{"Q":"num"}];
                 if (filterSubType=="LinkwitzTransform") return [{"Actual F":"num"},{"Actual Q":"num"},{"Target F":"num"},{"Target Q":"num"}];
-            
+                if (filterSubType=="Tilt") return [{"Gain":"num"}]
             case Types.Dither:
                 return [{"Type":["None","Flat","Highpass","Fweigthed441","Shibata48"]},{"Bits":["16"]}] ;
 

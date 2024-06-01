@@ -231,7 +231,7 @@ class camillaDSP {
             this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
                 res(true);                
             }).catch(e=>{
-                console.error("Error in upload config. >> ",e);
+                console.error("Error in upload config. >> ",this.config);
                 rej(false);
             });
         })

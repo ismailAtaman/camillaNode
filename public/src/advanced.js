@@ -232,9 +232,12 @@ function createFilterElement(currentFilter) {
     filterBasic.appendChild(typeSpan);
     filterBasic.appendChild(currentFilter.elementCollection.filterType);                
 
-    let subTypeSpan = document.createElement('span'); subTypeSpan.innerText='Filter Sub Type :'
-    filterBasic.appendChild(subTypeSpan);
-    filterBasic.appendChild(currentFilter.elementCollection.filterSubType);       
+    // If filter type does not have any sub types, do not show sub types
+    if (currentFilter.elementCollection.filterSubType.childNodes.length>0) {
+        let subTypeSpan = document.createElement('span'); subTypeSpan.innerText='Filter Sub Type :'
+        filterBasic.appendChild(subTypeSpan);
+        filterBasic.appendChild(currentFilter.elementCollection.filterSubType);
+    }       
 
     let peqParams = document.createElement('div');             
     peqParams.id = "peqParams"; peqParams.className='peqParams';          
@@ -257,11 +260,9 @@ function createFilterElement(currentFilter) {
         // // console.log("Running updated for ",e.target.id);        
         let filterName = e.target.getAttribute("configName");
         let channelNo = e.target.parentElement.getAttribute("label").split(" ")[1];        
-        e.target.parentElement.insertBefore(loadFilter(filterName, channelNo),e.target);
-        e.target.remove();
-        // console.log(peqElement.children["peqParams"].children)        
-
-        
+        let newFilter=loadFilter(filterName, channelNo);        
+        e.target.parentElement.insertBefore(newFilter,e.target);
+        e.target.remove();       
     })   
 
     // if (window.parent.activeSettings.peqSingleLine) {        
