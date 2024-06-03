@@ -204,7 +204,7 @@ function loadFilters(element,config,channelCount) {
 }
 
 function loadFilter(filterName, channelNo ) {
-    let filter = window.parent.DSP.createFilter(filterName,channelNo);
+    let filter = window.parent.DSP.createFilter(filterName,channelNo);    
     return createFilterElement(filter);    
 }
 
@@ -261,6 +261,7 @@ function createFilterElement(currentFilter) {
         let filterName = e.target.getAttribute("configName");
         let channelNo = e.target.parentElement.getAttribute("label").split(" ")[1];        
         let newFilter=loadFilter(filterName, channelNo);        
+        // console.log("newFilter sub type : ",newFilter.filter.parameters.type)
         e.target.parentElement.insertBefore(newFilter,e.target);
         e.target.remove();       
     })   

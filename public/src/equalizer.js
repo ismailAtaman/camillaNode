@@ -17,22 +17,16 @@ async function equalizerOnLoad() {
     const PEQ = document.getElementById('PEQ');                
     DSP=window.parent.DSP;            
 
-    document.getElementById("spectrum").addEventListener("dblclick",()=>{
 
-        // let params = "width=600,height=200,popup=true,menubar=false,toolbar=false,status=false,resizable=false,scrollbars=false,left=800,top=200"        
-        console.log("W :",window.screen.availWidth)
+    // Open a floating spectrum window on spectrum double click
+    document.getElementById("spectrum").addEventListener("dblclick",()=>{        
+        // console.log("W :",window.screen.availWidth)
         let w = Math.round(window.screen.availWidth/3.5);
-        let h = 280; //Math.round(w/4);
+        let h = 300; //Math.round(w/4);
         let params = "location=no,status=no,menubar=no,scrollbars=no,width="+w+",height="+h;
         let win = window.open("/spectrum","spectrumWindow",params);        
-        win.DSP=window.parent.DSP;
-        
-
-        win.document.documentElement.style.setProperty("--bck-hue",window.parent.activeSettings.backgroundHue) 
-        console.log("Hue : ",window.parent.activeSettings.backgroundHue)
-        
+        win.DSP=window.parent.DSP;        
     })
-
     
     /// Basics Controls Section
     const basicControls = document.getElementById('basicControls');
@@ -138,10 +132,11 @@ function updateElementWidth() {
 async function loadFiltersFromConfig() {                        
     PEQ.innerHTML='';                
 
+    
     await DSP.downloadConfig();
 
     let multiChannel = window.parent.activeSettings.peqDualChannel
-    console.log("Multi channel? ",multiChannel)
+    // console.log("Multi channel? ",multiChannel)
     
     if (multiChannel) {
         let singleChannel = DSP.isSingleChannel();        
@@ -152,7 +147,7 @@ async function loadFiltersFromConfig() {
         window.document.documentElement.style.setProperty("--peq-channel-before-display","block");
     } else {        
         let singleChannel = DSP.isSingleChannel();   
-        console.log("DSP config single channel?",singleChannel);     
+        // console.log("DSP config single channel?",singleChannel);     
         if (!singleChannel) DSP.mergeFilters();                       
     }        
 
@@ -172,8 +167,9 @@ async function loadFiltersFromConfig() {
         // console.log("Filter list of channel No",channelNo," : " , filterList)        
         
         for (let filter of filterList) {        
-            // console.log(filter);
+            
             let currentFilter = DSP.createFilter(filter,channelNo);                        
+            // console.log(currentFilter.name);
             if (currentFilter.type=="Gain") {
                 let gain =Math.round(currentFilter.parameters.gain);                           
                 preamp.setVal(gain * 10 + 181);
@@ -221,22 +217,20 @@ function createFilterElement(currentFilter) {
     peqElement.appendChild(filterBasic);
     peqElement.appendChild(currentFilter.elementCollection.peqParams);
     
-
-    peqElement.addEventListener("updated",plotConfig)
+    
+    peqElement.addEventListener("updated",plotConfig);
     peqElement.addEventListener("addNewFilter",e=>addNewFilter(e))
     peqElement.addEventListener("removeFilter",e=>removeFilter(e))    
 
     if (window.parent.activeSettings.peqSingleLine) {        
         peqElement.style = "display:flex; height: 40px;"
         filterBasic.style = 'margin-right: 20px'
-        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 7px 7px 0px");
-        
+        window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 7px 7px 0px");        
 
         peqElement.appendChild(currentFilter.elementCollection.addButton);
         peqElement.appendChild(currentFilter.elementCollection.removeButton);
     } else {
         window.document.documentElement.style.setProperty("--peq-param-border-radius","0px 0px 7px 7px");
-
         filterBasic.appendChild(currentFilter.elementCollection.addButton);
         filterBasic.appendChild(currentFilter.elementCollection.removeButton);
     }
@@ -401,7 +395,7 @@ async function initSpectrum(parentWindow){
     let boxHeight = 6+3;
     const boxCount =Math.round(barHeight/boxHeight);     
 
-    console.log("Count ",boxCount,"Spec ",spec.getBoundingClientRect().height);
+    // console.log("Count ",boxCount,"Spec ",spec.getBoundingClientRect().height);
 
     let bar,box;
     spec.innerHTML='';
@@ -430,7 +424,7 @@ async function initSpectrum(parentWindow){
     const scaler = 1;
     const levelPerBox = Math.round(10 * (maxVal-minVal)/boxCount * scaler)/10;
 
-    console.log("Level per box ",levelPerBox);
+    // console.log("Level per box ",levelPerBox);
     // Get the data and update the analyser
     
     setInterval(async function(){

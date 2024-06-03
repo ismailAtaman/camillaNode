@@ -20,21 +20,26 @@ class filter {
     filterElement;
     elementCollection={};
     loading=false;
+    basic=false;
     
     
 
-    constructor(name,filter) {                
+    constructor(name,filter) {                        
+        
         if (name==undefined) name=new Date().getTime().toString().substring(8);
-        this.name=name;
+        this.name = name;
         this.description=filter.description;        
         this.type=filter.type;
-        this.parameters=filter.parameters;         
-        this.createElement()
+        this.parameters=filter.parameters;                 
+        this.createElement();
+        return this;
     }
 
     createElement(basic) {
         if (basic==undefined) basic=false;
         this.loading=true;
+        this.basic=basic;
+        this.elementCollection={};
 
         const filterName = document.createElement('input');        
         filterName.className="filterName"; filterName.value=this.name; filterName.id="filterName";
@@ -49,7 +54,7 @@ class filter {
         const filterType = document.createElement('select');
         filterType.className="filterType"; filterType.setAttribute("id","filterType");       
         for (let type of Object.keys(Types)) {
-            if (basic && (type!="Biquad")) continue;
+            if (this.basic && (type!="Biquad")) continue;
             let opt = document.createElement("option");
             opt.setAttribute("value",type); opt.innerText=type;
             filterType.appendChild(opt);
@@ -57,10 +62,13 @@ class filter {
 
         filterType.value=this.type;
         filterType.addEventListener("change",this.updateEventHandler);
-        this.elementCollection.filterType=filterType;
+        this.elementCollection.filterType=filterType;        
 
-        this.updateSubTypes(basic);
-        this.updateParams();        
+        this.createSubTypesElement();
+        this.createParamsElement();
+
+        
+        
 
         // Add buttons 
         const addButton = document.createElement('div'); 
@@ -100,21 +108,18 @@ class filter {
         })
 
         this.elementCollection.removeButton = removeButton;
-
         this.loading=false;
         
     }
 
-    updateSubTypes(basic) {
-        if (basic==undefined) basic=false;
-
+    createSubTypesElement() {
         let basicTypes = ["Highshelf","Lowshelf","Peaking"]        
 
         const filterSubType = document.createElement("select");
         filterSubType.className="filterType"; filterSubType.setAttribute("id","filterSubType");
 
         for (let subType of this.getFilterSubTypes(this.type)) {                        
-            if (basic && !basicTypes.includes(subType)) continue;
+            if (this.basic && !basicTypes.includes(subType)) continue;
             let opt = document.createElement("option");
             opt.setAttribute("value",subType); opt.innerText=subType;
             filterSubType.appendChild(opt);
@@ -125,17 +130,11 @@ class filter {
         this.elementCollection.filterSubType=filterSubType;        
     }
 
-    updateParams() {        
-        //console.log("Exiting params?",this.elementCollection.peqParams);
-        this.elementCollection.peqParams={}
-
+    createParamsElement() {        
+        // this.elementCollection.peqParams={}
         const peqParams=document.createElement('div');
         peqParams.setAttribute("id","peqParams"); peqParams.className="peqParams";
         let elem;
-
-        let oldParams = this.parameters;
-        this.parameters={};
-        this.parameters.type=oldParams.type;
 
         // console.log("Type ",this.type,"Subtype ",this.parameters.type)
         for (let param of filter.filterParamsTemplate(this.type,this.parameters.type)) { 
@@ -144,74 +143,150 @@ class filter {
             switch (Object.values(param)[0]) {
                 case "num":
                     elem = document.createElement("input"); 
-                    elem.setAttribute("type","text");
-                    elem.value=0; 
+                    elem.setAttribute("type","text");                    
                     elem.id=Object.keys(param)[0].toLowerCase();
 
                     elem.addEventListener("wheel",function(e){                        
                         if (this.getAttribute("wheel")=="disabled") return;
                         let dir = e.deltaY> 0 ? 1:-1;
                         let val; 
-                        if (dir>0) val = parseFloat(this.value) * 0.1; else val = parseFloat(this.value) / 11;
+                        if (dir>0) val = parseFloat(this.value) * 0.1; else val = Math.round(10*parseFloat(this.value) / 11)/10;
                         if (val<1) val=1;
                         val = Math.round(val);                        
-                        this.value = Math.round(parseFloat(this.value) + dir * val);
+                        this.value = parseFloat(this.value) + dir * val;
+
+                        // Q can not be zero - so change it to min 0.2 if it is
+                        if (this.id=="q" && this.value<=0) this.value=0.1;
+
+                        // Freq can not be less than 3 - so change it to min 3 if it is
+                        if (this.id=="frequency" && this.value<=3) this.value=3;
+                        
                         e.preventDefault();
                         this.dispatchEvent(new Event("change"));
                     })
 
                     elem.addEventListener("dblclick",e=>{e.target.value=0;e.target.dispatchEvent(new Event("change"));});
+                    elem.value=1;
                     break;
                 case "bool":
                     elem = document.createElement("input"); 
                     elem.setAttribute("type","checkbox");
-                    elem.id=Object.keys(param)[0].toLowerCase();
+                    elem.id=Object.keys(param)[0].toLowerCase();                                        
+                    elem.checked=false;                                
                     break;
                 case "text":
                     elem = document.createElement("input"); 
-                    elem.setAttribute("type","text");
-                    elem.value="";
+                    elem.setAttribute("type","text");                    
                     elem.id=Object.keys(param)[0].toLowerCase();
+                    elem.value="";
                     break;
                 case "array":
                     elem = document.createElement("input"); 
-                    elem.setAttribute("type","text");
-                    elem.value=0;
+                    elem.setAttribute("type","text");                    
                     elem.id=Object.keys(param)[0].toLowerCase();
+                    elem.value="";
                     break;
                 default:
                     elem = document.createElement("select"); 
                     elem.id = Object.keys(param)[0];
+                    let i=0;
                     for (let opt of Object.values(param)[0]) {                            
                         let o = document.createElement("option");
-                        o.innerText=opt;o.setAttribute("value",opt);    
+                        o.innerText=opt;o.setAttribute("value",opt);                            
                         elem.appendChild(o);
+                        if (i==0) elem.value=opt;
+                        i++;
                     }
+                    
+            }            
+
+            let paramName = Object.keys(param)[0].toLowerCase().replace(" ","_");                        
+            if (paramName=="frequency") paramName="freq";
+            if (paramName=="filtersubtype") paramName="type";         
+            // console.log("Param :", paramName,"Filter val : ",this.parameters[paramName]," Element Val : ",elem.value," Type :",typeof(elem.value))
+            
+            if (this.parameters[paramName]!=undefined) {                
+                if (elem.type=="checkbox") elem.checked = this.parameters[paramName]; else elem.value=this.parameters[paramName]; 
+            } else {                                
+                if (elem.value!=undefined) this.parameters[paramName]=elem.value;                                
             }
 
-            // Correct parameter names from UI friendly to DSP correct name
-            let paramText = Object.keys(param)[0].toLowerCase().replace(" ","_");
-            if (paramText=="frequency") paramText="freq";
-            if (paramText=="filtersubtype") paramText="type";         
-            this.parameters[paramText]!=undefined
-            
-            if (oldParams[paramText]!=undefined) this.parameters[paramText]=oldParams[paramText];
-            if (this.parameters[paramText]!=undefined) elem.value=this.parameters[paramText];             
             elem.addEventListener("change",this.updateEventHandler);
             peqParams.appendChild(elem);
         }
                 
-        //  console.log("peqParams :",peqParams.childNodes)
+        // console.log("peqParams :",this.parameters)
         this.elementCollection.peqParams=peqParams;
     }
 
-    async updateEventHandler(e) {
-        let peqElement;
-        if (e.target.className=='peqElement') peqElement=e.target;
-        if (e.target.parentElement.className=='peqElement') peqElement=e.target.parentElement;
-        if (e.target.parentElement.parentElement.className=='peqElement') peqElement=e.target.parentElement.parentElement;
 
-        let id = e.target.id;
+    setType(type) {
+        this.type=type;
+        let subType;
+        if (this.basic) subType = "Peaking"; else this.getFilterSubTypes(type)[0];                
+        this.setSubType(subType);        
+    }
+
+    setSubType(subType) {        
+        if (this.parameters.type==subType) return;
+
+        if (this.elementCollection.filterSubType!=undefined) this.elementCollection.filterSubType.value = subType;        
+
+        let type = this.type;        
+        let oldParameters = this.parameters;
+        this.parameters={};
+        this.parameters.type=subType;
+
+        let params =  filter.filterParamsTemplate(type,subType);
+        for (let param of params) {
+            let paramName = Object.keys(param)[0].toLowerCase().replace(" ","_");                        
+            if (paramName=="frequency") paramName="freq";
+            if (paramName=="filtersubtype") paramName="type";         
+            let paramType = Object.values(param)[0];
+
+            // If old value exists, use it, if not set to default
+            if (oldParameters[paramName]!=undefined) 
+                this.parameters[paramName]=oldParameters[paramName];
+            else {
+                switch (paramType) {
+                    case "num":
+                        let val;
+                        if (paramName=="freq") val=3146;
+                        if (paramName=="gain") val=0;
+                        if (paramName=="q") val=1.41;
+                        this.parameters[paramName]=val;
+                        break;
+                    case "bool":
+                        this.parameters[paramName]=false;
+                        break;
+                    case "text":
+                        this.parameters[paramName]="";
+                        break;
+                    case "array":
+                        this.parameters[paramName]="";                    
+                        break;
+                    default:
+                        this.parameters[paramName]=paramType[0];                    
+                        break;
+                }     
+            }       
+        }
+
+
+        // console.log("setSubType parameters ",this.parameters);
+    }
+
+
+
+    async updateEventHandler(e) {
+        // console.log(e.target,e.target.parentElement,e.target.parentElement.parentElement)
+        let peqElement;
+        if (e.target.classList.contains('peqElement')) peqElement=e.target;
+        if (e.target.parentElement.classList.contains('peqElement')) peqElement=e.target.parentElement;
+        if (e.target.parentElement.parentElement.classList.contains('peqElement')) peqElement=e.target.parentElement.parentElement;
+
+        
+        let id = e.target.id.toLowerCase();
         let value = e.target.value;
 
         if (value.length==0) { 
@@ -219,10 +294,7 @@ class filter {
             e.target.value=0;
         }
 
-        if (peqElement.filter.loading) return;
-
-        let basic = (peqElement.getAttribute("basic")=="true");
-        // console.log("Filter basic?",basic)
+        if (peqElement.filter.loading) return;        
 
         console.log("peqUpdate : ",id, value)
         switch (id) {
@@ -232,25 +304,40 @@ class filter {
                 peqElement.filter.description = value;
                 break;
             case "filterType":
-                peqElement.filter.type = value
-                peqElement.filter.updateSubTypes(basic);
-                peqElement.filter.updateParams();                
+                peqElement.filter.setType(value)                
+                peqElement.filter.createSubTypesElement();                
                 break;
-            case "filterSubType":
-                peqElement.filter.parameters.type = value                    
-                peqElement.filter.updateParams();                
+            case "filterSubType":                
+                peqElement.filter.setSubType(value)                           
+                peqElement.filter.createParamsElement();               
                 break;
             default:
+                
                 let val;
                 if (id=="frequency") id="freq";
                 if (id=="filtersubtype") id="type";                
                 if (!isNaN(parseFloat(value))) val = parseFloat(value); else val = value;
+                if (isBoolean(value)) val = Boolean(value);                        
                 peqElement.filter.parameters[id]= val;
+        }             
+
+
+        function isBoolean(valueToCheck) {
+            return valueToCheck==true?true:valueToCheck==false?true:valueToCheck=="true"?true:valueToCheck=="false"?true:false;
         }
 
-        console.log("Updated >>> ", peqElement.filter.elementCollection)
+
+        // Update config 
+        
+        DSP.config.filters[peqElement.filter.name].description=peqElement.filter.description;
+        DSP.config.filters[peqElement.filter.name].type=peqElement.filter.type;
+        DSP.config.filters[peqElement.filter.name].parameters=peqElement.filter.parameters
+
+        console.log("peqElement filter config :",DSP.config.filters[peqElement.filter.name])
+
         peqElement.dispatchEvent(new Event("updated"));
-        await peqElement.filter.updateDSP();
+
+        await DSP.uploadConfig();
     }
 
     async updateDSP() {                
@@ -361,6 +448,7 @@ class filter {
                 if (filterSubType=="Peaking" || filterSubType=="Highshelf" || filterSubType=="Lowshelf") return [{"Frequency":"num"},{"Gain":"num"},{"Q":"num"}];
                 if (filterSubType=="LinkwitzTransform") return [{"Actual F":"num"},{"Actual Q":"num"},{"Target F":"num"},{"Target Q":"num"}];
                 if (filterSubType=="Tilt") return [{"Gain":"num"}]
+
             case Types.Dither:
                 return [{"Type":["None","Flat","Highpass","Fweigthed441","Shibata48"]},{"Bits":["16"]}] ;
 

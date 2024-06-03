@@ -227,6 +227,8 @@ class camillaDSP {
         }
         if (debugLevel=='high') console.log("Upload >>> ",this.config);
 
+        this.cleanFilters();
+
         return new Promise((res,rej)=>{
             this.sendDSPMessage({"SetConfigJson":JSON.stringify(this.config)}).then(r=>{
                 res(true);                
@@ -701,6 +703,34 @@ class camillaDSP {
         // convert to yaml at server
         // run validate
         // return result
+    }
+
+    cleanFilters() {
+        // Changes to string booleans to boolean and string numbers to numbers
+        let filterList = Object.keys(this.config.filters);
+        // console.log("Filterlist ",filterList)
+        for (let filterName of filterList) {
+            // console.log("Filter name : ",filterName)
+            let paramList = Object.keys(this.config.filters[filterName].parameters);
+            // console.log("Param list : ",paramList)
+            for (let paramName of paramList) {
+                let val = this.config.filters[filterName].parameters[paramName];
+                if (val==null) continue;
+                if (isBoolean(val)) this.config.filters[filterName].parameters[paramName]=Boolean(val);
+                if (isNumber(val)) this.config.filters[filterName].parameters[paramName]=parseFloat(val);
+
+                // console.log("Name : ", paramName,"\tValue : ", val, "\tBool :",isBoolean(val),"\tNumber :",isNumber(val))
+            }
+        }
+
+        function isBoolean(valueToCheck) {
+            return valueToCheck==true?true:valueToCheck==false?true:valueToCheck=="true"?true:valueToCheck=="false"?true:false;
+        }
+
+        function isNumber(valueToCheck) {
+            return !isNaN(parseFloat(valueToCheck));
+        }
+
     }
 }
 

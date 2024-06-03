@@ -14,11 +14,15 @@ async function mainBodyOnLoad() {
         updateActions(this.getAttribute('src').replace("/",""));        
     })
 
+
+    // Connect to camillaDSP
+    await conectToDSP();
+
     // Find all navigate items and add event handler to change them to links to their target attribute        
     const navigates = document.getElementsByClassName("navigate");    
     for (i=0;i<navigates.length;i++) {        
         navigates[i].addEventListener('click',function (){ 
-            let target =this.getAttribute('target')
+            let target =this.getAttribute('target')            
             if (target.length>0) window.mainframe.src=target;             
         })
     }    
@@ -27,8 +31,7 @@ async function mainBodyOnLoad() {
     let indicators = document.getElementById("indicators")
     // if (indicators!=null) indicators.style = 'display:none'
 
-    // Connect to camillaDSP
-    await conectToDSP();
+
 
     // Load & Apply preferences
     window.parent.activeSettings = window.preferences.getPreferences();
