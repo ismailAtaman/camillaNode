@@ -18,7 +18,7 @@ class camillaDSP {
     upperMidsFreq=3000;
     trebleFreq=8000;
 
-    DCProtectionFilter = {"__DCProFilter":{"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":7,"q":0.7}}};
+    DCProtectionFilter = {"__DCProFilter":{"type":"Biquad","description":"DC Protection Filter","parameters":{"type":"Highpass","freq":5,"q":1}}};
     Limiter = {"__Limiter":{"type":"Limiter","parameters":{"clip_limit":-3}}};
     defaultMixer = {"recombine":{
         "description":"CamillaNode Default Mixer",
@@ -28,7 +28,8 @@ class camillaDSP {
             {"dest":1,"sources":[{"channel":1,"gain":0,"inverted":false,"mute":false,"scale":"dB"},{"channel":0,"gain":0,"inverted":false,"mute":true,"scale":"dB"}],"mute":false}
             ]
         }
-    };      
+    };     
+     
     defaultPipeline = [
         {          
             "type": "Mixer",

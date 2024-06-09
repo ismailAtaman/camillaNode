@@ -196,29 +196,32 @@ function loadFilters(element,config,channelCount) {
         
         let channelPipeline = pipeline.filter(function(p){ return (p.type=="Filter" && p.channel==channelNo) });        
         for (let filterName of channelPipeline[0].names) {            
-            let filterElement = loadFilter(filterName,channelNo)
+            let filterElement = loadFilter(filterName)
             filterChannel.appendChild(filterElement);
         }
         element.appendChild(filterChannel);        
     }
 }
 
-function loadFilter(filterName, channelNo ) {
-    let filter = window.parent.DSP.createFilter(filterName,channelNo);    
+function loadFilter(filterName) {
+    let filter = new window.filter(window.parent.DSP)
+    filter.loadFromDSP(filterName);
     return createFilterElement(filter);    
 }
 
 function createFilterElement(currentFilter) {
-    currentFilter.createElement(false);            
+    currentFilter.createElementCollection(false);            
 
-    let peqElement = document.getElementById(currentFilter.name);    
-    if (peqElement.className!="peqElement") peqElement=undefined;
-    if (peqElement==undefined) peqElement = document.createElement('div');     
+    // let peqElement = document.getElementById(currentFilter.getName());    
+    // if (peqElement.className!="peqElement") peqElement=undefined;
+    //if (peqElement==undefined) 
 
+    let peqElement = document.createElement('div');     
     peqElement.remove();
 
-    peqElement.filter=currentFilter; peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.name);
-    peqElement.setAttribute("id",currentFilter.name);
+    peqElement.filter=currentFilter.filter; 
+    peqElement.className="peqElement"; peqElement.setAttribute("configName",currentFilter.getName());
+    peqElement.setAttribute("id",currentFilter.getName());
     peqElement.setAttribute("basic",false);
         
     let filterBasic = document.createElement('div'); 
@@ -245,12 +248,12 @@ function createFilterElement(currentFilter) {
     peqElement.appendChild(filterBasic);
     
     // Disable updates with wheel as interferes with scrolling
-    if (currentFilter.elementCollection.peqParams.children["frequency"]!=undefined) 
-        currentFilter.elementCollection.peqParams.children["frequency"].setAttribute("wheel","disabled")
-    if (currentFilter.elementCollection.peqParams.children["gain"]!=undefined) 
-        currentFilter.elementCollection.peqParams.children["gain"].setAttribute("wheel","disabled")
-    if (currentFilter.elementCollection.peqParams.children["q"]!=undefined) 
-        currentFilter.elementCollection.peqParams.children["q"].setAttribute("wheel","disabled")
+    if (currentFilter.elementCollection.peqParams.children["Frequency"]!=undefined) 
+        currentFilter.elementCollection.peqParams.children["Frequency"].setAttribute("wheel","disabled")
+    if (currentFilter.elementCollection.peqParams.children["Gain"]!=undefined) 
+        currentFilter.elementCollection.peqParams.children["Gain"].setAttribute("wheel","disabled")
+    if (currentFilter.elementCollection.peqParams.children["Q"]!=undefined) 
+        currentFilter.elementCollection.peqParams.children["Q"].setAttribute("wheel","disabled")
 
     peqElement.appendChild(currentFilter.elementCollection.peqParams);       
         

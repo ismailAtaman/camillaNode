@@ -295,10 +295,11 @@ function sortByFreq(parent) {
             }                
         })
     parent.innerHTML='';    
-    // console.log(elementArray);
+
 
     function compareLines(a,b) {    
-        return parseInt(a.filter.getParameters.freq) - parseInt(b.filter.getParameters.freq);                
+        
+        return parseInt(a.filter.getParameters().freq) - parseInt(b.filter.getParameters().freq);                
     }
 
     elementArray=elementArray.sort(compareLines);            
