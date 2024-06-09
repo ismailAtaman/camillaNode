@@ -8,7 +8,52 @@
 
 <script type="module">
     import camillaDSP from "/src/camillaDSP.js"
-    window.DSP = new camillaDSP();
+    import Filter from "/src/filter.js"        
+    window.filter = new Filter(window.parent.DSP);
+    onload();
+
+    
+</script>
+
+<script>
+    function onload() {
+        let filter = window.filter;
+        
+        // console.log(filter.filterElement)
+        filter.loadFromDSP("bass")
+        filter.createElementCollection()
+        let temp = document.getElementById("temp");
+
+        let filterType = filter.elementCollection.filterType;
+        let filterSubType = filter.elementCollection.filterSubType;
+        let peqParams = filter.elementCollection.peqParams;
+
+        filterType.addEventListener("change",function(){            
+            let subtype = document.getElementById("subType");            
+            this.filter.createSubTypeElement();            
+            temp.insertBefore(filter.elementCollection.filterSubType,subtype)
+            temp.removeChild(subtype);         
+
+            let params = document.getElementsByClassName("peqParams")[0];            
+            this.filter.createParamsElement();            
+            temp.insertBefore(filter.elementCollection.peqParams,params)
+            temp.removeChild(params);   
+        });
+        
+        temp.addEventListener("change",function(e){                        
+            if (e.target.id=="subType") {
+                let params = document.getElementById("peqParams");            
+                e.target.filter.createParamsElement();            
+                temp.insertBefore(e.target.filter.elementCollection.peqParams,params)
+                temp.removeChild(params);
+            }
+        })
+
+        temp.appendChild(filterType)
+        temp.appendChild(filterSubType)
+        temp.appendChild(peqParams)
+
+    }
 </script>
 
 <style>
@@ -17,6 +62,7 @@
 
 <body>
     <div id="sectionMainTitle"><img src="img/icon/room.png" class="icon">Room EQ</div>
+    <div id="temp"></div>
 </body>
 
 </html>

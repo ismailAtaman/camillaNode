@@ -15,8 +15,10 @@
         import camillaDSP from "/src/camillaDSP.js";       
         import EQKnob from '/src/knob.js';
         import plot from '/src/eqplot.js';        
-        import savedConfigs from "/src/savedConfigs.js";        
-        
+        import savedConfigs from "/src/savedConfigs.js";     
+        import filter from "/src/filter.js"        
+    
+        window.filter = filter;
         window.savedConfigs = new savedConfigs();                
         window.camillaDSP = camillaDSP;                        
         window.EQKnob=EQKnob;

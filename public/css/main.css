@@ -537,7 +537,7 @@ select {
     margin-right: 10px;
 }
 
-#filterType, #filterSubType {
+.filterType, .filterSubType {
     width: 100px;
 }
 

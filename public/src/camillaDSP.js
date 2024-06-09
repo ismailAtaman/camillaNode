@@ -718,6 +718,8 @@ class camillaDSP {
                 if (val==null) continue;
                 if (isBoolean(val)) this.config.filters[filterName].parameters[paramName]=Boolean(val);
                 if (isNumber(val)) this.config.filters[filterName].parameters[paramName]=parseFloat(val);
+                if (val=="on") this.config.filters[filterName].parameters[paramName]=true;
+                if (val=="off") this.config.filters[filterName].parameters[paramName]=false;
 
                 // console.log("Name : ", paramName,"\tValue : ", val, "\tBool :",isBoolean(val),"\tNumber :",isNumber(val))
             }

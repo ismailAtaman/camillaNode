@@ -1,3 +1,4 @@
+
 const Types = {
     Gain : "Gain",
     Volume: "Volume",
@@ -9,68 +10,168 @@ const Types = {
     Limiter:"Limiter"
 }
 
-
 class filter {
-    name;
-    description;
-    type;    
-    parameters={}    
-    channel;
-    DSP;
-    filterElement;
+    DSP = {}; 
+    basic=false;       
+    filterElement ={"DefaultFilterName":{"type":"Biquad","description":"Default filter","parameters":{
+        "type": "Peaking",
+        "freq": 1000,
+        "q": 1.41,
+        "gain": 0
+    }}}
     elementCollection={};
-    loading=false;
-    basic=false;
-    
-    
 
-    constructor(name,filter) {                        
-        
-        if (name==undefined) name=new Date().getTime().toString().substring(8);
-        this.name = name;
-        this.description=filter.description;        
-        this.type=filter.type;
-        this.parameters=filter.parameters;                 
-        this.createElement();
+
+    constructor(dsp) {
+        this.DSP=dsp;
         return this;
     }
 
-    createElement(basic) {
+    newFilter() {
+
+    }
+
+    getName() {
+        return Object.keys(this.filterElement)[0];
+    }
+
+    getDescription() {
+        let name = this.getName();
+        return this.filterElement[name].description;
+    }
+
+    getType() {
+        let name = this.getName();
+        return this.filterElement[name].type;
+    }
+
+    getSubType() {
+        let name = this.getName();
+        return this.filterElement[name].parameters.type;
+    }
+
+    setFilterParameter(parameter,value) {
+        let filterName = this.getName();
+        let paramName=parameter.toLowerCase().replace(" ","_");
+        if (paramName=="frequency") paramName="freq";
+        switch (paramName) {
+            case "name":
+                let filterBody = this.filterElement[filterName];
+                this.filterElement={};
+                this.filterElement[value]=filterBody;                
+                break;
+            case "description":
+                this.filterElement[filterName].description=value;                
+                break;
+            case "type":
+                this.filterElement[filterName].type=value;
+                let subTypes = this.getFilterSubTypes();                 
+                this.setFilterParameter("subType",subTypes[0])                
+                break;
+            case "subtype":
+                this.filterElement[filterName].parameters={};
+                if (value!=undefined) if (value.length>0) this.filterElement[filterName].parameters.type=value;                                
+                let params = this.getFilterParams();                
+                params.forEach(param=>{                                    
+                    let paramName = Object.keys(param)[0];
+                    let paramType = param[paramName]; 
+                    paramName=paramName.toLowerCase().replace(" ","_");                    
+                    if (paramName=="frequency") paramName="freq";
+                    console.log("setFilterParams name and type :",paramName,paramType);
+                    switch (paramType) {
+                        case "num":                        
+                            let val=0;                            
+                            if (paramName.toLowerCase().includes("q")) val=1.41;
+                            if (paramName.toLowerCase().includes("freq")) val=100;
+                            this.filterElement[filterName].parameters[paramName]=val;
+                            break;
+                        case "bool":
+                            this.filterElement[filterName].parameters[paramName]=false;
+                            break;
+                        case "text":
+                            this.filterElement[filterName].parameters[paramName]="";
+                            break;
+                        case "array":
+                            this.filterElement[filterName].parameters[paramName]=""
+                            break;
+                        default:
+                            this.filterElement[filterName].parameters[paramName]=Object.values(paramType)[0];                            
+                    }                         
+                })                
+                
+                break;                
+            default:                
+                if (value=="true") value=true;
+                if (value=="false") value=false;
+                this.filterElement[filterName].parameters[paramName]=value;            
+        }       
+        // console.log(parameter,value) 
+        // console.log(this.filterElement[filterName].parameters);
+        
+        this.loadToDSP();
+    }
+
+    getFilterParameter(parameter) {
+        let filterName = this.getName();
+        let paramName=parameter.toLowerCase().replace(" ","_");
+        if (paramName=="frequency") paramName="freq";
+        switch (paramName) {
+            case "name":
+                return this.getName()                
+            case "description":
+                return this.getDescription();                
+            case "type":
+                return this.getType();                
+            case "subtype":
+                return this.getSubType();                
+            default:
+                return this.filterElement[filterName].parameters[paramName];
+        }             
+    }
+
+    getParameters() {
+        let name = this.getName();
+        return this.filterElement[name].parameters;
+    }
+
+    async loadFromDSP(filterName) {
+        this.filterElement={};
+        this.filterElement[filterName] = this.DSP.config.filters[filterName];
+    }
+
+    loadToDSP() {        
+        let filterName = this.getName();
+        this.DSP.config.filters[filterName]=this.filterElement[filterName];
+    }    
+
+    async uploadToDSP() {
+        await this.DSP.uploadConfig();
+    }
+
+    createElementCollection(basic) {
         if (basic==undefined) basic=false;
         this.loading=true;
         this.basic=basic;
         this.elementCollection={};
 
-        const filterName = document.createElement('input');        
-        filterName.className="filterName"; filterName.value=this.name; filterName.id="filterName";
-        filterName.addEventListener("change",this.updateEventHandler);
-        this.elementCollection.filterName=filterName;        
+        this.elementCollection.filter=this;
 
-        const filterDesc = document.createElement('input');
-        filterDesc.className="filterDesc"; filterDesc.value=this.description; 
-        filterDesc.addEventListener("change",this.updateEventHandler);
-        this.elementCollection.filterDesc=filterDesc;        
+        // Name
+        this.createNameElement();  
 
-        const filterType = document.createElement('select');
-        filterType.className="filterType"; filterType.setAttribute("id","filterType");       
-        for (let type of Object.keys(Types)) {
-            if (this.basic && (type!="Biquad")) continue;
-            let opt = document.createElement("option");
-            opt.setAttribute("value",type); opt.innerText=type;
-            filterType.appendChild(opt);
-        }
+        // Description
+        this.createDescriptionElement();
 
-        filterType.value=this.type;
-        filterType.addEventListener("change",this.updateEventHandler);
-        this.elementCollection.filterType=filterType;        
+        // Type
+        this.createTypeElement();
 
-        this.createSubTypesElement();
+        // Sub-type       
+        this.createSubTypeElement();
+
+        // Parameters
         this.createParamsElement();
 
-        
-        
-
-        // Add buttons 
+        // Add button 
         const addButton = document.createElement('div'); 
         addButton.className="peqNavigate"; addButton.setAttribute("target","");
         addButton.style = "width: max-content; margin-left: 20px;";
@@ -89,7 +190,7 @@ class filter {
         })
         this.elementCollection.addButton = addButton;
 
-
+        // Remove button
         const removeButton = document.createElement('div'); 
         removeButton.className="peqNavigate"; removeButton.setAttribute("target","");
         removeButton.style = "width: max-content;"
@@ -108,43 +209,91 @@ class filter {
         })
 
         this.elementCollection.removeButton = removeButton;
-        this.loading=false;
-        
+              
     }
 
-    createSubTypesElement() {
+
+    createNameElement() {
+        const filterName = document.createElement('input');        
+        filterName.className="filterName"; filterName.value=this.getName(); filterName.id="name";        
+        this.elementCollection.filterName=filterName;       
+    }
+
+    createDescriptionElement() {
+        const filterDesc = document.createElement('input');
+        filterDesc.className="filterDesc"; filterDesc.value=this.getDescription(); filterDesc.id = "description"
+        //filterDesc.addEventListener("change",this.updateEventHandler);
+        this.elementCollection.filterDesc=filterDesc;       
+    }
+
+    createTypeElement() {
+        const filterType = document.createElement('select');
+        filterType.className="filterType"; filterType.id= "type";
+        for (let type of Object.keys(Types)) {
+            if (this.basic && (type!="Biquad")) continue;
+            let opt = document.createElement("option");
+            opt.setAttribute("value",type); opt.innerText=type;
+            filterType.appendChild(opt);
+        }
+        filterType.value=this.getType();        
+        filterType.filter = this;
+        filterType.addEventListener("change",async function(){            
+            this.filter.setFilterParameter(this.id,this.value);
+            this.filter.createSubTypeElement();            
+            this.filter.elementCollection.filterSubType.dispatchEvent(new Event("change"));
+            await this.filter.uploadToDSP();
+        });
+        this.elementCollection.filterType=filterType;
+    }
+
+    createSubTypeElement() {
         let basicTypes = ["Highshelf","Lowshelf","Peaking"]        
 
         const filterSubType = document.createElement("select");
-        filterSubType.className="filterType"; filterSubType.setAttribute("id","filterSubType");
+        filterSubType.className="filterType"; filterSubType.id= "subType";
 
-        for (let subType of this.getFilterSubTypes(this.type)) {                        
+        for (let subType of this.getFilterSubTypes()) {                        
             if (this.basic && !basicTypes.includes(subType)) continue;
             let opt = document.createElement("option");
             opt.setAttribute("value",subType); opt.innerText=subType;
             filterSubType.appendChild(opt);
         }
-        
-        filterSubType.addEventListener("change",this.updateEventHandler);
-        if (this.parameters.type!=undefined) filterSubType.value=this.parameters.type;
-        this.elementCollection.filterSubType=filterSubType;        
+
+        filterSubType.value=this.getSubType();
+        filterSubType.filter = this;
+        filterSubType.addEventListener("change",async function(){            
+            this.filter.setFilterParameter(this.id,this.value);
+            this.filter.createParamsElement();            
+            await this.filter.uploadToDSP();
+            
+        });
+        if (filterSubType.children.length==0) filterSubType.style.display="none"; else filterSubType.style.display="unset";
+        this.elementCollection.filterSubType=filterSubType;       
     }
 
     createParamsElement() {        
-        // this.elementCollection.peqParams={}
         const peqParams=document.createElement('div');
-        peqParams.setAttribute("id","peqParams"); peqParams.className="peqParams";
-        let elem;
+        peqParams.className="peqParams";
+        peqParams.id = "peqParams";
+        
+        let params = this.getFilterParams();        
+        0
+        params.forEach(param=>{
+            // console.log("Param",param)
+            let paramName = Object.keys(param)[0];
+            let paramType = param[paramName];            
 
-        // console.log("Type ",this.type,"Subtype ",this.parameters.type)
-        for (let param of filter.filterParamsTemplate(this.type,this.parameters.type)) { 
-            let title=document.createElement("span"); title.innerText=Object.keys(param)[0]+" :";
-            peqParams.appendChild(title);
-            switch (Object.values(param)[0]) {
+            // Add the title 
+            let titleElement = document.createElement("span"); titleElement.innerText= paramName;
+            peqParams.appendChild(titleElement);
+            let elem;
+            // console.log("Name",paramName,"Type : ",paramType)
+
+            switch (paramType) {
                 case "num":
                     elem = document.createElement("input"); 
                     elem.setAttribute("type","text");                    
-                    elem.id=Object.keys(param)[0].toLowerCase();
+                    elem.id=paramName;
 
                     elem.addEventListener("wheel",function(e){                        
                         if (this.getAttribute("wheel")=="disabled") return;
@@ -166,254 +315,62 @@ class filter {
                     })
 
                     elem.addEventListener("dblclick",e=>{e.target.value=0;e.target.dispatchEvent(new Event("change"));});
-                    elem.value=1;
+                    
                     break;
                 case "bool":
                     elem = document.createElement("input"); 
                     elem.setAttribute("type","checkbox");
-                    elem.id=Object.keys(param)[0].toLowerCase();                                        
+                    elem.id=paramName;                             
                     elem.checked=false;                                
                     break;
                 case "text":
                     elem = document.createElement("input"); 
                     elem.setAttribute("type","text");                    
-                    elem.id=Object.keys(param)[0].toLowerCase();
+                    elem.id=paramName;
                     elem.value="";
                     break;
                 case "array":
                     elem = document.createElement("input"); 
                     elem.setAttribute("type","text");                    
-                    elem.id=Object.keys(param)[0].toLowerCase();
+                    elem.id=paramName;
                     elem.value="";
                     break;
                 default:
                     elem = document.createElement("select"); 
-                    elem.id = Object.keys(param)[0];
+                    elem.id = paramName;
                     let i=0;
-                    for (let opt of Object.values(param)[0]) {                            
+                    for (let opt of Object.values(paramType)) {                            
                         let o = document.createElement("option");
                         o.innerText=opt;o.setAttribute("value",opt);                            
                         elem.appendChild(o);
                         if (i==0) elem.value=opt;
                         i++;
-                    }
-                    
-            }            
+                }                    
+            }   
 
-            let paramName = Object.keys(param)[0].toLowerCase().replace(" ","_");                        
-            if (paramName=="frequency") paramName="freq";
-            if (paramName=="filtersubtype") paramName="type";         
-            // console.log("Param :", paramName,"Filter val : ",this.parameters[paramName]," Element Val : ",elem.value," Type :",typeof(elem.value))
-            
-            if (this.parameters[paramName]!=undefined) {                
-                if (elem.type=="checkbox") elem.checked = this.parameters[paramName]; else elem.value=this.parameters[paramName]; 
-            } else {                                
-                if (elem.value!=undefined) this.parameters[paramName]=elem.value;                                
-            }
+            elem.value=this.getFilterParameter(paramName);
+            elem.filter=this;
+            elem.addEventListener("change",async function(){
+                let val = this.value;
+                if (this.type=="checkbox") val = this.checked;
+                this.filter.setFilterParameter(this.id,val);
+                this.parentElement.parentElement.dispatchEvent(new Event("updated"));
+                await this.filter.uploadToDSP();
 
-            elem.addEventListener("change",this.updateEventHandler);
+            })
             peqParams.appendChild(elem);
-        }
-                
-        // console.log("peqParams :",this.parameters)
-        this.elementCollection.peqParams=peqParams;
+
+        })
+        this.elementCollection.peqParams=peqParams;       
+
     }
 
-
-    setType(type) {
-        this.type=type;
-        let subType;
-        if (this.basic) subType = "Peaking"; else this.getFilterSubTypes(type)[0];                
-        this.setSubType(subType);        
-    }
-
-    setSubType(subType) {        
-        if (this.parameters.type==subType) return;
-
-        if (this.elementCollection.filterSubType!=undefined) this.elementCollection.filterSubType.value = subType;        
-
-        let type = this.type;        
-        let oldParameters = this.parameters;
-        this.parameters={};
-        this.parameters.type=subType;
-
-        let params =  filter.filterParamsTemplate(type,subType);
-        for (let param of params) {
-            let paramName = Object.keys(param)[0].toLowerCase().replace(" ","_");                        
-            if (paramName=="frequency") paramName="freq";
-            if (paramName=="filtersubtype") paramName="type";         
-            let paramType = Object.values(param)[0];
-
-            // If old value exists, use it, if not set to default
-            if (oldParameters[paramName]!=undefined) 
-                this.parameters[paramName]=oldParameters[paramName];
-            else {
-                switch (paramType) {
-                    case "num":
-                        let val;
-                        if (paramName=="freq") val=3146;
-                        if (paramName=="gain") val=0;
-                        if (paramName=="q") val=1.41;
-                        this.parameters[paramName]=val;
-                        break;
-                    case "bool":
-                        this.parameters[paramName]=false;
-                        break;
-                    case "text":
-                        this.parameters[paramName]="";
-                        break;
-                    case "array":
-                        this.parameters[paramName]="";                    
-                        break;
-                    default:
-                        this.parameters[paramName]=paramType[0];                    
-                        break;
-                }     
-            }       
-        }
-
-
-        // console.log("setSubType parameters ",this.parameters);
-    }
-
-
-
-    async updateEventHandler(e) {
-        // console.log(e.target,e.target.parentElement,e.target.parentElement.parentElement)
-        let peqElement;
-        if (e.target.classList.contains('peqElement')) peqElement=e.target;
-        if (e.target.parentElement.classList.contains('peqElement')) peqElement=e.target.parentElement;
-        if (e.target.parentElement.parentElement.classList.contains('peqElement')) peqElement=e.target.parentElement.parentElement;
-
-        
-        let id = e.target.id.toLowerCase();
-        let value = e.target.value;
-
-        if (value.length==0) { 
-            value=0;
-            e.target.value=0;
-        }
-
-        if (peqElement.filter.loading) return;        
-
-        console.log("peqUpdate : ",id, value)
-        switch (id) {
-            case "filterName":                               
-                break;
-            case "filterDesc":
-                peqElement.filter.description = value;
-                break;
-            case "filterType":
-                peqElement.filter.setType(value)                
-                peqElement.filter.createSubTypesElement();                
-                break;
-            case "filterSubType":                
-                peqElement.filter.setSubType(value)                           
-                peqElement.filter.createParamsElement();               
-                break;
-            default:
-                
-                let val;
-                if (id=="frequency") id="freq";
-                if (id=="filtersubtype") id="type";                
-                if (!isNaN(parseFloat(value))) val = parseFloat(value); else val = value;
-                if (isBoolean(value)) val = Boolean(value);                        
-                peqElement.filter.parameters[id]= val;
-        }             
-
-
-        function isBoolean(valueToCheck) {
-            return valueToCheck==true?true:valueToCheck==false?true:valueToCheck=="true"?true:valueToCheck=="false"?true:false;
-        }
-
-
-        // Update config 
-        
-        DSP.config.filters[peqElement.filter.name].description=peqElement.filter.description;
-        DSP.config.filters[peqElement.filter.name].type=peqElement.filter.type;
-        DSP.config.filters[peqElement.filter.name].parameters=peqElement.filter.parameters
-
-        console.log("peqElement filter config :",DSP.config.filters[peqElement.filter.name])
-
-        peqElement.dispatchEvent(new Event("updated"));
-
-        await DSP.uploadConfig();
-    }
-
-    async updateDSP() {                
-        DSP.config.filters[this.name].description=this.description;
-        DSP.config.filters[this.name].type=this.type;
-        DSP.config.filters[this.name].parameters=this.parameters
-        await DSP.uploadConfig();        
-    }
-
-    static getParams(element) {
-        let filterObject = {};
-        convertNodeToObject(element, filterObject)
-        // console.log(filterObject);        
-        
-        function convertNodeToObject(node, returnObject) {            
-            let val;       
-            if (node.id==undefined) return;
-            switch (node.tagName) {
-                case "SPAN":
-                    break;
-                case "DIV":
-                    val = node.innerText;                    
-                case "INPUT":                                      
-                    if (node.type=="checkbox") val = node.checked; else val = node.value;
-                    break;
-                case "SELECT":                    
-                    val = node.value;
-                    break;
-                case "OPTION":
-                    break;
-                default:
-                    console.error("filter.getParams error. Tag yype not defined. ",node.tagName);  
-                    break;
-            }            
-            
-            returnObject[node.id] = val;            
-            if (val== undefined) delete returnObject[node.id];
-            if (!isNaN(parseFloat(val))) returnObject[node.id]= parseFloat(val);            
-
-            for (let child of node.children) convertNodeToObject(child,returnObject);            
-        }
-        return filterObject;
-            
-        
-    }
-
-    createFilterJson(filterName,filterType,filterParams) {
-        let filterJson = {}       
-        
-        // console.log(filterParams);
-        let parameters={}
-        for (let paramName of Object.keys(filterParams)) {                        
-            if (paramName=="filterName" || paramName=="filterType") continue;
-            
-            let paramVal= filterParams[paramName];
-            let paramText = paramName.toLowerCase().replace(" ","_");
-
-            if (paramText=="frequency") paramText="freq";
-            if (paramText=="filtersubtype") paramText="type";
-            parameters[paramText]=paramVal;
-        }
-
-
-        filterJson[filterName]={"type":filterType,"parameters":parameters}
-        return filterJson;
-    }
-
-    getFilterTypes() {
-        return ["Gain","Biquad","Conv","Delay"];
-    }
-
-    getFilterSubTypes(filterType) {        
+    getFilterSubTypes() {        
+        let filterType = this.getType();
         switch (filterType) {
             case Types.Biquad:
                 // return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "HighpassFO", "LowpassFO", "HighshelfFO", "LowshelfFO", "Notch", "Allpass", "Bandpass", "AllpassFO", "Tilt", "LinkwitzTransform"]                  
-                return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "Allpass", "Bandpass", "Tilt", "LinkwitzTransform"]                  
+                return ["Free", "Highpass", "Lowpass", "Peaking", "Highshelf", "Lowshelf", "Allpass", "Bandpass", "LinkwitzTransform"]                  
             case Types.Conv:
                 return ["Raw","Wav","Values"];
             default:
@@ -421,9 +378,13 @@ class filter {
         }        
     }
 
+    getFilterParams() {
+        let type = this.getType();
+        let subType = this.getSubType();
 
-    static filterParamsTemplate(filterType, filterSubType) {
-        switch (filterType) {
+        // console.log("GetFilterParams ",type,subType)
+
+        switch (type) {
             case Types.Gain:
                 return [{"Gain":"num"},{"Inverted":"bool"},{"Mute":"bool"},{"Scale":["dB","linear"]}];
 
@@ -431,23 +392,23 @@ class filter {
                 return [{"Ramp Time":"num"},{"Fader":["Aux1","Aux2","Aux3","Aux4"]}];
 
             case Types.Loudness:
-                return [{"Fader":["Main","Aux1","Aux2","Aux3","Aux4"]},{"Ref Level":"num"},{"High Boost":"num"},{"Low Boost":"num"},{"Attenuate Mid":"bool"}];
+                return [{"Fader":["Main","Aux1","Aux2","Aux3","Aux4"]},{"Reference Level":"num"},{"High Boost":"num"},{"Low Boost":"num"},{"Attenuate Mid":"bool"}];
 
             case Types.Delay:
                 return [{"Delay":"num"},{"Unit":["ms","mm","samples"]},{"Subsample":"bool"}];
 
             case Types.Conv:         
 
-                if (filterSubType=="Raw") return [{"Filename":"text"},{"Skip bytes lines":"num"},{"Read bytes lines":"num"}];
-                if (filterSubType=="Wav") return [{"Filename":"text"},{"channel":"num"}];
-                if (filterSubType=="Values") return [{"values":"array"}];
+                if (subType=="Raw") return [{"Filename":"text"},{"Skip bytes lines":"num"},{"Read bytes lines":"num"}];
+                if (subType=="Wav") return [{"Filename":"text"},{"channel":"num"}];
+                if (subType=="Values") return [{"values":"array"}];
 
             case Types.Biquad:
-                if (filterSubType=="Free") return [{"a1":"num"},{"a2":"num"},{"b0":"num"},{"b1":"num"},{"b2":"num"}];
-                if (filterSubType=="Highpass" || filterSubType=="Lowpass" || filterSubType=="Bandpass" || filterSubType=="Allpass") return [{"Frequency":"num"},{"Q":"num"}];
-                if (filterSubType=="Peaking" || filterSubType=="Highshelf" || filterSubType=="Lowshelf") return [{"Frequency":"num"},{"Gain":"num"},{"Q":"num"}];
-                if (filterSubType=="LinkwitzTransform") return [{"Actual F":"num"},{"Actual Q":"num"},{"Target F":"num"},{"Target Q":"num"}];
-                if (filterSubType=="Tilt") return [{"Gain":"num"}]
+                if (subType=="Free") return [{"a1":"num"},{"a2":"num"},{"b0":"num"},{"b1":"num"},{"b2":"num"}];
+                if (subType=="Highpass" || subType=="Lowpass" || subType=="Bandpass" || subType=="Allpass") return [{"Frequency":"num"},{"Q":"num"}];
+                if (subType=="Peaking" || subType=="Highshelf" || subType=="Lowshelf") return [{"Frequency":"num"},{"Gain":"num"},{"Q":"num"}];
+                if (subType=="LinkwitzTransform") return [{"Freq Act":"num"},{"Q Act":"num"},{"Freq Target":"num"},{"Q Target":"num"}];
+                if (subType=="Tilt") return [{"Gain":"num"}]
 
             case Types.Dither:
                 return [{"Type":["None","Flat","Highpass","Fweigthed441","Shibata48"]},{"Bits":["16"]}] ;
@@ -456,20 +417,10 @@ class filter {
                 return [{"Soft Clip":"bool"},{"Clip Limit":"num"}];
 
             default:
-                console.error("Undefined filter type : ",filterType)
+                console.error("Undefined filter type : ",type)
                 return [];        
         }
     }    
-
-    removeFilter(filterName) {
-        delete this.DSP.config.filter[filterName];        
-        this.DSP.createFilters();
-    }
 }
 
 export default filter;
-
-function beep() {
-    var snd = new Audio("data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");
-    snd.play();
-}
