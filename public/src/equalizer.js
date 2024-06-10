@@ -170,24 +170,17 @@ async function loadFiltersFromConfig() {
             let currentFilter = new window.filter(DSP);            
             currentFilter.loadFromDSP(filterName);
 
+            // Don't show filters that are not Biquads or system generated in the EQ window
+            if (currentFilter.getType()!="Biquad" || currentFilter.getName().startsWith("__")) continue;   
+
             if (currentFilter.getType()=="Gain") {
                 let gain =Math.round(currentFilter.getParameters().gain);                           
                 preamp.setVal(gain * 10 + 181);
             }
-            if (currentFilter.getType()!="Biquad" || currentFilter.getName().startsWith("__")) continue;   
+            
             currentFilter.createElementCollection(true);
             let peqElement = createFilterElement(currentFilter);
-            peqChannel.appendChild(peqElement);
-
-            // let currentFilter = DSP.createFilter(filter,channelNo);                        
-            // // console.log(currentFilter.name);
-            // if (currentFilter.type=="Gain") {
-            //     let gain =Math.round(currentFilter.parameters.gain);                           
-            //     preamp.setVal(gain * 10 + 181);
-            // }
-            // if (currentFilter.type!="Biquad" || currentFilter.name.startsWith("__")) continue;            
-            // let peqElement = createFilterElement(currentFilter);
-            // peqChannel.appendChild(peqElement);
+            peqChannel.appendChild(peqElement);            
         }        
         
         if (!window.parent.activeSettings.peqDualChannel) break;

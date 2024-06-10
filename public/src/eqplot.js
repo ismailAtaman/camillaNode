@@ -280,8 +280,8 @@ function createGrid(canvas) {
 	// Vertical lines and level scale
 	ctx.beginPath();
 	for (let i=1;i<verticalLineCount;i+=2) {    		
-		ctx.moveTo(60,verticalStepSize * i);
-		ctx.lineTo(w-10,verticalStepSize * i) 
+		ctx.moveTo(70,verticalStepSize * i);
+		ctx.lineTo(w+15,verticalStepSize * i) 
 		let level = (i + verticalLineCount/2 - verticalLineCount)*-1;
 		ctx.fillText(level+"dB", 10 ,verticalStepSize * i)		
 	}   
@@ -291,8 +291,7 @@ function createGrid(canvas) {
 	ctx.beginPath();
 	let xPos;
 	const freqList = [[30,28],[40, 71],[50, 104],[60, 131],[70, 154],[80, 174],[90, 191],[100, 207],[200, 309],[300, 369],[400, 412],[500, 445],[600, 472],[700, 495],[800, 515],[900, 532],[1000, 548],[2000, 650],[3000, 711],[4000, 753],[5000, 786],[6000, 814],[7000, 837],[8000, 857],[9000, 874],[10000, 890],[11000, 904],[12000, 918],[13000, 930],[14000, 941],[15000, 951],[16000, 961],[17000, 971],[18000, 979],[19000, 988],[20000, 996]]
-	for (let i=0;i<freqList.length;i++) {			
-		
+	for (let i=0;i<freqList.length;i++) {				
 		xPos= 35+(freqList[i][1]/1024*w);
 		// xPos= 35+freqList[i][1]
 
@@ -300,10 +299,10 @@ function createGrid(canvas) {
 			case 100:
 			case 1000:
 			case 10000:
-				ctx.fillText(freqList[i][0]+"Hz", xPos-15, h-25);				
+				ctx.fillText(new Intl.NumberFormat("en-US").format(freqList[i][0]) +"Hz", xPos-15, h-25);				
 		}		
-		ctx.moveTo(xPos,18);
-		ctx.lineTo(xPos,h-50);						
+		ctx.moveTo(xPos,15);
+		ctx.lineTo(xPos,h-45);						
 	}
 	ctx.stroke();
 	
@@ -313,14 +312,14 @@ function createGrid(canvas) {
 
 	// Horizontal lines at 100, 1,000 and 10,000Hz
 	ctx.beginPath();
-	ctx.moveTo(35 + (207/1024*w),18);
-	ctx.lineTo(35 + (207/1024*w),h-50);		
+	ctx.moveTo(35 + (207/1024*w),15);
+	ctx.lineTo(35 + (207/1024*w),h-45);		
 
-	ctx.moveTo(35 + (548/1024*w),18);
-	ctx.lineTo(35 + (548/1024*w),h-50);		
+	ctx.moveTo(35 + (548/1024*w),15);
+	ctx.lineTo(35 + (548/1024*w),h-45);		
 
-	ctx.moveTo(35 + (890/1024*w),18);
-	ctx.lineTo(35 + (890/1024*w),h-50);		
+	ctx.moveTo(35 + (890/1024*w),15);
+	ctx.lineTo(35 + (890/1024*w),h-45);		
 
 	ctx.stroke();
 	
