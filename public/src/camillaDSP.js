@@ -536,17 +536,22 @@ class camillaDSP {
     setTone(subBass, bass, mids, upperMids, treble) {        
         // Multi channel
         if (DSP.config.filters["__subBass"]==undefined) {
-            const subBassFilter ={"__subBass":camillaDSP.createPeakFilterJSON(this.subBassFreq,subBass,1.41)};
+            const subBassFilter ={"__subBass":camillaDSP.createPeakFilterJSON(this.subBassFreq,subBass,0.7)};
             const bassFilter = {"__bass":camillaDSP.createPeakFilterJSON(this.bassFreq,bass,1.41)};
             const midsFilter = {"__mids":camillaDSP.createPeakFilterJSON(this.midsFreq,mids,1.41)};
             const upperMidsFilter = {"__upperMids":camillaDSP.createPeakFilterJSON(this.upperMidsFreq,upperMids,1.41)};
-            const trebleFilter = {"__treble":camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,1.41)};
+            const trebleFilter = {"__treble":camillaDSP.createPeakFilterJSON(this.trebleFreq,treble,0.7)};
+            
 
-            this.addFilterToAllChannels(subBassFilter)              
+            this.addFilterToAllChannels(subBassFilter)                          
             this.addFilterToAllChannels(bassFilter)       
             this.addFilterToAllChannels(midsFilter)       
             this.addFilterToAllChannels(upperMidsFilter)       
             this.addFilterToAllChannels(trebleFilter)        
+
+            this.config.filters["__subBass"].parameters.type="Lowshelf";
+            this.config.filters["__treble"].parameters.type="Highshelf";
+
             return;
         }
         

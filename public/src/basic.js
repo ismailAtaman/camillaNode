@@ -6,6 +6,8 @@ async function basicLoad() {
     const ctx = document.getElementById('plotCanvas');    
 
     DSP = window.parent.DSP;            
+
+    // Load default frequencies for tone controls
     DSP.subBassFreq= parseInt(window.parent.activeSettings.subBassFreq)
     DSP.bassFreq= parseInt(window.parent.activeSettings.bassFreq)
     DSP.midsFreq= parseInt(window.parent.activeSettings.midsFreq)
@@ -125,14 +127,21 @@ async function loadData() {
     let bal = DSP.getBalance() * 10 +181;
     balance.knob.instance.setVal(bal)
 
-    // Load filters    
+    // Load filters if they don't exist
     if (DSP.config.filters["__subBass"]==undefined) {        
         DSP.setTone(0,0,0,0,0);                
         await DSP.uploadConfig();
         console.log("Basic filters created at default values.")
-    }            
+    } else {
+        // If gain is zero, change the freq setting to the latest freq set in preferences
+        if (DSP.config.filters["__subBass"].parameters.gain==0) DSP.config.filters["__subBass"].parameters.freq=parseInt(window.parent.activeSettings.subBassFreq)
+        if (DSP.config.filters["__bass"].parameters.gain==0)    DSP.config.filters["__bass"].parameters.freq=parseInt(window.parent.activeSettings.bassFreq)
+        if (DSP.config.filters["__mids"].parameters.gain==0)    DSP.config.filters["__mids"].parameters.freq=parseInt(window.parent.activeSettings.midsFreq)
+        if (DSP.config.filters["__upperMids"].parameters.gain==0) DSP.config.filters["__upperMids"].parameters.freq=parseInt(window.parent.activeSettings.upperMidsFreq)
+        if (DSP.config.filters["__treble"].parameters.gain==0)  DSP.config.filters["__treble"].parameters.freq=parseInt(window.parent.activeSettings.trebleFreq)
+    }
     
-    console.log("Subbass:",DSP.config.filters["__subBass"].parameters.gain);
+    // console.log("Subbass:",DSP.config.filters["__subBass"].parameters.gain);
 
     subBass.knob.instance.setVal(DSP.config.filters["__subBass"].parameters.gain*10+181);
     bass.knob.instance.setVal(DSP.config.filters["__bass"].parameters.gain*10+181);
