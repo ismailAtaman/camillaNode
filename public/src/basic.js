@@ -61,6 +61,7 @@ async function basicLoad() {
     vol.knob.addEventListener("change",function(e){
         const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
         DSP.sendDSPMessage({"SetVolume":volume})
+        DSP.sendSpectrumMessage({"SetVolume":volume})
     })
 
     balance.knob.addEventListener("change",function(e){
