@@ -340,16 +340,16 @@ class camillaDSP {
         }
     }
 
-    addFilterToAllChannels(filter) {    
+    addFilterToAllChannels(filterJSON) {    
         let channelCount=this.getChannelCount();
         for (let channel=0;channel<channelCount;channel++) {
-            this.addFilter(filter,channel)
+            this.addFilter(filterJSON,channel)
         }
     }
 
-    addFilter(filter,channelNo) {            
-        Object.assign(this.config.filters,filter);        
-        this.addFilterToChannelPipeline(filter,channelNo)        
+    addFilter(filterJSON,channelNo) {            
+        Object.assign(this.config.filters,filterJSON);        
+        this.addFilterToChannelPipeline(filterJSON,channelNo)        
         return true;
     }
 

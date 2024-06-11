@@ -13,7 +13,7 @@ const Types = {
 class filter {
     DSP = {}; 
     basic=false;       
-    filterElement ={"DefaultFilterName":{"type":"Biquad","description":"Default filter","parameters":{
+    filterJSON ={"DefaultFilterName":{"type":"Biquad","description":"Default filter","parameters":{
         "type": "Peaking",
         "freq": 1000,
         "q": 1.41,
@@ -24,30 +24,35 @@ class filter {
 
     constructor(dsp) {
         this.DSP=dsp;
+        let filterName ="F"+new Date().getTime().toString().substring(6)
+        this.setName(filterName);
         return this;
     }
 
-    newFilter() {
-
+    getName() {
+        return Object.keys(this.filterJSON)[0];
     }
 
-    getName() {
-        return Object.keys(this.filterElement)[0];
+    setName(name) {
+        let filterName = this.getName();
+        let filterBody = this.filterJSON[filterName];
+        this.filterJSON={};
+        this.filterJSON[name]=filterBody;
     }
 
     getDescription() {
         let name = this.getName();
-        return this.filterElement[name].description;
+        return this.filterJSON[name].description;
     }
 
     getType() {
         let name = this.getName();
-        return this.filterElement[name].type;
+        return this.filterJSON[name].type;
     }
 
     getSubType() {
         let name = this.getName();
-        return this.filterElement[name].parameters.type;
+        return this.filterJSON[name].parameters.type;
     }
 
     setFilterParameter(parameter,value) {
@@ -56,54 +61,60 @@ class filter {
         if (paramName=="frequency") paramName="freq";
         switch (paramName) {
             case "name":
-                let filterBody = this.filterElement[filterName];
-                this.filterElement={};
-                this.filterElement[value]=filterBody;                
+                let filterBody = this.filterJSON[filterName];
+                this.filterJSON={};
+                this.filterJSON[value]=filterBody;                
                 break;
             case "description":
-                this.filterElement[filterName].description=value;                
+                this.filterJSON[filterName].description=value;                
                 break;
             case "type":
-                this.filterElement[filterName].type=value;
+                this.filterJSON[filterName].type=value;
                 let subTypes = this.getFilterSubTypes();                 
                 this.setFilterParameter("subType",subTypes[0])                
                 break;
             case "subtype":
-                this.filterElement[filterName].parameters={};
-                if (value!=undefined) if (value.length>0) this.filterElement[filterName].parameters.type=value;                                
+                let oldParameters =this.filterJSON[filterName].parameters;
+                this.filterJSON[filterName].parameters={};
+                if (value!=undefined) if (value.length>0) this.filterJSON[filterName].parameters.type=value;                                
                 let params = this.getFilterParams();                
                 params.forEach(param=>{                                    
                     let paramName = Object.keys(param)[0];
                     let paramType = param[paramName]; 
                     paramName=paramName.toLowerCase().replace(" ","_");                    
                     if (paramName=="frequency") paramName="freq";
-                    console.log("setFilterParams name and type :",paramName,paramType);
+                    console.log("setFilterParams name and type :",paramName,paramType,value);
                     switch (paramType) {
                         case "num":                        
                             let val=0;                            
                             if (paramName.toLowerCase().includes("q")) val=1.41;
                             if (paramName.toLowerCase().includes("freq")) val=100;
-                            this.filterElement[filterName].parameters[paramName]=val;
+                            // Parameter existed before, maintain the value
+                            if (oldParameters[paramName]!=undefined) val = oldParameters[paramName];
+                            this.filterJSON[filterName].parameters[paramName]=val; 
                             break;
                         case "bool":
-                            this.filterElement[filterName].parameters[paramName]=false;
+                            // Parameter existed before, maintain the value
+                            if (oldParameters[paramName]!=undefined)  this.filterJSON[filterName].parameters[paramName] = oldParameters[paramName]; else this.filterJSON[filterName].parameters[paramName]=false;
                             break;
                         case "text":
-                            this.filterElement[filterName].parameters[paramName]="";
+                            // Parameter existed before, maintain the value
+                            if (oldParameters[paramName]!=undefined)  this.filterJSON[filterName].parameters[paramName] = oldParameters[paramName]; else this.filterJSON[filterName].parameters[paramName]="";
                             break;
                         case "array":
-                            this.filterElement[filterName].parameters[paramName]=""
+                            // Parameter existed before, maintain the value
+                            if (oldParameters[paramName]!=undefined)  this.filterJSON[filterName].parameters[paramName] = oldParameters[paramName]; else this.filterJSON[filterName].parameters[paramName]=""
                             break;
                         default:
-                            this.filterElement[filterName].parameters[paramName]=Object.values(paramType)[0];                            
+                            // Parameter existed before, maintain the value
+                            if (oldParameters[paramName]!=undefined)  this.filterJSON[filterName].parameters[paramName] = oldParameters[paramName]; else this.filterJSON[filterName].parameters[paramName]=Object.values(paramType)[0];                            
                     }                         
-                })                
-                
+                })                                
                 break;                
             default:                
                 if (value=="true") value=true;
                 if (value=="false") value=false;
-                this.filterElement[filterName].parameters[paramName]=value;            
+                this.filterJSON[filterName].parameters[paramName]=value;            
         }       
         // console.log(parameter,value) 
         // console.log(this.filterElement[filterName].parameters);
@@ -125,23 +136,22 @@ class filter {
             case "subtype":
                 return this.getSubType();                
             default:
-                return this.filterElement[filterName].parameters[paramName];
+                return this.filterJSON[filterName].parameters[paramName];
         }             
     }
 
     getParameters() {
         let name = this.getName();
-        return this.filterElement[name].parameters;
+        return this.filterJSON[name].parameters;
     }
 
     async loadFromDSP(filterName) {
-        this.filterElement={};
-        this.filterElement[filterName] = this.DSP.config.filters[filterName];
+        this.filterJSON={};
+        this.filterJSON[filterName] = this.DSP.config.filters[filterName];
     }
 
-    loadToDSP() {        
-        let filterName = this.getName();
-        this.DSP.config.filters[filterName]=this.filterElement[filterName];
+    loadToDSP(channel) {
+        if (channel==undefined) this.DSP.addFilterToAllChannels(this.filterJSON); else this.DSP.addFilter(this.filterJSON,channel)        
     }    
 
     async uploadToDSP() {

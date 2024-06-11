@@ -196,8 +196,8 @@ function createFilterElement(currentFilter) {
 
     let peqElement = document.createElement('div');
     peqElement.filter=currentFilter; peqElement.className="peqElement"; 
-    peqElement.setAttribute("configName",currentFilter.name);
-    peqElement.setAttribute("id",currentFilter.name);
+    peqElement.setAttribute("configName",currentFilter.getName());
+    peqElement.setAttribute("id",currentFilter.getName());
     peqElement.setAttribute("basic",true);
         
     let filterBasic = document.createElement('div'); 
@@ -313,9 +313,9 @@ async function clearPEQ() {
 
 async function addNewFilter(e) {    
     // Create a filter object based on default filter 
-    let filter = DSP.getDefaultFilter();
-    let freq = 3146;
-    let currentElementFreq = 3146;
+    let newFilter = new window.filter(DSP);    
+    let freq = 1000;
+    let currentElementFreq = 1000;
     let peqChannel= undefined;
     let channel = 0;
 
@@ -326,26 +326,25 @@ async function addNewFilter(e) {
         peqChannel= e.target.parentElement;
         channel = parseInt(peqChannel.getAttribute("channelno"));
 
-
-        currentElementFreq = e.target.filter.parameters.freq;        
+        currentElementFreq = e.target.filter.getFilterParameter("freq");        
         if (e.target.nextSibling!=null) {
-            freq = Math.round((currentElementFreq+e.target.nextSibling.filter.parameters.freq)/2);
+            freq = Math.round((currentElementFreq+e.target.nextSibling.filter.getFilterParameter("freq"))/2);
         } else {
             freq = Math.round((currentElementFreq+20000)/2);
         }
     }
 
     // Set frequency to average of where filter is being insterted
-    filter[Object.keys(filter)[0]].parameters.freq=freq;    
+    newFilter.setFilterParameter("freq",freq);    
     
     // Create new DSP filter and upload
-    let newFilter = DSP.createNewFilter(filter,channel);    
-    if (!window.parent.activeSettings.peqDualChannel) DSP.addFilterToAllChannels(filter);
+    // let newFilter = DSP.createNewFilter(filter,channel);    
+    if (!window.parent.activeSettings.peqDualChannel) newFilter.loadToDSP(); else newFilter.loadToDSP(channel) // DSP.addFilterToAllChannels(filter);
+    await newFilter.uploadToDSP();
     
 
-    await DSP.uploadConfig();
-
     // Create and load the filter element to the channel element    
+    newFilter.createElementCollection(true);
     let peqElement = createFilterElement(newFilter);
 
     // If first filter or last, just append it, if not insert after current element 
