@@ -253,6 +253,13 @@ class filter {
             this.filter.elementCollection.filterSubType.dispatchEvent(new Event("change"));
             await this.filter.uploadToDSP();
         });
+
+        filterType.addEventListener("change",async function(){                        
+            this.filter.setFilterParameter(this.id,this.value);
+            this.parentElement.parentElement.dispatchEvent(new Event("updated"));
+            await this.filter.uploadToDSP();
+
+        })
         this.elementCollection.filterType=filterType;
     }
 
@@ -278,6 +285,12 @@ class filter {
             
         });
         if (filterSubType.children.length==0) filterSubType.style.display="none"; else filterSubType.style.display="unset";
+        filterSubType.addEventListener("change",async function(){                        
+            this.filter.setFilterParameter(this.id,this.value);
+            this.parentElement.parentElement.dispatchEvent(new Event("updated"));
+            await this.filter.uploadToDSP();
+
+        })
         this.elementCollection.filterSubType=filterSubType;       
     }
 
