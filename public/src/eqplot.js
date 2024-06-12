@@ -288,10 +288,12 @@ function createGrid(canvas) {
 	
 }
 
-function plot(filterObject, canvas, name,color) {
+function plot(filterObject, canvas, name, color) {
 	const ctx = canvas;        
 	const context = ctx.getContext('2d');             
-	if (color == undefined) color = "#FFF";
+	let newColor;
+	if (color!=undefined) newColor = color.toString(16); else newColor="6688BB"
+	console.log("Color ",newColor)
 
 	// Clear the canvas	
 	// context.clearRect(0, 0, ctx.width, ctx.height);        	
@@ -299,8 +301,7 @@ function plot(filterObject, canvas, name,color) {
 
 	// Create the grid
 	createGrid(ctx); 
-	let startColor = parseInt("CCFFBB",16);	
-
+	
 	canvas.totalArray = plotFilters(Object.keys(filterObject),ctx,color);
 
 	function plotFilters(filters, ctx, color) {
@@ -318,11 +319,13 @@ function plot(filterObject, canvas, name,color) {
 				totalArray[i][0]=dataMatrix[i][0]
 				totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
 			}
-			let colorText = (startColor + (11 * filterNum)).toString(16);									
-			plotArray(ctx,dataMatrix,"#"+colorText,0.4);		
+			// let newColor = colorChange(color,filterNum)						
+			plotArray(ctx,dataMatrix,"#"+newColor,0.5);		
 			filterNum++;
+			
 		}
-		let t= plotArray(ctx, totalArray,color,2.5);					
+		
+		let t= plotArray(ctx, totalArray,"#FFF",2.5);					
 		return totalArray;
 	}
 
@@ -340,6 +343,23 @@ function plot(filterObject, canvas, name,color) {
 	let max = Math.round(Math.max(...canvas.totalArray[1]));
 	// console.log("Max ",max);
 	return max;
+}
+
+function colorChange(startColor,colorIndex) {
+	let colorText = startColor.toString(16);
+	let red = parseInt(colorText.substring(0,2),16);
+	let green = parseInt(colorText.substring(2,4),16);
+	let blue = parseInt(colorText.substring(4),16);
+	
+    console.log("Color Text :",colorText,"\tR:",red,"G:",green,"B:",blue);
+	red  = red;
+	green = (green + 2 * colorIndex) % 255;
+	blue = blue;
+
+	let changedColor = red+green*255+blue*255*255;
+	// console.log("New color:",changedColor)
+	return changedColor;
+	
 }
 
 export default plot;
