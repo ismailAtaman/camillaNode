@@ -287,7 +287,9 @@ class filter {
         if (filterSubType.children.length==0) filterSubType.style.display="none"; else filterSubType.style.display="unset";
         filterSubType.addEventListener("change",async function(){                        
             this.filter.setFilterParameter(this.id,this.value);
-            this.parentElement.parentElement.dispatchEvent(new Event("updated"));
+            let parent = this.parentElement? this.parentElement.parentElement: this.parentElement;  
+            if (parent==null) return;
+            parent.dispatchEvent(new Event("updated"));
             await this.filter.uploadToDSP();
 
         })
