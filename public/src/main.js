@@ -555,20 +555,22 @@ async function saveConfigurationClick() {
             data={"server":server,"port":port,"spectrumPort":spectrumPort}
             break;
         case "basic":
-            DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
+            await DSP.downloadConfig()
+            DSPConfig = DSP.config;
             let vol = await DSP.sendDSPMessage("GetVolume");
             let balance = await DSP.getBalance();
             let crossfeed = await DSP.getCrossfeed();
             let filters={}
-            filters.subBass= DSPConfig.filters.subBass;
-            filters.bass= DSPConfig.filters.bass;
-            filters.mids= DSPConfig.filters.mids;
-            filters.upperMids= DSPConfig.filters.upperMids;
-            filters.treble= DSPConfig.filters.treble;                    
+            filters.subBass= DSPConfig.filters["__subBass"];
+            filters.bass= DSPConfig.filters["__bass"];
+            filters.mids= DSPConfig.filters["__mids"];
+            filters.upperMids= DSPConfig.filters["__upperMids"];
+            filters.treble= DSPConfig.filters["__treble"];                          
             data={"volume":vol,"balance":balance,"crossfeed":crossfeed,"filters":filters,"mixers":DSPConfig.mixers}                    
             break;
         case "equalizer":
-            DSPConfig = await DSP.sendDSPMessage("GetConfigJson");
+            await DSP.downloadConfig()
+            DSPConfig = DSP.config;
             data={"title":DSPConfig.title,"filters":DSPConfig.filters,"mixers":DSPConfig.mixers,"pipeline":DSPConfig.pipeline}
             break;
         case "advanced":
@@ -617,19 +619,14 @@ async function openConfigurationClick() {
             break;
 
         case "basic":                                        
+            await DSP.downloadConfig();  
             await DSP.sendDSPMessage({"SetVolume":data.volume})                    
             await DSP.setBalance(data.balance);
             await DSP.setCrossfeed(data.crossfeed);
-            DSPConfig = DSP.config;
-            DSPConfig.filters.subBass= data.filters.subBass;
-            DSPConfig.filters.bass= data.filters.bass;
-            DSPConfig.filters.mids= data.filters.midsass;
-            DSPConfig.filters.upperMids= data.filters.upperMids;
-            DSPConfig.filters.treble= data.filters.treble;                    
-            DSPConfig.mixers=data.mixers;
-            DSPConfig.pipeline=DSP.updatePipeline(DSPConfig);
-            DSPConfig.title="loading from config"
-            await DSP.uploadConfig(DSPConfig);                    
+            DSP.clearFilters();            
+            DSP.config.title=configName.value;                     
+            DSP.addFilters(data.filters);
+            await DSP.uploadConfig();                    
             await window.mainframe.contentWindow.loadData.apply();                    
             break;
 
