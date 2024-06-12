@@ -561,11 +561,11 @@ async function saveConfigurationClick() {
             let balance = await DSP.getBalance();
             let crossfeed = await DSP.getCrossfeed();
             let filters={}
-            filters.subBass= DSPConfig.filters["__subBass"];
-            filters.bass= DSPConfig.filters["__bass"];
-            filters.mids= DSPConfig.filters["__mids"];
-            filters.upperMids= DSPConfig.filters["__upperMids"];
-            filters.treble= DSPConfig.filters["__treble"];                          
+            filters["__subBass"]= DSPConfig.filters["__subBass"];
+            filters["__bass"]= DSPConfig.filters["__bass"];
+            filters["__mids"]= DSPConfig.filters["__mids"];
+            filters["__upperMids"]= DSPConfig.filters["__upperMids"];
+            filters["__treble"]= DSPConfig.filters["__treble"];                          
             data={"volume":vol,"balance":balance,"crossfeed":crossfeed,"filters":filters,"mixers":DSPConfig.mixers}                    
             break;
         case "equalizer":
