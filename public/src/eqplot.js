@@ -319,8 +319,8 @@ function plot(filterObject, canvas, name, color) {
 				totalArray[i][0]=dataMatrix[i][0]
 				totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
 			}
-			// let newColor = colorChange(color,filterNum)						
-			plotArray(ctx,dataMatrix,"#"+newColor,0.5);		
+			let newColor = colorChange(color,filterNum)						
+			plotArray(ctx,dataMatrix,"#"+newColor,0.2);		
 			filterNum++;
 			
 		}
@@ -346,18 +346,20 @@ function plot(filterObject, canvas, name, color) {
 }
 
 function colorChange(startColor,colorIndex) {
-	let colorText = startColor.toString(16);
+	let colorText;
+	if (typeof(startColor)=="number") colorText = startColor.toString(16); else colorText=startColor;
+
 	let red = parseInt(colorText.substring(0,2),16);
 	let green = parseInt(colorText.substring(2,4),16);
 	let blue = parseInt(colorText.substring(4),16);
 	
-    console.log("Color Text :",colorText,"\tR:",red,"G:",green,"B:",blue);
-	red  = red;
-	green = (green + 2 * colorIndex) % 255;
-	blue = blue;
+    // console.log("Color Text :",colorText,"\tR:",red,"G:",green,"B:",blue);
+	red  = (red + 1 * colorIndex) % 255;
+	green = (green + 4 * colorIndex) % 255;
+	blue = (blue + 2 * colorIndex) % 255;
 
-	let changedColor = red+green*255+blue*255*255;
-	// console.log("New color:",changedColor)
+	let changedColor = (red+green*255+blue*255*255).toString(16);
+	// console.log("New color #",colorIndex,":",changedColor)
 	return changedColor;
 	
 }

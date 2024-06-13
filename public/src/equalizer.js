@@ -261,11 +261,10 @@ function plotConfig() {
         }
 
     } else {
-        let hue = window.parent.activeSettings.backgroundHue /360;
+        let hue = (Math.abs((parseInt(window.parent.activeSettings.backgroundHue) -30 )) % 360) /360;
+        console.log("Start hue : ",window.parent.activeSettings.backgroundHue,hue*360,hue)
         let color = hslToRgb(hue, 0.3, 0.3);
         let colorNum = (color[0]+color[1]*255+color[2]*255*255);
-        console.log("Color Array",color,"Color ",colorNum,"\tColor Text",colorNum.toString(16));
-
         plot(DSP.config.filters,canvas,DSP.config.title,colorNum);            
     }    
 }
