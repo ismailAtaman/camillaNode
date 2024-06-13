@@ -320,7 +320,7 @@ function plot(filterObject, canvas, name, color) {
 				totalArray[i][1]=dataMatrix[i][1]+totalArray[i][1];        
 			}
 			let newColor = colorChange(color,filterNum)						
-			plotArray(ctx,dataMatrix,"#"+newColor,0.2);		
+			plotArray(ctx,dataMatrix,"#"+newColor,0.5);		
 			filterNum++;
 			
 		}
@@ -332,12 +332,12 @@ function plot(filterObject, canvas, name, color) {
 
 	// Centre and print the config name 
 	if (name!=undefined) {
-		context.font="15px Abel";            
-		context.fillStyle="#FEC"
+		context.font="16px Abel";            
+		context.fillStyle="#FFF";
 		const nameText = " "+name+" "
 		const textWidth = context.measureText(nameText).width;
 		const nameLeft = (canvas.width - textWidth)/2;
-		context.fillText(nameText,nameLeft,40);            
+		context.fillText(nameText,nameLeft,12);            
 	}
 
 	let max = Math.round(Math.max(...canvas.totalArray[1]));
