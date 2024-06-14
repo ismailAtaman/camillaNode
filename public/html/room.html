@@ -8,21 +8,144 @@
 
 <script type="module">
     import camillaDSP from "/src/camillaDSP.js"
-    
+    document.addEventListener("DOMContentLoaded",onload);
 </script>
 
 <script>
+    selectedNode=undefined;
 
+    function onload() {
+        let nodes = document.getElementsByClassName("node");
+        let editor = document.getElementById("editor");
+        for (let i=0;i<nodes.length;i++) {
+            nodes[i].addEventListener("mousemove",onMouseMove);      
+            nodes[i].addEventListener("mousedown",onMouseDown);            
+            nodes[i].addEventListener("mouseover",onMouseOver);      
+            nodes[i].addEventListener("mouseout",onMouseOut);      
+            nodes[i].addEventListener("mouseup",onMouseUp);            
+            nodes[i].addEventListener("dblclick",onDblClick);            
+        }
+        editor.addEventListener("mouseup",onMouseUp);
+        editor.addEventListener("mousemove",onMouseMove);
+        editor.addEventListener("dblclick",editorDblClick);
+        editor.addEventListener("click",editorClick);
+
+        window.nodeWidth = nodes[0].getBoundingClientRect().width;
+        window.nodeHeight = nodes[0].getBoundingClientRect().height;
+
+        window.editorWidth = editor.getBoundingClientRect().width;
+        window.editorHeight = editor.getBoundingClientRect().height;
+    }
+
+    function onMouseDown(e) {        
+        selectedNode=e.target;
+        selectedNode.classList.add("selectedNode")
+        selectedNode.startClientX = e.clientX - selectedNode.offsetLeft;
+        selectedNode.startClientY = e.clientY- selectedNode.offsetTop;
+        selectedNode.left = selectedNode.getBoundingClientRect().left - selectedNode.offsetLeft;
+        selectedNode.top = selectedNode.getBoundingClientRect().top - selectedNode.offsetTop;
+        // console.log(e.clientX,e.clientY);        
+    }
+
+    function onMouseUp() {
+        if (selectedNode!=undefined) selectedNode.classList.remove("selectedNode")
+        selectedNode=undefined;
+        // console.log(selectedNode);
+    }
+
+    function onMouseMove(e) {
+        if (selectedNode!=undefined) {             
+            let left = parseInt(e.clientX - selectedNode.startClientX);
+            let top  = parseInt(e.clientY - selectedNode.startClientY);
+            let maxWidth = selectedNode.parentElement.getBoundingClientRect().width;
+            let maxHeight = selectedNode.parentElement.getBoundingClientRect().width;
+            if (left<0) left=0; if (left>window.editorWidth-window.nodeWidth) left=window.editorWidth-window.nodeWidth
+            if (top<0) top=0; if (top>window.editorHeight-window.nodeHeight) top=window.editorHeight-window.nodeHeight
+            selectedNode.style.left = left+'px';
+            selectedNode.style.top = top+'px';
+            // console.log(left,top,e.clientX,e.clientY)
+        } 
+    }
+
+    function onMouseOver(e) {
+        e.target.classList.add("hoverNode")
+    }
+
+    function onMouseOut(e) {
+        e.target.classList.remove("hoverNode")
+    }
+
+    function nodeContextShow(e) {
+        e.preventDefault();
+    }
+
+    function onDblClick() {
+     
+    }
+
+    function editorClick() {
+     
+    }
+
+    function editorDblClick(e) {    
+        let node = document.getElementsByClassName("node")[0];                
+        addNode(e.clientX - window.nodeWidth +node.offsetLeft ,e.clientY - window.nodeHeight + node.offsetTop)     
+    }
+
+    function addNode(left,top) {        
+        if (left==undefined) left = 10;
+        if (top==undefined) top = 10;
+        let editor = document.getElementById("editor");
+        let node = document.createElement("div");        
+        node.className="node";
+        node.addEventListener("mousedown",onMouseDown);
+        node.addEventListener("mouseup",onMouseUp);            
+        node.addEventListener("mousemove",onMouseMove);      
+        node.addEventListener("mouseover",onMouseOver);      
+        node.addEventListener("mouseout",onMouseOut);      
+        node.addEventListener("mouseup",onMouseUp);            
+        node.addEventListener("dblclick",onDblClick);            
+        editor.appendChild(node);
+        node.style.left = left+'px';
+        node.style.top = top+'px';
+    }
 </script>
     
 <style>
+    #editor {
+        width: 80%;
+        height: 500px;
+        display: block;
+        position: relative;
+        border: 1px solid wheat;
+        background-color: hsl(var(--bck-hue),20%, 10%);        
+    }
 
+    .node {
+        position: absolute;
+        width: 100px;
+        aspect-ratio: 1;
+        display: block;        
+        background-color: hsl(var(--bck-hue),30%, 30%);        
+        border-radius: 10px;
+        border: 2px outset hsl(var(--bck-hue), 20%, 50%);
+        top:10px;
+        left: 10px;        
+    }
+
+    .selectedNode {
+        background-color: hsl(var(--bck-hue),35%, 25%);        
+    }
+
+    .hoverNode {
+        border: 2px outset hsl( var(--bck-hue), 25%, 70%)
+    }
 </style>
 
 <body>
     <div id="sectionMainTitle"><img src="img/icon/room.png" class="icon">Room EQ</div>
     <div id="editor">
-        
+        <div class="node"></div>
     </div>
 </body>
 
