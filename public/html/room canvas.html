@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100%, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<script type="module">
+    import camillaDSP from "/src/camillaDSP.js"
+    document.addEventListener("DOMContentLoaded",onload);
+</script>
+
+<script>
+    const nodeWidth = 100;
+    const nodeHeight= 100;
+    
+    function onload() {
+        window.canvas  = document.getElementById("canvas");
+        window.ctx = window.canvas.getContext("2d");
+        window.canvas.addEventListener("mousedown",onmousedown)
+    }
+
+    function onmousedown() {
+
+    }
+
+    function addNode(left,right) {
+
+    }
+
+</script>
+    
+<style>
+</style>
+
+<body>
+    <div id="sectionMainTitle"><img src="img/icon/room.png" class="icon">Room EQ</div>
+    <canvas width="1000" height="600" id="canvas"></canvas>
+        
+    
+</body>
+
+</html>
+

@@ -13,6 +13,8 @@
 
 <script>
     selectedNode=undefined;
+    selectedConnector=undefined;
+    selectedLine=undefined;
 
     function onload() {
         let nodes = document.getElementsByClassName("node");
@@ -27,33 +29,105 @@
         }
         editor.addEventListener("mouseup",onMouseUp);
         editor.addEventListener("mousemove",onMouseMove);
+        editor.addEventListener("mousedown",onMouseDown);        
         editor.addEventListener("dblclick",editorDblClick);
         editor.addEventListener("click",editorClick);
 
-        window.nodeWidth = nodes[0].getBoundingClientRect().width;
-        window.nodeHeight = nodes[0].getBoundingClientRect().height;
+        window.nodeWidth = 100;
+        window.nodeHeight = 100;
 
-        window.editorWidth = editor.getBoundingClientRect().width;
-        window.editorHeight = editor.getBoundingClientRect().height;
+        let editorRect = editor.getBoundingClientRect();
+        window.editorWidth = editorRect.width;
+        window.editorHeight = editorRect.height;
+
+        window.editorOffsetX = editorRect.left;
+        window.editorOffsetY = editorRect.top;
     }
 
-    function onMouseDown(e) {        
-        selectedNode=e.target;
-        selectedNode.classList.add("selectedNode")
-        selectedNode.startClientX = e.clientX - selectedNode.offsetLeft;
-        selectedNode.startClientY = e.clientY- selectedNode.offsetTop;
-        selectedNode.left = selectedNode.getBoundingClientRect().left - selectedNode.offsetLeft;
-        selectedNode.top = selectedNode.getBoundingClientRect().top - selectedNode.offsetTop;
-        // console.log(e.clientX,e.clientY);        
+    function onMouseDown(e) {     
+        
+        // If target is node, prepare for movement   
+        if ([...e.target.classList].includes("node")) {
+            selectedNode=e.target;            
+            selectedNode.classList.add("selectedNode")
+            selectedNode.startClientX = e.clientX - selectedNode.offsetLeft;
+            selectedNode.startClientY = e.clientY- selectedNode.offsetTop;
+            selectedNode.left = selectedNode.getBoundingClientRect().left - selectedNode.offsetLeft;
+            selectedNode.top = selectedNode.getBoundingClientRect().top - selectedNode.offsetTop;
+
+        // If target is connector, create a line for connection
+        } else if ([...e.target.classList].includes("connector")) {
+            selectedConnector = e.target;
+            let line = document.createElement("div");
+            document.getElementById('editor').appendChild(line);        
+            line.className='line';
+            selectedLine = line;
+
+            let rect = e.target.getBoundingClientRect();                        
+            line.from={"x":0,"y":0}; 
+            line.from.x = rect.left + rect.width/2 - line.parentElement.offsetLeft
+            line.from.y = rect.top + rect.height/2 - line.parentElement.offsetTop;
+            
+        } else {
+    
+        }
     }
 
-    function onMouseUp() {
-        if (selectedNode!=undefined) selectedNode.classList.remove("selectedNode")
+    function onMouseUp(e) {
+        if (selectedNode!=undefined) selectedNode.classList.remove("selectedNode")            
+        if (selectedConnector!=undefined) selectedConnector.classList.remove("selectedConnector")
+        if (selectedLine!=undefined) {            
+            let target = e.target;
+            let isTargetNode = [...e.target.classList].includes("node")
+            let isTargetConnector = [...e.target.classList].includes("connector");
+
+            if (isTargetNode) {                                
+                // targetConnector=true;
+            }
+            
+            if (isTargetConnector) {                
+                console.log("Target connector..")
+                let left = parseFloat(selectedLine.style.left.replace("px",""));
+                let top = parseFloat(selectedLine.style.top.replace("px",""));
+                let len = parseFloat(selectedLine.style.width.replace("px",""))
+                let angle = parseFloat(selectedLine.style.transform.replace("rotate(","").replace("deg)",""));
+                let right =  left + Math.cos(angle/180*Math.PI) * len;
+                let bottom =  top + Math.sin(angle/180*Math.PI) * len;
+                selectedLine.rect={"left":left,"top":top,"len":len,"angle":angle,"right":right,"bottom":bottom};
+
+                // Align the line end to the center of the connector
+                let rect = target.getBoundingClientRect();
+                let from ={"x":left,"y":top}                
+                let to ={"x":rect.left ,"y":rect.top - target.offsetTop - rect.height/2 }
+                selectedLine.to = to;                
+                drawLine(selectedLine,selectedLine.from,to);                
+
+                // Add line to node lines array
+                let fromNode = selectedConnector.parentElement;
+                let toNode = target.parentElement;
+                fromNode.lines.push({"type":"from","lineElement":selectedLine});
+                toNode.lines.push({"type":"to","lineElement":selectedLine});
+
+                // selectedLine.nodes=[];
+                // selectedLine.nodes.push({"type":"from","nodeElement":fromNode})
+                // selectedLine.nodes.push({"type":"to","toElement":fromNode})
+
+                selectedLine.classList.remove("selectedLine");
+
+            } else {
+                selectedLine.parentElement.removeChild(selectedLine);
+            }
+            
+        }
         selectedNode=undefined;
+        selectedConnector=undefined;
+        selectedLine=undefined;
         // console.log(selectedNode);
     }
 
     function onMouseMove(e) {
+
+        document.getElementById("pos").innerText="x : "+e.clientX+" y : "+e.clientY+"\n";
         if (selectedNode!=undefined) {             
             let left = parseInt(e.clientX - selectedNode.startClientX);
             let top  = parseInt(e.clientY - selectedNode.startClientY);
@@ -62,9 +136,41 @@
             if (left<0) left=0; if (left>window.editorWidth-window.nodeWidth) left=window.editorWidth-window.nodeWidth
             if (top<0) top=0; if (top>window.editorHeight-window.nodeHeight) top=window.editorHeight-window.nodeHeight
             selectedNode.style.left = left+'px';
-            selectedNode.style.top = top+'px';
+            selectedNode.style.top = top+'px';              
+
+            // Move lines
+            for (let line of selectedNode.lines) {           
+                // console.log("lines of node:",line)     
+                if (line.type=="from") {                    
+                    let fromConnector = selectedNode.children['connectorR']
+                    let fromConnectorRect = fromConnector.getBoundingClientRect()
+                    let from = {"x":fromConnectorRect.left ,"y":fromConnectorRect.top - fromConnector.offsetTop - 10};                    
+                    line.lineElement.from = from;
+                    drawLine(line.lineElement, from, line.lineElement.to)
+                    
+                } else if (line.type=="to") {                                        
+                    let toConnector = selectedNode.children['connectorL']
+                    let toConnectorRect = toConnector.getBoundingClientRect()                    
+                    // line.lineElement.from.x = line.lineElement.from.x + line.lineElement.offsetLeft; 
+                    // line.lineElement.from.y = line.lineElement.from.y + line.lineElement.offsetTop; 
+                    let to = {"x":toConnectorRect.left - toConnector.offsetLeft ,"y":toConnectorRect.top - toConnector.offsetTop - 10};                    
+                    line.lineElement.to = to;
+                    drawLine(line.lineElement,line.lineElement.from,to)
+                    
+                }
+            }
+
+
+
             // console.log(left,top,e.clientX,e.clientY)
         } 
+
+        if (selectedLine!=undefined) {            
+            drawLine(selectedLine,selectedLine.from,{"x":e.clientX - selectedLine.parentElement.offsetLeft,"y":e.clientY- selectedLine.parentElement.offsetTop})
+            selectedLine.style.right = e.clientX+'px';
+            selectedLine.style.bottom = e.clientY+'px';
+            
+        }
     }
 
     function onMouseOver(e) {
@@ -87,14 +193,15 @@
      
     }
 
-    function editorDblClick(e) {    
-        let node = document.getElementsByClassName("node")[0];                
-        addNode(e.clientX - window.nodeWidth +node.offsetLeft ,e.clientY - window.nodeHeight + node.offsetTop)     
+    function editorDblClick(e) {            
+        addNode(e.clientX - window.nodeWidth  ,e.clientY - window.nodeHeight )     
     }
 
     function addNode(left,top) {        
-        if (left==undefined) left = 10;
-        if (top==undefined) top = 10;
+        if (left==undefined || left<0 ) left = 10;
+        if (top==undefined || top<0 ) top = 10;
+
+
         let editor = document.getElementById("editor");
         let node = document.createElement("div");        
         node.className="node";
@@ -105,10 +212,43 @@
         node.addEventListener("mouseout",onMouseOut);      
         node.addEventListener("mouseup",onMouseUp);            
         node.addEventListener("dblclick",onDblClick);            
-        editor.appendChild(node);
+        
         node.style.left = left+'px';
         node.style.top = top+'px';
+        node.lines=[];
+
+        // connectors
+        let connectorL = document.createElement("div");
+        connectorL.className='connector';
+        connectorL.classList.add("left")
+        connectorL.style.left="0px";        
+        connectorL.id="connectorL";
+        node.appendChild(connectorL);
+
+        let connectorR = document.createElement("div");
+        connectorR.className='connector';
+        connectorR.classList.add("right")
+        connectorR.style.right="0px";                
+        connectorR.id="connectorR";
+        node.appendChild(connectorR);
+
+        editor.appendChild(node);
     }
+
+    function drawLine(lineElement,from,to) {
+
+
+        let x = (to.x-from.x);
+        let y = (to.y-from.y);
+        let len = Math.sqrt( x*x + y*y );
+        let angle = Math.atan(y/x)/Math.PI*180;
+        lineElement.style.left=from.x+"px";
+        lineElement.style.top=from.y+"px";
+        lineElement.style.width=len+"px";        
+        lineElement.style.transform="rotate("+angle+"deg)"
+        // console.log(from,to,x,y,angle)
+    }
+
 </script>
     
 <style>
@@ -131,6 +271,7 @@
         border: 2px outset hsl(var(--bck-hue), 20%, 50%);
         top:10px;
         left: 10px;        
+        user-select: none;
     }
 
     .selectedNode {
@@ -140,13 +281,45 @@
     .hoverNode {
         border: 2px outset hsl( var(--bck-hue), 25%, 70%)
     }
+
+    .connector {
+        position:absolute;
+        width: 16px;
+        top: 50%;
+        aspect-ratio: 1;
+        border-radius: 50%;        
+        transform: translate(50%,-50%);
+        user-select: none;
+    }
+
+    .left {
+        background-color: white;
+        transform: translate(-50%,-50%);
+    }
+
+    .right {
+        background-color: wheat;
+        transform: translate(50%,-50%);
+    }
+
+    .line {
+        position: absolute;
+        display: block;
+        width: 1px;
+        height: 3px;        
+        background-color: red;
+        user-select: none;
+        transform-origin: 0px 0px;
+
+    }
 </style>
 
 <body>
     <div id="sectionMainTitle"><img src="img/icon/room.png" class="icon">Room EQ</div>
     <div id="editor">
-        <div class="node"></div>
+        
     </div>
+    <div id="pos"></div>
 </body>
 
 </html>
