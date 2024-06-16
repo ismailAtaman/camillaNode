@@ -67,7 +67,7 @@
 
             let rect = e.target.getBoundingClientRect();                        
             line.from={"x":0,"y":0}; 
-            line.from.x = rect.left + rect.width/2 - line.parentElement.offsetLeft
+            line.from.x = rect.left + rect.width/2 - line.parentElement.offsetLeft -2;
             line.from.y = rect.top + rect.height/2 - line.parentElement.offsetTop -2;
             
         } else {
@@ -101,7 +101,7 @@
 
                 // Align the line end to the center of the connector
                 let rect = target.getBoundingClientRect();                
-                let to ={"x":rect.left ,"y":rect.top - target.offsetTop - rect.height/2 }
+                let to ={"x":rect.left ,"y":rect.top - target.offsetTop - rect.height/2 - 4}
                 selectedLine.to = to;                
 
                 drawLine(selectedLine,selectedLine.from,to);                
@@ -158,16 +158,14 @@
                 if (line.type=="from") {                    
                     let fromConnector = selectedNode.children['connectorR']
                     let fromConnectorRect = fromConnector.getBoundingClientRect()
-                    let from = {"x":fromConnectorRect.left ,"y":fromConnectorRect.top - fromConnector.offsetTop - 10 -2 };                    
+                    let from = {"x":fromConnectorRect.left ,"y":fromConnectorRect.top - fromConnector.offsetTop - 10 - 3};                    
                     line.lineElement.from = from;
                     drawLine(line.lineElement, from, line.lineElement.to)
                     
                 } else if (line.type=="to") {                                        
                     let toConnector = selectedNode.children['connectorL']
                     let toConnectorRect = toConnector.getBoundingClientRect()                    
-                    // line.lineElement.from.x = line.lineElement.from.x + line.lineElement.offsetLeft; 
-                    // line.lineElement.from.y = line.lineElement.from.y + line.lineElement.offsetTop; 
-                    let to = {"x":toConnectorRect.left - toConnector.offsetLeft ,"y":toConnectorRect.top - toConnector.offsetTop - 10};                    
+                    let to = {"x":toConnectorRect.left - toConnector.offsetLeft ,"y":toConnectorRect.top - toConnector.offsetTop - 10 - 2};                    
                     line.lineElement.to = to;
                     drawLine(line.lineElement,line.lineElement.from,to)
                     
@@ -284,8 +282,8 @@
 
     .node {
         position: absolute;
-        width: 100px;
-        aspect-ratio: 1;
+        height: 10vh;
+        aspect-ratio: 1.5;
         display: block;        
         background-color: hsl(var(--bck-hue),30%, 30%);        
         border-radius: 10px;
@@ -305,7 +303,7 @@
 
     .connector {
         position:absolute;
-        width: 16px;
+        width: 12px;
         top: 50%;
         aspect-ratio: 1;
         border-radius: 50%;        
@@ -314,12 +312,12 @@
     }
 
     .left {
-        background-color: white;
+        background-color: rgb(109, 183, 243);
         transform: translate(-50%,-50%);
     }
 
     .right {
-        background-color: wheat;
+        background-color: rgb(228, 166, 166);
         transform: translate(50%,-50%);
     }
 
@@ -328,7 +326,7 @@
         display: block;
         width: 1px;
         height: 3px;        
-        background-color: red;
+        background:linear-gradient(90deg, rgb(228, 166, 166), rgb(109, 183, 243));
         user-select: none;
         transform-origin: 0px 0px;
 
