@@ -64,6 +64,8 @@ class camillaDSP {
             spectrumPort= window.localStorage.getItem("spectrumPort");
         }
 
+        if (server==undefined) return false;
+
         let connect = false;
 
         await this.connectToDSP(server,port).then((r)=>{ 
@@ -97,6 +99,7 @@ class camillaDSP {
         let initSuccess = await this.initAfterConnection();
         if (initSuccess==undefined || initSuccess==false) { console.log("Configuration initialization failed!"); return false}
         
+        this.connected=connect;
         return connect;
 
     }
@@ -109,12 +112,15 @@ class camillaDSP {
     }
 
     connectToDSP(server,port) {        
-        if (server==undefined) {
-            console.error("No server string specified")
-            return false;
-        }        
-        let WS = new WebSocket("ws://"+server+":"+port);
+             
+        
         return new Promise((resolve,reject)=>{        
+            if (server==undefined) {
+                console.error("No server string specified")
+                reject();
+                return;
+            }   
+            let WS = new WebSocket("ws://"+server+":"+port);
             WS.addEventListener('open',function(){                            
                 resolve([true,WS]);
             })

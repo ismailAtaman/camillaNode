@@ -127,9 +127,14 @@ function updateActions(page) {
 
 async function conectToDSP() {
     const DSP = new camillaDSP();
-    await DSP.connect();    
-    window.DSP= DSP;        
-    initIndicators();
+    await DSP.connect();        
+    if (DSP.connected) {
+        window.DSP= DSP;        
+        initIndicators();
+        return true;
+    }
+    return false;
+
 }
 
 async function initIndicators() {

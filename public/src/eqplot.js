@@ -293,7 +293,7 @@ function plot(filterObject, canvas, name, color) {
 	const context = ctx.getContext('2d');             
 	let newColor;
 	if (color!=undefined) newColor = color.toString(16); else newColor="6688BB"
-	console.log("Color ",newColor)
+	// console.log("Color ",newColor)
 
 	// Clear the canvas	
 	// context.clearRect(0, 0, ctx.width, ctx.height);        	

@@ -269,6 +269,9 @@ class preferences {
 
     getPreferences() {
         let returnObject= new Object();
+        
+        if (this.preferenceObject.sections) this.reset()
+
         for (let section of Object.keys(this.preferenceObject.sections)) {
             for (let item of this.preferenceObject[section]) {                                
                 returnObject[item.id]=item.value;

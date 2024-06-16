@@ -8,10 +8,19 @@
 
 <script type="module">
     import camillaDSP from "/src/camillaDSP.js"
-    document.addEventListener("DOMContentLoaded",onload);
+    // document.addEventListener("DOMContentLoaded",onload);
 </script>
 
 <script>
+    const nodeTypes ={
+        input:"input",
+        output:"output",
+        mixer:"mixer",
+        filter:"filter",
+        processor:"processor",
+
+    }
+
     selectedNode=undefined;
     selectedConnector=undefined;
     selectedLine=undefined;
@@ -165,7 +174,7 @@
                 } else if (line.type=="to") {                                        
                     let toConnector = selectedNode.children['connectorL']
                     let toConnectorRect = toConnector.getBoundingClientRect()                    
-                    let to = {"x":toConnectorRect.left - toConnector.offsetLeft ,"y":toConnectorRect.top - toConnector.offsetTop - 10 - 2};                    
+                    let to = {"x":toConnectorRect.left - toConnector.offsetLeft ,"y":toConnectorRect.top - toConnector.offsetTop - 10 - 3};                    
                     line.lineElement.to = to;
                     drawLine(line.lineElement,line.lineElement.from,to)
                     
@@ -208,9 +217,10 @@
         addNode(e.clientX - window.nodeWidth  ,e.clientY - window.nodeHeight )     
     }
 
-    function addNode(left,top) {        
+    function addNode(left,top,type) {        
         if (left==undefined || left<0 ) left = 10;
         if (top==undefined || top<0 ) top = 20;
+        if (type==undefined) type= nodeTypes.filter;
 
         left = clamp(left,10);
         top = clamp(top,20);
@@ -219,6 +229,8 @@
         let editor = document.getElementById("editor");
         let node = document.createElement("div");        
         node.className="node";
+        node.setAttribute("type",type)
+
         node.addEventListener("mousedown",onMouseDown);
         node.addEventListener("mouseup",onMouseUp);            
         node.addEventListener("mousemove",onMouseMove);      
@@ -232,19 +244,23 @@
         node.lines=[];
 
         // connectors
-        let connectorL = document.createElement("div");
-        connectorL.className='connector';
-        connectorL.classList.add("left")
-        connectorL.style.left="0px";        
-        connectorL.id="connectorL";
-        node.appendChild(connectorL);
+        if (type!=nodeTypes.input) {
+            let connectorL = document.createElement("div");
+            connectorL.className='connector';
+            connectorL.classList.add("left")
+            connectorL.style.left="0px";        
+            connectorL.id="connectorL";
+            node.appendChild(connectorL);
+        }
 
-        let connectorR = document.createElement("div");
-        connectorR.className='connector';
-        connectorR.classList.add("right")
-        connectorR.style.right="0px";                
-        connectorR.id="connectorR";
-        node.appendChild(connectorR);
+        if (type!=nodeTypes.output) {
+            let connectorR = document.createElement("div");
+            connectorR.className='connector';
+            connectorR.classList.add("right")
+            connectorR.style.right="0px";                
+            connectorR.id="connectorR";
+            node.appendChild(connectorR);
+        }
 
         editor.appendChild(node);
     }
@@ -338,7 +354,9 @@
     <div id="editor">
         
     </div>
-    <div id="pos"></div>
+    <div id="pos" style="font-size:13px"></div>
+    <div id="contextMenu"></div>
+
 </body>
 
 </html>
