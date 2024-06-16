@@ -270,7 +270,7 @@ class preferences {
     getPreferences() {
         let returnObject= new Object();
         
-        if (this.preferenceObject.sections) this.reset()
+        if (this.preferenceObject.sections==undefined) this.reset()
 
         for (let section of Object.keys(this.preferenceObject.sections)) {
             for (let item of this.preferenceObject[section]) {                                
