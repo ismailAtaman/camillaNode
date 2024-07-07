@@ -180,7 +180,7 @@ filters:
     type: Biquad
     parameters:
       type: Bandpass
-      freq: 24500
+      freq: 14000
       q: 24
   band_28:
     type: Biquad

@@ -1,6 +1,6 @@
 [Unit]
 Description=CamillaDSP2 Daemon
-After=syslog.target
+After=network.target
 StartLimitIntervalSec=10
 StartLimitBurst=10
 
@@ -14,8 +14,6 @@ StandardError=syslog
 SyslogIdentifier=camilladsp
 User=root
 Group=root
-CPUSchedulingPolicy=fifo
-CPUSchedulingPriority=10
 
 [Install]
 WantedBy=multi-user.target
