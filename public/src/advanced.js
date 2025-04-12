@@ -17,15 +17,15 @@ async function advancedOnLoad() {
 
     // loadPipeline(pipelineManagement,window.config.pipeline)
     // loadMixers(channelMapping,window.config.mixers)    
-    await loadPipeline(pipelineContainer,window.parent.DSP)
+    await loadPipeline(pipelineContainer)
 
 
-    await window.parent.DSP.downloadConfig();
-    loadMixers(channelMapping,window.parent.DSP.config.mixers);
+    // await window.parent.DSP.downloadConfig();
+    // loadMixers(channelMapping,window.parent.DSP.config.mixers);
 
 
-    const channelCount = await window.parent.DSP.getChannelCount();
-    loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
+    // const channelCount = await window.parent.DSP.getChannelCount();
+    // loadFilters(advancedFilters,window.parent.DSP.config,channelCount);   
 
     // document.addEventListener('click',function() {
     //     document.getElementById('pipeContextMenu').style.display='none';        
@@ -33,9 +33,12 @@ async function advancedOnLoad() {
 
     
 }
-async function loadPipeline(element, DSP) {    
+async function loadPipeline(element) {    
     element.replaceChildren();
-    const channels = await DSP.linearizeConfig();  
+    // const channels = await DSP.linearizeConfig();  
+    // Todo : Remove when using only Equalizer APO
+    let channels = [[{type:"input",device:{device:"Headphone",format:"S24_LE"}},{type:"filter",Filter_0:{type:"Biquad",parameters:{type:"LPF",freq:1000,Q:0.707}}},{type:"output",device:{device:"Headphone",format:"S24_LE"}}]];
+
     window.channels = channels;  
     const channelCount = channels.length;
     const nodeWidth = 100;
@@ -181,10 +184,10 @@ function loadMixers(element, mixers) {
 function loadFilters(element,config,channelCount) {
     element.replaceChildren();
     const filters = config.filters;
-    const pipeline = config.pipeline;
-    const DSP = window.parent.DSP;
-
-
+    // const pipeline = config.pipeline;
+    const pipeline = [{type:"Filter",channel:0,names:["Filter_0"]}];
+    // const DSP = window.parent.DSP;
+    
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
         let filterChannel = document.createElement("div"); 
         filterChannel.className='filterChannel'; 
@@ -204,7 +207,8 @@ function loadFilters(element,config,channelCount) {
 }
 
 function loadFilter(filterName) {
-    let filter = new window.filter(window.parent.DSP)
+    // let filter = new window.filter(window.parent.DSP)
+    let filter = new window.filter()
     filter.loadFromDSP(filterName);
     return createFilterElement(filter);    
 }
@@ -313,16 +317,17 @@ async function deleteNode() {
     let nodeType = selectedNode.getAttribute("nodeType");
     if (nodeType=="output" || nodeType=="input") {
         alert("Input and output nodes can not be deleted.");
-        
     } else if (nodeType=="filter") {
         let filterName = selectedNode.id;
         if (confirm("Are you sure you would like like to delete filter '"+filterName+"'?")) {
-            window.parent.DSP.removeFilter(filterName);
-            await window.parent.DSP.uploadConfig();
+            // window.parent.DSP.removeFilter(filterName);
+            // await window.parent.DSP.uploadConfig();
             // document.getElementById(filterName).remove();
+            alert("Filter removed")
         };              
         
     }
+
 
     document.getElementById("pipeContextMenu").style.display='none';            
     const pipelineContainer = document.getElementById("pipelineContainer");

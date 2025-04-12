@@ -5,11 +5,11 @@ async function basicLoad() {
     const basicControls = document.getElementById('basicControls');
     const ctx = document.getElementById('plotCanvas');    
 
-    DSP = window.parent.DSP;            
 
     // Load default frequencies for tone controls
-    DSP.subBassFreq= parseInt(window.parent.activeSettings.subBassFreq)
-    DSP.bassFreq= parseInt(window.parent.activeSettings.bassFreq)
+
+    window.parent.DSP.subBassFreq= parseInt(window.parent.activeSettings.subBassFreq)
+    window.parent.DSP.bassFreq= parseInt(window.parent.activeSettings.bassFreq)
     DSP.midsFreq= parseInt(window.parent.activeSettings.midsFreq)
     DSP.upperMidsFreq= parseInt(window.parent.activeSettings.upperMidsFreq)
     DSP.trebleFreq= parseInt(window.parent.activeSettings.trebleFreq)
@@ -60,14 +60,11 @@ async function basicLoad() {
     // Event Listeners
     vol.knob.addEventListener("change",function(e){
         const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
-        DSP.sendDSPMessage({"SetVolume":volume})
-        DSP.sendSpectrumMessage({"SetVolume":volume})
+        window.parent.DSP.sendSpectrumMessage({"SetVolume":volume})
     })
 
     balance.knob.addEventListener("change",function(e){
-        const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
-        DSP.setBalance(bal);
-        DSP.uploadConfig();        
+        const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick                    
     })
 
     crossfeed.knob.addEventListener("change",function(e){
@@ -101,7 +98,6 @@ function updateElementWidth() {
     const basicControls = document.getElementById("basicControls");       
     const canvas = document.getElementById("plotCanvas");           
     const ctx = document.getElementById('plotCanvas');    
-    DSP = window.parent.DSP;            
     
     canvas.width = basicControls.getBoundingClientRect().width;
     plotConfig();
@@ -109,46 +105,37 @@ function updateElementWidth() {
 
 async function loadData() {
     const ctx = document.getElementById('plotCanvas');    
-    DSP = window.parent.DSP;            
     
-
-    // Load v from DSP
-    DSP.sendDSPMessage("GetVolume").then(r=>{            
-        let volMarker = r/3*10 + 181;
-        vol.setVal(volMarker);            
-    });
-
-    await DSP.downloadConfig();
 
     // Load crossfeed
-    let crossfeedVal = DSP.getCrossfeed() * 20 + 331;        
-    crossfeed.knob.instance.setVal(crossfeedVal);
+    // let crossfeedVal = DSP.getCrossfeed() * 20 + 331;        
+    // crossfeed.knob.instance.setVal(crossfeedVal);
 
     // Load balance
-    let bal = DSP.getBalance() * 10 +181;
-    balance.knob.instance.setVal(bal)
+    // let bal = DSP.getBalance() * 10 +181;
+    // balance.knob.instance.setVal(bal)
 
     // Load filters if they don't exist
-    if (DSP.config.filters["__subBass"]==undefined) {        
-        DSP.setTone(0,0,0,0,0);                
-        await DSP.uploadConfig();
-        console.log("Basic filters created at default values.")
-    } else {
-        // If gain is zero, change the freq setting to the latest freq set in preferences
-        if (DSP.config.filters["__subBass"].parameters.gain==0) DSP.config.filters["__subBass"].parameters.freq=parseInt(window.parent.activeSettings.subBassFreq)
-        if (DSP.config.filters["__bass"].parameters.gain==0)    DSP.config.filters["__bass"].parameters.freq=parseInt(window.parent.activeSettings.bassFreq)
-        if (DSP.config.filters["__mids"].parameters.gain==0)    DSP.config.filters["__mids"].parameters.freq=parseInt(window.parent.activeSettings.midsFreq)
-        if (DSP.config.filters["__upperMids"].parameters.gain==0) DSP.config.filters["__upperMids"].parameters.freq=parseInt(window.parent.activeSettings.upperMidsFreq)
-        if (DSP.config.filters["__treble"].parameters.gain==0)  DSP.config.filters["__treble"].parameters.freq=parseInt(window.parent.activeSettings.trebleFreq)
-    }
+    // if (DSP.config.filters["__subBass"]==undefined) {        
+    //     DSP.setTone(0,0,0,0,0);                
+    //     await DSP.uploadConfig();
+    //     console.log("Basic filters created at default values.")
+    // } else {
+    //     // If gain is zero, change the freq setting to the latest freq set in preferences
+    //     if (DSP.config.filters["__subBass"].parameters.gain==0) DSP.config.filters["__subBass"].parameters.freq=parseInt(window.parent.activeSettings.subBassFreq)
+    //     if (DSP.config.filters["__bass"].parameters.gain==0)    DSP.config.filters["__bass"].parameters.freq=parseInt(window.parent.activeSettings.bassFreq)
+    //     if (DSP.config.filters["__mids"].parameters.gain==0)    DSP.config.filters["__mids"].parameters.freq=parseInt(window.parent.activeSettings.midsFreq)
+    //     if (DSP.config.filters["__upperMids"].parameters.gain==0) DSP.config.filters["__upperMids"].parameters.freq=parseInt(window.parent.activeSettings.upperMidsFreq)
+    //     if (DSP.config.filters["__treble"].parameters.gain==0)  DSP.config.filters["__treble"].parameters.freq=parseInt(window.parent.activeSettings.trebleFreq)
+    // }
     
-    // console.log("Subbass:",DSP.config.filters["__subBass"].parameters.gain);
+    
 
-    subBass.knob.instance.setVal(DSP.config.filters["__subBass"].parameters.gain*10+181);
-    bass.knob.instance.setVal(DSP.config.filters["__bass"].parameters.gain*10+181);
-    mids.knob.instance.setVal(DSP.config.filters["__mids"].parameters.gain*10+181);
-    upperMids.knob.instance.setVal(DSP.config.filters["__upperMids"].parameters.gain*10+181);
-    treble.knob.instance.setVal(DSP.config.filters["__treble"].parameters.gain*10+181);
+    // subBass.knob.instance.setVal(DSP.config.filters["__subBass"].parameters.gain*10+181);
+    // bass.knob.instance.setVal(DSP.config.filters["__bass"].parameters.gain*10+181);
+    // mids.knob.instance.setVal(DSP.config.filters["__mids"].parameters.gain*10+181);
+    // upperMids.knob.instance.setVal(DSP.config.filters["__upperMids"].parameters.gain*10+181);
+    // treble.knob.instance.setVal(DSP.config.filters["__treble"].parameters.gain*10+181);
     
     plotConfig();
 }
@@ -159,22 +146,22 @@ function plotConfig() {
 	context.clearRect(0, 0, canvas.width, canvas.height);        	
     
     if (window.parent.activeSettings.peqDualChannel) {
-        let colors = ["#B55","#55B","#5B5","#F33","#33F","#3F3"]
-        let channelCount = DSP.getChannelCount();
-        for (let channelNo=0;channelNo<channelCount;channelNo++) {
-            let channelFilters = {};
-            filterList=DSP.getChannelFiltersList(channelNo)                
-            for (let filter of filterList) {     
-                channelFilters[filter]=DSP.config.filters[filter];
-            }
-            plot(channelFilters,canvas,DSP.config.title,colors[channelNo]);
-        }
+        // let colors = ["#B55","#55B","#5B5","#F33","#33F","#3F3"]
+        // let channelCount = DSP.getChannelCount();
+        // for (let channelNo=0;channelNo<channelCount;channelNo++) {
+        //     let channelFilters = {};
+        //     filterList=DSP.getChannelFiltersList(channelNo)                
+        //     for (let filter of filterList) {     
+        //         channelFilters[filter]=DSP.config.filters[filter];
+        //     }
+        //     plot(channelFilters,canvas,DSP.config.title,colors[channelNo]);
+        // }
 
     } else {
-        let hue = (Math.abs((parseInt(window.parent.activeSettings.backgroundHue) + 10 )) % 360) /360;        
+        let hue = (Math.abs((parseInt(window.parent.activeSettings.backgroundHue) + 10 )) % 360) /360;
         let color = hslToRgb(hue, 0.3, 0.3);
         let colorNum = (color[0]+color[1]*255+color[2]*255*255);
-        plot(DSP.config.filters,canvas,DSP.config.title,colorNum);            
+        //plot(DSP.config.filters,canvas,DSP.config.title,colorNum);            
     }    
 }
 
@@ -197,8 +184,8 @@ async function setTone() {
     trebleVal = (parseInt(trebleVal)-181)/10
     
     // console.log(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal);
-    let config = DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
-    await DSP.uploadConfig();
+    // let config = DSP.setTone(subBassVal,bassVal,midsVal,upperMidsVal,trebleVal); 
+    // await DSP.uploadConfig();
     const canvas = document.getElementById('plotCanvas');        
     plotConfig();
 }
@@ -239,8 +226,7 @@ async function initSpectrum(){
     
     setInterval(async function(){
         const spec = document.getElementById("spectrum");
-        let r = await DSP.getSpectrumData();                
-        
+        let r = await window.parent.DSP.getSpectrumData();                        
         let i=0, height, boxCount, count;
         spec.childNodes.forEach(e=>{
             if (e.tagName=="DIV") {                         

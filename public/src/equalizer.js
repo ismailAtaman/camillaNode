@@ -2,12 +2,8 @@
 document.loading=false;        
         
 // Run equalizerOnLoad function after DSP is connected.
-let interval;
-interval = setInterval(function(){            
-    // console.log(window.parent.DSP);
-    if (window.parent.DSP!=undefined) {                
-        equalizerOnLoad();
-        clearInterval(interval);
+if (window.parent.DSP!=undefined) {                
+    equalizerOnLoad();
     }
 },100);
 
@@ -15,7 +11,7 @@ interval = setInterval(function(){
 async function equalizerOnLoad() {            
     document.loading=true;
     const PEQ = document.getElementById('PEQ');                
-    DSP=window.parent.DSP;            
+    DSP=window.parent.DSP;                                
 
 
     // Open a floating spectrum window on spectrum double click
@@ -31,59 +27,15 @@ async function equalizerOnLoad() {
     /// Basics Controls Section
     const basicControls = document.getElementById('basicControls');
 
-    // Create UI elements
-    let vol = new EQKnob("Volume",31);        
-    let balance = new EQKnob("Balance",181);
-    let crossfeed = new EQKnob("Crossfeed",31);
-    let preamp = new EQKnob("Pre-amp",181);
+      // Create UI elements
+      let preamp = new EQKnob("Pre-amp",181);
 
-    crossfeed.knob.instance.offAtDefault=true;
-    balance.knob.instance.offAtDefault=true;
-    preamp.knob.instance.offAtDefault=true;
-    
-    basicControls.appendChild(vol.knob);        
-    basicControls.appendChild(balance.knob)
-    basicControls.appendChild(crossfeed.knob)
-    basicControls.appendChild(preamp.knob)
-
-    window.vol=vol;
-    window.balance=balance;
-    window.crossfeed=crossfeed;
-    window.preamp=preamp;
-
-    // Load data from DSP
-    DSP.sendDSPMessage("GetVolume").then(r=>{            
-        let volMarker = r/3*10 + 181;
-        vol.setVal(volMarker);            
-    });
-
-    // load crossfeed
-    let crossfeedVal = await DSP.getCrossfeed() * 20 +331;        
-    crossfeed.knob.instance.setVal(crossfeedVal);
-    
-    // load balance
-    let bal = await DSP.getBalance() * 10 +181;
-    balance.knob.instance.setVal(bal)
-
-    vol.knob.addEventListener("change",function(e){
-        const volume = (this.instance.getVal() -181)/10*3; // 3db change per every tick            
-        DSP.sendDSPMessage({"SetVolume":volume})
-        DSP.sendSpectrumMessage({"SetVolume":volume})
-        
-    })
-
-    balance.knob.addEventListener("change",function(e){
-        const bal = (this.instance.getVal() -181)/10*1; // 1db change per every tick            
-        DSP.setBalance(bal);
-        DSP.uploadConfig();
-    })
-
-    crossfeed.knob.addEventListener("change",function(e){
-        let crossfeedVal = (this.instance.getVal()-331)/20;
-        // console.log(crossfeedVal)
-        DSP.setCrossfeed(crossfeedVal);
-        DSP.uploadConfig();
-    })
+      preamp.knob.instance.offAtDefault=true;
+      
+      basicControls.appendChild(preamp.knob)
+  
+      window.preamp=preamp;
+  
 
     preamp.knob.addEventListener("change",async function(e){
         const preampGain = (this.instance.getVal() -181)/10*1; // 1db change per every tick       
@@ -110,13 +62,11 @@ async function equalizerOnLoad() {
     
 
     if(window.parent.activeSettings.showEqualizerSpectrum && window.parent.activeSettings.enableSpectrum) {        
-        spec.style.display="grid";
+        spec.style.display="grid";        
         initSpectrum();    
     } else {
         spec.style.display="none";
-    }
-
-    
+    }   
 }
 
 function updateElementWidth() {
@@ -142,20 +92,18 @@ async function loadFiltersFromConfig() {
     if (multiChannel) {
         let singleChannel = DSP.isSingleChannel();        
         if (singleChannel) DSP.splitFiltersToChannels();
-
         window.document.documentElement.style.setProperty("--peq-columns","1fr 1fr");
         window.document.documentElement.style.setProperty("--peq-before-grid-column","1 / span 2;");    
         window.document.documentElement.style.setProperty("--peq-channel-before-display","block");
     } else {        
         let singleChannel = DSP.isSingleChannel();   
-        // console.log("DSP config single channel?",singleChannel);     
         if (!singleChannel) DSP.mergeFilters();                       
     }        
 
-    await DSP.uploadConfig();
     await DSP.downloadConfig();
 
     let channelCount = DSP.getChannelCount();    
+    console.log("channels : ",channelCount)
     for (let channelNo=0;channelNo<channelCount;channelNo++) {
         let peqChannel = document.createElement('div');
         peqChannel.className="peqChannel"; peqChannel.id="peqChannel"+channelNo;
@@ -165,7 +113,7 @@ async function loadFiltersFromConfig() {
 
         let filterList;        
         filterList=DSP.getChannelFiltersList(channelNo)
-        // console.log("Filter list of channel No",channelNo," : " , filterList)        
+        console.log("Filter list of channel No",channelNo," : " , filterList)        
         
         for (let filterName of filterList) {        
             let currentFilter = new window.filter(DSP);            
@@ -176,7 +124,8 @@ async function loadFiltersFromConfig() {
 
             if (currentFilter.getType()=="Gain") {
                 let gain =Math.round(currentFilter.getParameters().gain);                           
-                preamp.setVal(gain * 10 + 181);
+                window.preamp.setVal(gain * 10 + 181);
+                // console.log("Preamp ",preamp)
             }
             
             currentFilter.createElementCollection(true);
@@ -189,7 +138,7 @@ async function loadFiltersFromConfig() {
 
     sortAll();        
     document.loading=false;    
-    await DSP.uploadConfig();
+    // await DSP.uploadConfig();
 }
 
 function createFilterElement(currentFilter) {
@@ -270,7 +219,7 @@ function plotConfig() {
 }
 
 function setPreamp(gain) {    
-    if (DSP.config.filters.Gain == undefined) {        
+    if (DSP.config.filters.Gain == undefined) {      
         let gainFilter = {}
         gainFilter["Gain"]={"type":"Gain","parameters":{"gain":0,"inverted":false,"scale":"dB"}};
         DSP.addFilterToAllChannels(gainFilter);
@@ -372,7 +321,7 @@ async function removeFilter(e) {
 
     console.log("Removed "+filterName);
 
-    // Remove from current channel. if Dual Channel EQ is off remove from other channel as well
+    // Remove from current channel. if Dual Channel EQ is off remove from other channel as well    
     DSP.removeFilterFromChannelPipeline(filterName,channel);
     if (window.parent.activeSettings.peqDualChannel==false) DSP.removeFilterFromChannelPipeline(filterName,1-parseInt(channel));    
 
@@ -437,14 +386,15 @@ async function initSpectrum(parentWindow){
     // console.log("Level per box ",levelPerBox);
     // Get the data and update the analyser
     
-    setInterval(async function(){
+    // Spectrum analyzer
+    let spectrumInterval = setInterval(async function(){
         const spec = document.getElementById("spectrum");                
         let r = await DSP.getSpectrumData();                                    
-        if (r.length==0) return;                
+        if (r.length==0) return;                                 
 
         let i=0, height, pos, count, level;
         spec.childNodes.forEach(e=>{
-            if (e.tagName=="DIV") {  
+            if (e.tagName=="DIV") {                  
                 level = -Math.round(r[i]);
                 let pos = boxCount - (level/levelPerBox);                        
                 count=0;
@@ -454,9 +404,10 @@ async function initSpectrum(parentWindow){
                         count++;
                     }
                 })
-                i=i+2;
+                i=i+2;                
             }                     
         }) 
+    
     },100)
 
 }
@@ -541,3 +492,52 @@ function hslToRgb(h, s, l) {
     if (t < 2.0/3.0) return p + (q - p) * (2.0/3.0 - t) * 6;
     return p;
   }
+
+// create eq template for equalizer apo
+async function createEqApo() {
+  // Create a template for Equalizer APO
+  let result = "GraphicEQ: ";
+
+  let channelCount = DSP.getChannelCount();
+  for (let channelNo = 0; channelNo < channelCount; channelNo++) {    
+    let channelFilters = {};
+    filterList = DSP.getChannelFiltersList(channelNo);
+    for (let filter of filterList) {
+      channelFilters[filter] = DSP.config.filters[filter];
+    }
+    // result += `Channel: ${channelNo + 1}\n`;
+    for (let filterName in channelFilters) {
+      const filterData = channelFilters[filterName];
+      if (filterData.type === "Biquad") {
+        const params = filterData.parameters;
+        let gainParam = params.gain ? ` Gain ${params.gain.toFixed(2)}` : "";
+        result += `    Filter: ${params.type} ${params.freq.toFixed(1)} Hz Q ${params.q.toFixed(3)}${gainParam}\n`;
+      } else if (filterData.type === "Gain") {
+          result += `    Preamp: ${filterData.parameters.gain.toFixed(1)}\n`
+      }      
+    }    
+    
+  }
+
+  let channelFilters = {};
+    filterList = DSP.getChannelFiltersList(0);
+    let filters={};
+    for (let filter of filterList) {
+      filters[filter] = DSP.config.filters[filter];
+    }
+  let gainList=[];
+  for (let filterName in filters) {
+    const filterData = filters[filterName];
+    if (filterData.type == "Biquad") gainList.push([filterData.parameters.freq,filterData.parameters.gain]);
+  }
+  gainList.sort((a,b)=>{return a[0]-b[0]})
+  for (let gain of gainList) result+=gain[0]+" "+gain[1]+" "
+  return result;
+}
+
+async function exportEqApo() {
+  let template = await createEqApo();
+  let blob = new Blob([template], { type: "text/plain;charset=utf-8" });  
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement("a"); a.href = url; a.download = DSP.config.title+".txt"; a.click();
+}

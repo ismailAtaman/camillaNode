@@ -14,14 +14,7 @@ class preferences {
     getDefaults() {
         let tmpPref =  new Object();
         tmpPref["sections"] = {"general":"Generel Preferences","ui":"User Interface Preferences","basic":"Basic Section Preferences","equalizer":"Equalizer Section Preferences"}
-        tmpPref["general"] = [
-            {"id":"DCProtection",
-            "name":"Enable DC Protection",        
-            "value":true,
-            "type":"boolean",
-            "enabled":true,
-            },
-
+        tmpPref["general"] = [            
             {"id":"enableSpectrum",
             "name":"Enable Spectrum Analyzer",        
             "value":true,
@@ -128,8 +121,7 @@ class preferences {
             "type":"boolean",                        
             "enabled":true,
             },        
-
-            {"id":"peqSingleLine",
+            {"id":"peqSingleLine",            
             "name":"Show PEQ filters in a single line in single channel mode",
             "value":true,
             "type":"boolean",                        

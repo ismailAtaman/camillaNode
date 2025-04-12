@@ -12,15 +12,9 @@ const configsFile = "savedConfigs.dat"
 //// Global variables
 let strAppConfig;
 
-if (fs.existsSync('camillaNodeConfig.json')) {
-    strAppConfig = fs.readFileSync('camillaNodeConfig.json');
-} else {
-    strAppConfig = JSON.stringify({"port":80})
-    fs.writeFileSync('camillaNodeConfig.json',strAppConfig);   
-}
-let appConfig = JSON.parse(strAppConfig);
+let appConfig = {"port":80};
 
-PORT = appConfig.port;
+PORT = 3000;
 let currentConfigName="";
 
 //// Global settings
@@ -61,25 +55,6 @@ app.get('/preferences',(req,res)=>{
 app.get('/spectrum',(req,res)=>{
     res.sendFile(__dirname+'/public/html/spectrum.html');
 }) 
-
-// app.post('/validateConfig',(req,res)=>{
-//     let queryResponse="";
-//     req.on('data', function(chunk) {
-//         queryResponse+=chunk;        
-//     }).on('end', function(){
-//         let config = JSON.parse(queryResponse);              
-//         let fileName = configsFile;
-//         // console.log(fileName)
-//         let fileBuffer = Buffer.from(JSON.stringify(config),'utf-8');        
-//         fs.writeFileSync(fileName,fileBuffer,function(err){
-//             console.log("Error saving file ",fileName,"\n",err);            
-//         });        
-//         res.end();
-//     }); 
-    
-// })
-
-
 
 app.post('/saveConfigName',(req,res)=>{
     let queryResponse="";
@@ -194,41 +169,4 @@ app.get('/deleteConfig',function(req,res){
     }
 })
 
-
-app.get('/log',function(req,res){    
-    // Check camilla    
-
-})
-
-app.get('/restartService',function(req,res){
-    // const { exec } = require('child_process');
-    // exec('sudo service camilldasp restart', (err, stdout, stderr) => {
-    //     if (err) {
-    //         //some err occurred
-    //         console.error(err);
-    //         // res.write({"status":"error","details":stderr})            
-    //     } else {
-    //     // the *entire* stdout and stderr (buffered)
-    //     console.log(`stdout: ${stdout}`);
-    //     console.log(`stderr: ${stderr}`);
-    //     }
-    // })
-})
-    
-    
-
-
-
-// const { exec } = require('child_process');
-// exec('dir', (err, stdout, stderr) => {
-//   if (err) {
-//     //some err occurred
-//     console.error(err)
-//   } else {
-//    // the *entire* stdout and stderr (buffered)
-//    console.log(`stdout: ${stdout}`);
-//    console.log(`stderr: ${stderr}`);
-//   }
-// });
-
-app.listen(PORT,console.log(`CamillaNode is running on port ${PORT}...`));
+app.listen(PORT,console.log(`Equalizer APO app is running on port ${PORT}...`));
