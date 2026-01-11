@@ -356,6 +356,12 @@ select {
     background: hsl(var(--bck), 30%, 70%);   
     border: 0px solid 333;    
     box-shadow: 0px 0px 5px 0px hsl(var(--bck), 30%, 70%); 
+    transition: all 250ms ease;
+}
+
+.knob.is-selected {
+    box-shadow: 0px 0px 15px 3px hsl(var(--bck), 50%, 80%);
+    transform: scale(1.1);
 }
 
 .knob::before {
@@ -499,9 +505,17 @@ select {
     align-items: center;    
     user-select: none;
     border:1px solid hsl(var(--bck-hue), 20%, 30%);        
-    border-radius: 7px;            
+    border-radius: 7px;
+    transition: all 250ms ease;
 }
 
+.peqElement.is-selected {
+    border: 2px solid hsl(var(--bck-hue), 60%, 60%);
+    box-shadow: 0px 0px 20px 3px hsl(var(--bck-hue), 50%, 40%);
+    background: linear-gradient(90deg, 
+        hsla(var(--bck-hue), 40%, 22%, 0.6),
+        hsla(var(--bck-hue), 35%, 15%, 0.3));
+}
 
 .peqElement:hover {        
     filter: saturate(1.15) brightness(1.15);

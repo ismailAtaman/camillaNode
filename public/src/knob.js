@@ -1,5 +1,6 @@
-
-
+/**
+ * Represents an equalizer knob component.
+ */
 class EQKnob {    
     #knobHeadDot; 
 
@@ -8,6 +9,13 @@ class EQKnob {
     defaultVal;
     offAtDefault=false;
 
+    /**
+     * Create an EQKnob.
+     * @param {string} label - The label for the knob.
+     * @param {number|string} val - The initial value of the knob.
+     * If '181', sets offset to -15.
+     * Sets knob's label attribute to the specified label.
+     */    
     constructor(label,val) {
         this.knob = document.createElement('div');
         const knobHead = document.createElement('div');
@@ -28,6 +36,7 @@ class EQKnob {
         if (val=="181") this.knobHeadDot.setAttribute("offset",-15);
         this.knob.setAttribute("label",label);
 
+        // Observe changes to knobHeadDot's attributes and update knob UI accordingly
         const observer = new MutationObserver(function(muts){
             muts.forEach(function(mut){                
                 if (mut.type=="attributes" && mut.attributeName=="val") {                    
@@ -51,9 +60,10 @@ class EQKnob {
                     }              
 
                     const valElement = knob.children[1];
-                    valElement.innerText=((val-31)/10)+offset;
+                    const displayValue = ((val-31)/10)+offset;
+                    valElement.innerText = Number(displayValue.toFixed(1));
                     valElement.style.opacity='1';
-                    setTimeout(function(e){e.style.opacity='0';},1000,valElement);     
+                    setTimeout(function(e){e.style.opacity='0';},1000,valElement);
                 }
             })
         })        
@@ -82,20 +92,27 @@ class EQKnob {
         return this;
     }
 
+    /**
+     * Get the current value of the knob.
+     * @returns {string} The current value set on the knobHeadDot attribute.
+     */
     getVal() {
         return this.knobHeadDot.getAttribute("val");        
     }
 
+    /**
+     * Set the value of the knob.
+     * @param {number|string} v - The value to be set on the knob. 
+     * Rounds and applies if numeric, otherwise direct set.
+     * @returns {number|string} The processed value being set.
+     */
     setVal(v) {
-        this.knobHeadDot.setAttribute("val",v);
-        return v;
+        const num = Number(v);
+        const clean = Number.isFinite(num) ? Math.round(num) : v;
+        this.knobHeadDot.setAttribute("val", clean);
+        return clean;
     }
-
-
-
-
 
 }
 
-
-export default EQKnob; 
+export default EQKnob;

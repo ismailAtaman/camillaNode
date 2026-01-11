@@ -65,6 +65,8 @@ Simple tone controls for quick adjustments:
 
 Each tone control provides ±12 dB of adjustment using shelving/peaking filters.
 
+**Interactive graph:** Click a tone marker on the graph to select it. Drag to adjust frequency/gain. Hold **Shift** while dragging to adjust **Q**.
+
 #### Saving Basic Configurations
 
 1. Click the **Manage Configurations** icon in the toolbar
@@ -83,7 +85,9 @@ Each tone control provides ±12 dB of adjustment using shelving/peaking filters.
 
 ![Equalizer](../public/img/equalizer.png)
 
-Advanced parametric equalizer with visual frequency response:
+Advanced parametric equalizer with visual frequency response.
+
+**Interactive graph:** Click a filter marker on the graph to select the corresponding filter. Drag to adjust frequency/gain; **Shift+drag** adjusts Q.
 
 #### Adding Filters
 

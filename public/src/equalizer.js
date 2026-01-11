@@ -12,6 +12,11 @@ interval = setInterval(function(){
 },100);
 
 
+/**
+ * Initialize and load the parametric equalizer interface with all controls
+ * Sets up knobs, loads filters from DSP config, creates filter UI elements, and enables interactive plot markers
+ * @returns {Promise<void>} Promise that resolves when initialization is complete
+ */
 async function equalizerOnLoad() {            
     document.loading=true;
     const PEQ = document.getElementById('PEQ');                
@@ -101,13 +106,17 @@ async function equalizerOnLoad() {
 
     // Plot the config
     plotConfig();              
+    
+    // Enable interactive marker dragging and selection
+    setupPlotInteraction();
+    
+    // Enable PEQ element selection highlighting
+    setupPEQSelection();
 
     // change loading to false after 50ms to avoud update running multiple times during loading.            
     setInterval(function(){document.loading=false},50);            
 
-    const spec = document.getElementById("spectrum");   
-
-    
+    const spec = document.getElementById("spectrum");
 
     if(window.parent.activeSettings.showEqualizerSpectrum && window.parent.activeSettings.enableSpectrum) {        
         spec.style.display="grid";
@@ -119,20 +128,35 @@ async function equalizerOnLoad() {
     
 }
 
+/**
+ * Update canvas width and spectrum bar widths to match window dimensions
+ * Ensures proper visual alignment by recalculating widths and accounting for CSS padding
+ * @returns {void}
+ */
 function updateElementWidth() {
-    const spec = document.getElementById("spectrum");   
+    const spec = document.getElementById("spectrum");
     const barCount=spec.childNodes.length-1;
     const barWidth= (spec.getBoundingClientRect().width - (barCount*6)) / barCount;
     document.documentElement.style.setProperty("--levelbar-width",barWidth+"px") 
     
-    const canvas = document.getElementById("plotCanvas");           
-    canvas.width = spec.getBoundingClientRect().width - 20;
+    const canvas = document.getElementById("plotCanvas");
+    
+    // Compute canvas horizontal padding from CSS to ensure visual width alignment
+    const canvasStyle = getComputedStyle(canvas);
+    const paddingX = parseFloat(canvasStyle.paddingLeft) + parseFloat(canvasStyle.paddingRight);
+    
+    canvas.width = spec.getBoundingClientRect().width - paddingX;
     plotConfig();
 }
 
 
+/**
+ * Load all biquad filters from DSP config and create UI elements for each
+ * Handles single/dual channel modes by splitting or merging filters as needed and creates filter elements sorted by frequency
+ * @returns {Promise<void>} Promise that resolves when filters are loaded and UI is built
+ */
 async function loadFiltersFromConfig() {                        
-    PEQ.innerHTML='';                
+    PEQ.innerHTML='';
     
     await DSP.downloadConfig();
 
@@ -192,6 +216,12 @@ async function loadFiltersFromConfig() {
     await DSP.uploadConfig();
 }
 
+/**
+ * Create a UI element for a given filter with controls for type, subtype, parameters, and add/remove buttons
+ * Configures layout based on single-line or multi-line mode settings
+ * @param {Object} currentFilter - The filter object for which to create the UI element
+ * @returns {HTMLElement} The constructed filter UI element
+ */
 function createFilterElement(currentFilter) {
     // currentFilter.createElement(true);            
 
@@ -243,10 +273,23 @@ function createFilterElement(currentFilter) {
     return peqElement;
 }
 
+/** Plot the current DSP configuration on the canvas
+ * Supports single and dual channel modes with distinct colors for each channel
+ * Filters system filters and only displays parametric EQ (PEQ) filters
+ * @returns {void}
+ */
 function plotConfig() {
     const canvas = document.getElementById("plotCanvas");        
     const context = canvas.getContext('2d');             
 	context.clearRect(0, 0, canvas.width, canvas.height);        	
+    
+    // Filter function: only show markers for PEQ filters (exclude system filters starting with __)
+    const isPEQFilter = (filterName, filterDef) => {
+        return filterDef?.type === 'Biquad' && !filterName.startsWith('__');
+    };
+    
+    // Get current selection state
+    const selectedFilterBases = window.__eqSelectedBase ? new Set([window.__eqSelectedBase]) : null;
     
     if (window.parent.activeSettings.peqDualChannel) {
         let colors = ["#B55","#55B","#5B5","#F33","#33F","#3F3"]
@@ -257,7 +300,14 @@ function plotConfig() {
             for (let filter of filterList) {     
                 channelFilters[filter]=DSP.config.filters[filter];
             }
-            plot(channelFilters,canvas,DSP.config.title,colors[channelNo]);
+            // Accumulate markers across channels for multi-channel mode
+            plot(channelFilters, canvas, DSP.config.title, colors[channelNo], channelNo, {
+                markerFilter: isPEQFilter,
+                interactiveFilter: isPEQFilter,
+                appendMarkers: channelNo > 0,
+                drawGrid: channelNo === 0,
+                selectedFilterBases: selectedFilterBases
+            });
         }
 
     } else {
@@ -265,10 +315,19 @@ function plotConfig() {
         // console.log("Start hue : ",window.parent.activeSettings.backgroundHue,hue*360,hue)
         let color = hslToRgb(hue, 0.3, 0.3);
         let colorNum = (color[0]+color[1]*255+color[2]*255*255);
-        plot(DSP.config.filters,canvas,DSP.config.title,colorNum);            
+        plot(DSP.config.filters, canvas, DSP.config.title, colorNum, undefined, {
+            markerFilter: isPEQFilter,
+            interactiveFilter: isPEQFilter,
+            selectedFilterBases: selectedFilterBases
+        });            
     }    
 }
 
+/** Set the preamp gain in the DSP configuration
+ * Adds a Gain filter if not already present and updates its gain parameter
+ * @param {number} gain - The desired preamp gain in dB
+ * @returns {void}
+ */
 function setPreamp(gain) {    
     if (DSP.config.filters.Gain == undefined) {        
         let gainFilter = {}
@@ -278,6 +337,9 @@ function setPreamp(gain) {
     DSP.config.filters.Gain.parameters.gain= Math.round(gain);                    
 }
 
+/** Sort all PEQ channel elements by filter frequency
+ * @returns {void}
+ */
 function sortAll() {
     const PEQs=document.getElementsByClassName("peqChannel");                        
     for (let PEQ of PEQs) {
@@ -285,6 +347,10 @@ function sortAll() {
     }
 }
 
+/** Sort child PEQ elements of a parent container by their filter frequency
+ * @param {HTMLElement} parent - The parent container whose child PEQ elements will be sorted
+ * @returns {void}
+ */
 function sortByFreq(parent) {    
     let elementArray=[];
     parent.childNodes.forEach(element => {                        
@@ -306,6 +372,10 @@ function sortByFreq(parent) {
     }            
 }
 
+/** Clear all PEQ filters from DSP configuration and UI
+ * Resets preamp gain to 0 dB and updates the plot
+ * @returns {Promise<void>} Promise that resolves when clearing is complete
+ */
 async function clearPEQ() {        
     setPreamp(0);
     DSP.clearFilters();       
@@ -316,6 +386,11 @@ async function clearPEQ() {
     plotConfig(); 
 }
 
+/** Add a new filter to the specified channel at the appropriate frequency
+ * Inserts the new filter UI element in sorted order and uploads to DSP
+ * @param {Event} e - The event triggering the addition, contains context for insertion point
+ * @returns {Promise<void>} Promise that resolves when the filter is added
+ */
 async function addNewFilter(e) {    
     // Create a filter object based on default filter 
     let newFilter = new window.filter(DSP);    
@@ -365,6 +440,11 @@ async function addNewFilter(e) {
     
 }
 
+/** Remove a filter from DSP configuration and UI
+ * Also removes from the other channel if dual channel mode is off
+ * @param {Event} e - The event triggering the removal, contains context for which filter to remove
+ * @returns {Promise<void>} Promise that resolves when the filter is removed
+ */
 async function removeFilter(e) {
     let peqChannel= e.target.parentElement;
     let channel = parseInt(peqChannel.getAttribute("channelno"));
@@ -386,10 +466,18 @@ function resetPEQ() {
     console.log("Reset needs to be re-implemented")
 }
 
+/** Frequencies for spectrum analyzer bars
+ * @type {string[]}
+ */
 const  freq = ['25', '30', '40', '50', '63', '80', '100', '125', '160', '200', '250',
 '315', '400', '500', '630', '800', '1K', '1.2K', '1.6K', '2K', '2.5K',
 '3.1K', '4K', '5K', '6.3K', '8K', '10K', '12K', '16K', '20K']
 
+/** Initialize the spectrum analyzer display with bars and boxes
+ * Sets up the visual elements and starts periodic updates to reflect audio spectrum data
+ * @param {Window} [parentWindow=window] - The parent window context for accessing settings and DOM
+ * @returns {Promise<void>} Promise that resolves when initialization is complete
+ */
 async function initSpectrum(parentWindow){         
     
     if (!window.parent.activeSettings.enableSpectrum) return;
@@ -461,6 +549,10 @@ async function initSpectrum(parentWindow){
 
 }
 
+/** Converts camillaNode v1 configurations to v2 configurations
+ * Fetches existing v1 configs, transforms them to v2 format, and saves them remotely
+ * @returns {Promise<void>} Promise that resolves when all configurations have been converted
+ */
 async function convertConfigs() {
     // Converts camillaNode v1 configurations to v2 configurations
 
@@ -515,8 +607,177 @@ async function convertConfigs() {
     }
 }
 
-const { abs, min, max, round } = Math;
+/**
+ * Set up PEQ element selection highlighting
+ * Listens for PEQ element focus and marker selections to maintain bidirectional highlighting
+ * Handles dual-channel mode by highlighting all matching filter bases
+ * @returns {void}
+ */
+function setupPEQSelection() {
+    const PEQ = document.getElementById('PEQ');
+    
+    // Helper to clear all PEQ selections
+    function clearPEQSelections() {
+        const peqElements = PEQ.querySelectorAll('.peqElement');
+        peqElements.forEach(el => el.classList.remove('is-selected'));
+    }
+    
+    // Helper to select PEQ element(s) by filter base name
+    function selectPEQByFilterBase(filterBase) {
+        clearPEQSelections();
+        const peqElements = PEQ.querySelectorAll('.peqElement');
+        peqElements.forEach(el => {
+            const configName = el.getAttribute('configName');
+            if (!configName) return;
+            
+            // Strip channel suffix for comparison
+            const elBase = configName.replace(/__c\d+$/, '');
+            if (elBase === filterBase) {
+                el.classList.add('is-selected');
+            }
+        });
+    }
+    
+    // Listen for focus on any input/select within PEQ
+    PEQ.addEventListener('focusin', (evt) => {
+        const peqElement = evt.target.closest('.peqElement');
+        if (!peqElement) return;
+        
+        const configName = peqElement.getAttribute('configName');
+        if (configName) {
+            // Compute filter base (strip channel suffix)
+            const filterBase = configName.replace(/__c\d+$/, '');
+            window.__eqSelectedBase = filterBase;
+            selectPEQByFilterBase(filterBase);
+            plotConfig();
+        }
+    });
+    
+    // Listen for pointerdown on PEQ elements (clicking anywhere on the card)
+    PEQ.addEventListener('pointerdown', (evt) => {
+        const peqElement = evt.target.closest('.peqElement');
+        if (!peqElement) return;
+        
+        const configName = peqElement.getAttribute('configName');
+        if (configName) {
+            const filterBase = configName.replace(/__c\d+$/, '');
+            window.__eqSelectedBase = filterBase;
+            selectPEQByFilterBase(filterBase);
+            plotConfig();
+        }
+    });
+    
+    // Listen for marker selections from the plot
+    const canvas = document.getElementById('plotCanvas');
+    canvas.addEventListener('eqplot:marker-select', (evt) => {
+        const { filterName } = evt.detail;
+        const filterBase = filterName.replace(/__c\d+$/, '');
+        window.__eqSelectedBase = filterBase;
+        selectPEQByFilterBase(filterBase);
+        // Plot will already be updated by drag-start handler
+    });
+}
 
+/** Setup interactive plot marker dragging to adjust filter parameters
+ * Updates DSP configuration and UI input fields in real-time during marker drags
+ * Implements throttled plot updates and debounced DSP uploads for performance
+ * @returns {void}
+ */
+function setupPlotInteraction() {
+    const canvas = document.getElementById("plotCanvas");
+    
+    // Import and enable the interaction controller
+    import('/src/eqplot.js').then(module => {
+        const { enableEqPlotInteraction } = module;
+        enableEqPlotInteraction(canvas);
+    });
+    
+    let uploadTimer = null;
+    let plotTimer = null;
+    
+    // Throttled plot update using requestAnimationFrame
+    function scheduleThrottledPlot() {
+        if (plotTimer) return;
+        plotTimer = requestAnimationFrame(() => {
+            plotConfig();
+            plotTimer = null;
+        });
+    }
+    
+    // Debounced DSP upload
+    function scheduleDSPUpload() {
+        clearTimeout(uploadTimer);
+        uploadTimer = setTimeout(() => {
+            DSP.uploadConfig();
+        }, 100);
+    }
+    
+    // Handle marker drag events
+    canvas.addEventListener('eqplot:marker-drag-start', (evt) => {
+        // console.log('Drag start:', evt.detail);
+    });
+    
+    canvas.addEventListener('eqplot:marker-drag', (evt) => {
+        const { filterName, params } = evt.detail;
+        
+        if (!DSP.config.filters[filterName]) {
+            console.warn(`Filter ${filterName} not found in config`);
+            return;
+        }
+        
+        // Update DSP config parameters
+        if (params.freq !== undefined) {
+            DSP.config.filters[filterName].parameters.freq = params.freq;
+        }
+        if (params.gain !== undefined) {
+            DSP.config.filters[filterName].parameters.gain = params.gain;
+        }
+        if (params.q !== undefined) {
+            DSP.config.filters[filterName].parameters.q = params.q;
+        }
+        
+        // Update DOM input fields (without triggering change events)
+        const filterElement = document.getElementById(filterName);
+        if (filterElement && filterElement.filter) {
+            const peqParams = filterElement.filter.elementCollection.peqParams;
+            if (peqParams) {
+                if (params.freq !== undefined && peqParams.children['Frequency']) {
+                    peqParams.children['Frequency'].value = params.freq;
+                }
+                if (params.gain !== undefined && peqParams.children['Gain']) {
+                    peqParams.children['Gain'].value = params.gain;
+                }
+                if (params.q !== undefined && peqParams.children['Q']) {
+                    peqParams.children['Q'].value = params.q;
+                }
+            }
+        }
+        
+        // Throttled plot update for visual feedback
+        scheduleThrottledPlot();
+        
+        // Debounced DSP upload
+        scheduleDSPUpload();
+    });
+    
+    canvas.addEventListener('eqplot:marker-drag-end', async (evt) => {
+        // console.log('Drag end:', evt.detail);
+        
+        // Force immediate upload on drag end
+        clearTimeout(uploadTimer);
+        await DSP.uploadConfig();
+        
+        // Final plot update
+        plotConfig();
+    });
+}
+
+/** Convert HSL color values to RGB
+ * @param {number} h - Hue component (0 to 1)
+ * @param {number} s - Saturation component (0 to 1)
+ * @param {number} l - Lightness component (0 to 1)
+ * @returns {number[]} Array containing RGB components [r, g, b] (0 to 255)
+ */
 function hslToRgb(h, s, l) {
     let r, g, b;
   
@@ -530,9 +791,19 @@ function hslToRgb(h, s, l) {
       b = hueToRgb(p, q, h - 1.0/3.0);
     }
   
-    return [round(r * 255), round(g * 255), round(b * 255)];
+    return [
+      Math.round(r * 255),
+      Math.round(g * 255),
+      Math.round(b * 255)
+    ];
   }
   
+  /** Helper function for HSL to RGB conversion
+   * @param {number} p - Temporary value
+   * @param {number} q - Temporary value
+   * @param {number} t - Temporary value
+   * @returns {number} RGB component value (0 to 1)
+   */
   function hueToRgb(p, q, t) {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
